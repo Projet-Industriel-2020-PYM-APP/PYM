@@ -5,9 +5,10 @@ namespace App\Controller;
 use App\Form\UserEditType;
 
 use App\Entity\Utilisateur;
-use App\Form\RegistrationType;
+use Swift_Mailer;
+use Swift_Message;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -40,7 +41,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/modifier",name="user_edit")
      */
-    public function edit(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
+    public function edit(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -88,7 +89,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/modifier/{id}",name="user_edit_other")
      */
-    public function edit_other($id, Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer)
+    public function edit_other($id, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, Swift_Mailer $mailer)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -112,7 +113,7 @@ class UserController extends AbstractController
             $user_to_edit->setPassword($hash);
 
 
-            $message = (new \Swift_Message('Modification de votre compte'))
+            $message = (new Swift_Message('Modification de votre compte'))
                 ->setFrom('projetindu6@gmail.com')
                 ->setTo($user_to_edit->getEmail())
                 ->setBody(
@@ -136,7 +137,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/supprimer/{id}",name="user_delete")
      */
-    public function delete($id, ObjectManager $manager)
+    public function delete($id, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');

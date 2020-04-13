@@ -12,7 +12,7 @@ use App\Service\FileUploader;
 use App\Form\Batiment2Type;
 use App\Entity\FormeParametrique;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,7 +44,7 @@ class BatimentController extends AbstractController
     /**
      * @Route("/batiment/ajouter/0",name="batiment_add")
      */
-    public function add(Request $request, ObjectManager $manager, FileUploader $fileUploader)
+    public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -96,7 +96,7 @@ class BatimentController extends AbstractController
     /**
      * @Route("batiment/modifier/{id}",name="batiment_edit")
      */
-    public function edit($id, ObjectManager $manager, Request $request, FileUploader $fileUploader)
+    public function edit($id, EntityManagerInterface $manager, Request $request, FileUploader $fileUploader)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -154,7 +154,7 @@ class BatimentController extends AbstractController
     /**
      * @Route("batiments/{id}/ajouter_bureau",name="batiment_add_bureau")
      */
-    public function add_bureau($id, Request $request, ObjectManager $manager)
+    public function add_bureau($id, Request $request, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -193,7 +193,7 @@ class BatimentController extends AbstractController
     /**
      * @Route("/batiments/{id_bat}/modifier_bureau/{id_bur}",name="batiment_edit_bureau")
      */
-    public function edit_bureau($id_bat, $id_bur, ObjectManager $manager, Request $request)
+    public function edit_bureau($id_bat, $id_bur, EntityManagerInterface $manager, Request $request)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -231,7 +231,7 @@ class BatimentController extends AbstractController
     /**
      * @Route("batiments/{id_bur}/supprimer_bureau",name="batiment_delete_bureau")
      */
-    public function delete_bureau($id_bur, ObjectManager $manager)
+    public function delete_bureau($id_bur, EntityManagerInterface $manager)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -252,7 +252,7 @@ class BatimentController extends AbstractController
     /**
      * @Route("batiments/supprimer/{id}",name="batiment_delete")
      */
-    public function delete($id, ObjectManager $manager)
+    public function delete($id, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');

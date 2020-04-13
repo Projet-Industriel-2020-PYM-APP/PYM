@@ -8,7 +8,7 @@ use App\Entity\Activite;
 use App\Entity\Entreprise;
 use App\Form\ActiviteType;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,7 +38,7 @@ class ReferenceTableController extends AbstractController
     /**
      * @Route("tables_reference/ajouter_activite",name="reference_table_add_activite")
      */
-    public function add_activite(Request $request, ObjectManager $manager)
+    public function add_activite(Request $request, EntityManagerInterface $manager)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -57,7 +57,7 @@ class ReferenceTableController extends AbstractController
     /**
      * @Route("tables_reference/modifier_activite/{id}",name="reference_table_edit_activite")
      */
-    public function edit_activite($id, Request $request, ObjectManager $manager)
+    public function edit_activite($id, Request $request, EntityManagerInterface $manager)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -79,7 +79,7 @@ class ReferenceTableController extends AbstractController
     /**
      * @Route("tables_reference/ajouter_poste",name="reference_table_add_poste")
      */
-    public function add_poste(Request $request, ObjectManager $manager)
+    public function add_poste(Request $request, EntityManagerInterface $manager)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -99,7 +99,7 @@ class ReferenceTableController extends AbstractController
     /**
      * @Route("/tables_reference/supprimer_activite/{id}",name="reference_table_delete_activite")
      */
-    public function delete_activite(ObjectManager $manager, $id)
+    public function delete_activite(EntityManagerInterface $manager, $id)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -116,7 +116,7 @@ class ReferenceTableController extends AbstractController
     /**
      * @Route("tables_reference/modifier_poste/{id}",name="reference_table_edit_poste")
      */
-    public function edit_poste($id, Request $request, ObjectManager $manager)
+    public function edit_poste($id, Request $request, EntityManagerInterface $manager)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -137,7 +137,7 @@ class ReferenceTableController extends AbstractController
     /**
      * @Route("/tables_reference/supprimer_poste/{id}",name="reference_table_delete_poste")
      */
-    public function delete_poste(ObjectManager $manager, $id)
+    public function delete_poste(EntityManagerInterface $manager, $id)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 

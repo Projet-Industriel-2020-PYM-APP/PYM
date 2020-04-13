@@ -51,7 +51,6 @@ class BatimentType extends AbstractType
                  'label'=>'Etat'
             ])
             ;
-        ;
 
         $formModifier = function(FormInterface $form, TypeBatiment $type=null){
             if ($type=="Batiment"){

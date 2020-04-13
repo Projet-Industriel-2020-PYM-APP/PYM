@@ -6,7 +6,7 @@ use App\Entity\Domaine;
 use App\Form\DomaineType;
 use App\Service\FileUploader;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,7 +35,7 @@ class DomaineController extends AbstractController
     /**
      * @Route("/domaine/modifier/{id}",name="domaine_edit")
      */
-    public function edit($id, Request $request, FileUploader $fileUploader, ObjectManager $manager)
+    public function edit($id, Request $request, FileUploader $fileUploader, EntityManagerInterface $manager)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 

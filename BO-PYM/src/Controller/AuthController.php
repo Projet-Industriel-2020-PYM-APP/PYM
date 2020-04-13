@@ -6,8 +6,10 @@ use App\Entity\Utilisateur;
 use App\Form\RegistrationType;
 use App\Form\ResetPasswordType;
 
+use Swift_Mailer;
+use Swift_Message;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -24,7 +26,7 @@ class AuthController extends AbstractController
     /**
      * @Route("/utilisateurs/ajout", name="user_add")
      */
-    public function registration(\Swift_Mailer $mailer, Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
+    public function registration(Swift_Mailer $mailer, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -52,7 +54,7 @@ class AuthController extends AbstractController
             $manager->persist($user);
             $manager->flush();
 
-            $message = (new \Swift_Message('Voici votre mot de passe'))
+            $message = (new Swift_Message('Voici votre mot de passe'))
                 ->setFrom('account-security-noreply@map-pym.com')
                 ->setTo($user->getEmail())
                 ->setBody(
@@ -94,7 +96,7 @@ class AuthController extends AbstractController
     /**
      * @Route("/reinitialisation_mot_de_passe",name="auth_resetpassword")
      */
-    public function reset_password(ObjectManager $manager, Request $request, \Swift_Mailer $mailer, UserPasswordEncoderInterface $encoder)
+    public function reset_password(EntityManagerInterface $manager, Request $request, Swift_Mailer $mailer, UserPasswordEncoderInterface $encoder)
     {
 
         $user = new Utilisateur();
@@ -130,7 +132,7 @@ class AuthController extends AbstractController
             $hash = $encoder->encodePassWord($user, $password);
             $user->setPassword($hash);
 
-            $message = (new \Swift_Message('Récupération du mot de passe'))
+            $message = (new Swift_Message('Récupération du mot de passe'))
                 ->setFrom('account-security-noreply@map-pym.com')
                 ->setTo($email)
                 ->setBody(

@@ -16,35 +16,30 @@ class FileUploader
         $this->targetDirectory = $targetDirectory;
     }
 
-    public function upload($file,$name,$domaine=0)
+    public function upload($file, $name, $domaine = 0)
     {
-        if (is_null($file)){
+        if (is_null($file)) {
 
-        }
-        else{
-            
-            
+        } else {
+
             try {
-                if ($file->guessExtension()=="txt"){
-                    $fileName =$name.'.'."babylon";
-                   $file->move($this->getTargetDirectory().'modeles',$fileName); 
+                if ($file->guessExtension() == "txt") {
+                    $fileName = $name . '.' . "babylon";
+                    $file->move($this->getTargetDirectory() . 'modeles', $fileName);
+                } elseif ($domaine != 0) {
+                    $fileName = $name . '.' . $file->guessExtension();
+                    $file->move($this->getTargetDirectory() . 'domaine', $fileName);
+                } else {
+                    $fileName = $name . '.' . $file->guessExtension();
+                    $file->move($this->getTargetDirectory() . 'logos', $fileName);
                 }
-                elseif($domaine != 0){
-                    $fileName = $name.'.'.$file->guessExtension();
-                    $file->move($this->getTargetDirectory().'domaine',$fileName);
-                }
-                else {
-                    $fileName = $name.'.'.$file->guessExtension();
-                    $file->move($this->getTargetDirectory().'logos',$fileName);
-                }
+                return $fileName;
             } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
+                // ... handle exception if something happens during file upload
             }
-
-        return $fileName;
         }
     }
-    
+
     public function getTargetDirectory()
     {
         return $this->targetDirectory;

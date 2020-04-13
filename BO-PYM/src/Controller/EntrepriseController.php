@@ -15,7 +15,7 @@ use App\Service\FileUploader;
 use Intervention\Image\ImageManagerStatic as Image;
 use App\Form\EntrepriseEditType;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,7 +47,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/ajouter",name="entreprise_add")
      */
-    public function add(Request $request, ObjectManager $manager, FileUploader $fileUploader)
+    public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -95,7 +95,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/modifier/{id}",name="entreprise_edit")
      */
-    public function edit($id, Request $request, ObjectManager $manager, FileUploader $fileUploader)
+    public function edit($id, Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -167,7 +167,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id}/ajouter_contact",name="entreprise_add_contact")
      */
-    public function add_contact($id, Request $request, ObjectManager $manager)
+    public function add_contact($id, Request $request, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -215,7 +215,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/ajouter_poste",name="entreprise_add_poste")
      */
-    public function add_poste(Request $request, ObjectManager $manager)
+    public function add_poste(Request $request, EntityManagerInterface $manager)
     {
         $poste = new Poste;
         $form = $this->createForm(PosteType::class, $poste);
@@ -232,7 +232,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/ajouter_activite",name="entreprise_add_activite")
      */
-    public function add_activite(Request $request, ObjectManager $manager)
+    public function add_activite(Request $request, EntityManagerInterface $manager)
     {
         $activite = new Activite;
         $form = $this->createForm(ActiviteType::class, $activite);
@@ -249,7 +249,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/modifier_contact/{id_cont}",name="entreprise_edit_contact")
      */
-    public function edit_contact($id_ent, $id_cont, Request $request, ObjectManager $manager)
+    public function edit_contact($id_ent, $id_cont, Request $request, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -299,7 +299,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/supprimer_contact/{id_cont}",name="entreprise_delete_contact")
      */
-    public function delete_contact($id_ent, $id_cont, ObjectManager $manager)
+    public function delete_contact($id_ent, $id_cont, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -331,7 +331,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/supprimer_poste/{poste}/{id_cont}",name="entreprise_delete_poste")
      */
-    public function delete_poste($id_ent, $id_cont, $poste, ObjectManager $manager)
+    public function delete_poste($id_ent, $id_cont, $poste, EntityManagerInterface $manager)
     {
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id_ent);
@@ -359,7 +359,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/supprimer_activite/{activite}",name="entreprise_delete_activite")
      */
-    public function delete_activite($id_ent, $activite, ObjectManager $manager)
+    public function delete_activite($id_ent, $activite, EntityManagerInterface $manager)
     {
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id_ent);
@@ -378,7 +378,7 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/supprimer/{id}",name="entreprise_delete")
      */
-    public function delete($id, ObjectManager $manager)
+    public function delete($id, EntityManagerInterface $manager)
     {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');

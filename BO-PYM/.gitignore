@@ -23,3 +23,7 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+###> PhpStorm-related files ###
+.idea/**
+###< PhpStorm-related files ###

@@ -33,47 +33,47 @@ class UserController extends AbstractController
         $users = $repository->findAll();
 
 
-        return  $this->render("user/index.html.twig",['users'=>$users]);
+        return $this->render("user/index.html.twig", ['users' => $users]);
     }
 
 
     /**
      * @Route("/users/modifier",name="user_edit")
      */
-    public function edit(Request $request,ObjectManager $manager,UserPasswordEncoderInterface $encoder)
+    public function edit(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
     {
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $this -> getUser();
+        $user = $this->getUser();
 
         $form = $this->createFormBuilder($user)
-        ->add('email',EmailType::class,[
-            'attr' => [
-                'placeholder' => "Adresse e-mail",
-                'class' => 'reg-email rounded form-control'],
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'placeholder' => "Adresse e-mail",
+                    'class' => 'reg-email rounded form-control'],
                 'label' => ' '])
-        ->add('password',PasswordType::class,[
-            'attr' => [
-                'placeholder' => "Mot de passe",
-                'class' => 'reg-email rounded form-control'],
+            ->add('password', PasswordType::class, [
+                'attr' => [
+                    'placeholder' => "Mot de passe",
+                    'class' => 'reg-email rounded form-control'],
                 'label' => ' '])
-        ->add('confirm_password',PasswordType::class,[
-            'attr' => [
-                'placeholder' => "Confirmation du mot de passe",
-                'class' => 'reg-username rounded form-control'],
+            ->add('confirm_password', PasswordType::class, [
+                'attr' => [
+                    'placeholder' => "Confirmation du mot de passe",
+                    'class' => 'reg-username rounded form-control'],
                 'label' => ' '])
-        ->getForm();
+            ->getForm();
 
-        $form -> handleRequest($request);
+        $form->handleRequest($request);
 
 
-        if($form->isSubmitted() && $form->isValid()){
-            
+        if ($form->isSubmitted() && $form->isValid()) {
 
-            $hash = $encoder->encodePassWord($user,$user->getPassword());
+
+            $hash = $encoder->encodePassWord($user, $user->getPassword());
             $user->setPassword($hash);
-            
+
 
             $manager->persist($user);
             $manager->flush();
@@ -81,63 +81,63 @@ class UserController extends AbstractController
             return $this->redirectToRoute('auth_connexion');
         }
 
-    
-        return $this->render("user/edit.html.twig",['user'=>$user,'form' => $form->createView()]);
+
+        return $this->render("user/edit.html.twig", ['user' => $user, 'form' => $form->createView()]);
     }
 
     /**
      * @Route("/users/modifier/{id}",name="user_edit_other")
      */
-
-    public function edit_other($id,Request $request,ObjectManager $manager,UserPasswordEncoderInterface $encoder,\Swift_Mailer $mailer){
+    public function edit_other($id, Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder, \Swift_Mailer $mailer)
+    {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
         $user_to_edit = $repository->find($id);
-        if (!$user_to_edit){
+        if (!$user_to_edit) {
             throw $this->createNotFoundException(
-                'No user found for id'/$id
+                'No user found for id' / $id
             );
         }
 
         $user = $this->getUser();
 
-        $form = $this->createForm(UserEditType::class,$user_to_edit);
-        $form -> handleRequest($request);
+        $form = $this->createForm(UserEditType::class, $user_to_edit);
+        $form->handleRequest($request);
 
-        if($form->isSubmitted() ){
-            $password=$user_to_edit->getPassword();
-            $hash = $encoder->encodePassWord($user_to_edit,$user_to_edit->getPassword());
+        if ($form->isSubmitted()) {
+            $password = $user_to_edit->getPassword();
+            $hash = $encoder->encodePassWord($user_to_edit, $user_to_edit->getPassword());
             $user_to_edit->setPassword($hash);
-            
 
-            $message =(new \Swift_Message('Modification de votre compte'))
-                -> setFrom('projetindu6@gmail.com')
-                -> setTo($user_to_edit->getEmail())
-                -> setBody(
+
+            $message = (new \Swift_Message('Modification de votre compte'))
+                ->setFrom('projetindu6@gmail.com')
+                ->setTo($user_to_edit->getEmail())
+                ->setBody(
                     $this->renderView(
                         "auth/email/resetpassword.html.twig",
-                        ['password'=>$password]
+                        ['password' => $password]
                     )
                 );
 
             $manager->flush();
 
-            $mailer->send($message);        
+            $mailer->send($message);
 
-            
+
             return $this->redirectToRoute('users');
         }
 
-        return $this->render('user/edit.html.twig',['user'=>$user_to_edit,'user_connected'=>$user,'form' => $form->createView()]);
+        return $this->render('user/edit.html.twig', ['user' => $user_to_edit, 'user_connected' => $user, 'form' => $form->createView()]);
     }
 
     /**
-     * @Route("/users/supprimer/{id}",name="user_delete")   
+     * @Route("/users/supprimer/{id}",name="user_delete")
      */
-
-    public function delete($id,ObjectManager $manager){
+    public function delete($id, ObjectManager $manager)
+    {
 
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -146,7 +146,7 @@ class UserController extends AbstractController
 
         $manager->remove($user_to_delete);
         $manager->flush();
-        
+
         return $this->redirectToRoute('users');
     }
 }

@@ -22,12 +22,12 @@ class DomaineController extends AbstractController
     {
         $repository = $this->getDoctrine()->getRepository(Domaine::class);
         $domaine = $repository->findAll();
-        $file='';
-        if ($domaine != null){
-            $file=$domaine[0]->getFichier();
+        $file = '';
+        if ($domaine != null) {
+            $file = $domaine[0]->getFichier();
         }
-        return $this->render('domaine/index.html.twig',[
-            'file'=>$file
+        return $this->render('domaine/index.html.twig', [
+            'file' => $file
         ]);
     }
 
@@ -35,26 +35,26 @@ class DomaineController extends AbstractController
     /**
      * @Route("/domaine/modifier/{id}",name="domaine_edit")
      */
-
-     public function edit($id,Request $request,FileUploader $fileUploader,ObjectManager $manager){
+    public function edit($id, Request $request, FileUploader $fileUploader, ObjectManager $manager)
+    {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $repository = $this->getDoctrine()->getRepository(Domaine::class);
         $domaine = $repository->find($id);
-        $form=$this->createForm(DomaineType::class, $domaine);
+        $form = $this->createForm(DomaineType::class, $domaine);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()){
-            $file=new File($domaine->getFichier());
-            $filename=$fileUploader->upload($file,"domaine",1);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = new File($domaine->getFichier());
+            $filename = $fileUploader->upload($file, "domaine", 1);
             $domaine->setFichier($filename);
             $manager->persist($domaine);
             $manager->flush();
             return $this->redirectToRoute('domaine');
         }
 
-        return $this->render("domaine/edit.html.twig",[
-            'form'=>$form->createView()
+        return $this->render("domaine/edit.html.twig", [
+            'form' => $form->createView()
         ]);
-     }
+    }
 }

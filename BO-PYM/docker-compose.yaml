@@ -1,0 +1,32 @@
+version: '3.7'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  db:
+    image: bitnami/mariadb:latest
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: default_db
+    expose:
+      - '3306'
+    ports:
+      - 3306:3306
+    volumes:
+      - 'dbdata:/bitnami/mariadb'
+    networks:
+      - app-tier
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - app-tier
+
+volumes:
+  dbdata:

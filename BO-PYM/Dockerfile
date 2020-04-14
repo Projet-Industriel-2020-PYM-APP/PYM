@@ -15,7 +15,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 COPY --from=builder /var/www/ .
 RUN chmod -R 777 /var/www/public/uploads
-RUN composer install --no-dev --no-interaction --optimize-autoloader
+RUN composer install --no-interaction --optimize-autoloader
 CMD wait-for-it database:3306 -- bin/console doctrine:migrations:migrate ; php-fpm
 
 EXPOSE 9000

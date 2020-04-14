@@ -1,8 +1,9 @@
 FROM node:latest AS builder
 ENV NPM_CONFIG_LOGLEVEL info
 WORKDIR /var/www
-ADD . /var/www
+COPY package.json yarn.lock /var/www/
 RUN yarn install
+COPY . /var/www/
 RUN yarn build
 
 FROM php:fpm-alpine
@@ -12,6 +13,8 @@ RUN apk --update --no-cache add git
 RUN docker-php-ext-install pdo_mysql
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
-CMD composer install -o ; wait-for-it database:3306 -- bin/console doctrine:migrations:migrate ; php-fpm
+COPY --from=builder /var/www/ .
+RUN composer install -o
+CMD wait-for-it database:3306 -- bin/console doctrine:migrations:migrate ; php-fpm
 
 EXPOSE 9000

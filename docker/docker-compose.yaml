@@ -20,16 +20,20 @@ services:
       context: ../BO-PYM
     depends_on:
       - database
+    expose:
+      - 9000
     environment:
       - APP_ENV=${APP_ENV}
       - APP_SECRET=${APP_SECRET}
       - DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@database:3306/${DATABASE_NAME}
+    volumes:
+      - app_prod:/var/www
 
   nginx:
     build:
       context: ./nginx
     volumes:
-      - ../BO-PYM:/var/www
+      - app_prod:/var/www
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/sites/:/etc/nginx/sites-available
       - ./nginx/conf.d/:/etc/nginx/conf.d
@@ -39,3 +43,12 @@ services:
     ports:
       - '80:80'
       - '443:443'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  app_prod:

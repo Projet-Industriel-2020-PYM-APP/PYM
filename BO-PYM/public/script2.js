@@ -16,7 +16,7 @@ PARAM_ANGLE = 'Angle';
 PARAM_ECHELLE = 'Echelle';
 LISTE_BATIMENTS = [];
 ID_BAT = 0;
-PARAM_URL = "http://127.0.0.1:8000/uploads/modeles/";
+PARAM_URL = "https://map-pym.com/sharedfolder/modeles/";
 
 window.addEventListener('DOMContentLoaded', function() {
 	var engine = undefined;
@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', function() {
 				var ground = BABYLON.Mesh.CreateGround("ground1", 650, 600, 20, scene);
 				ground.material = new BABYLON.StandardMaterial("test_mat", scene);
 				ground.material.specularColor = new BABYLON.Color3(0, 0, 0);
-				ground.material.diffuseTexture = new BABYLON.Texture("http://map-pym.com/sharedfolder/domaine/domaine.png", scene);
+				ground.material.diffuseTexture = new BABYLON.Texture("https://map-pym.com/sharedfolder/domaine/domaine.png", scene);
 				ground.receiveShadows = true;
 	
 				return scene;
@@ -507,7 +507,7 @@ window.addEventListener('DOMContentLoaded', function() {
 			var ground = BABYLON.Mesh.CreateGround("ground1", 650, 600, 20, scene);
 			ground.material = new BABYLON.StandardMaterial("test_mat", scene);
 			ground.material.specularColor = new BABYLON.Color3(0, 0, 0);
-			ground.material.diffuseTexture = new BABYLON.Texture("http://map-pym.com/sharedfolder/domaine/domaine.png", scene);
+			ground.material.diffuseTexture = new BABYLON.Texture("https://map-pym.com/sharedfolder/domaine/domaine.png", scene);
 			ground.receiveShadows = true;
 
 			return scene;

@@ -1,9 +1,9 @@
 {% extends 'layout.html.twig' %}
 {% block stylesheets %}
-    {{ encore_entry_link_tags('contactAdd') }}
+    {{ encore_entry_link_tags('addedit') }}
 {% endblock %}
 {% block javascripts %}
-    {{ encore_entry_script_tags('contactAdd') }}
+    {{ encore_entry_script_tags('addedit') }}
     <script>
         function toggle() {
             contentNumero = document.getElementById("numero");
@@ -24,8 +24,6 @@
 {% endblock %}
 {% block body %}
     {% if app.user %}
-        <div class="col-lg-3 col-md-2"></div>
-        <div class="col-lg-6 col-md-8">
             <div class="card">
                 <div class="card-header bg-dark ">
                     <h4>Modifier un bureau</h4>
@@ -54,12 +52,11 @@
                         <div class="col-1"></div>
                         <a href="{{path('batiments')}}" class="btn btn-secondary btn-back col-3">Annuler</a>
                         <div class="col-4"></div>
-                        <button class="btn btn-success btn-add col-3" type="submit">Ajouter</button>
+                        <button class="btn btn-success btn-add col-3" type="submit">Modifier</button>
                         <div class="col-1"></div>
                     </div>
                     {{form_end(form) }}
                 </div>
-            </div>
         </div>
 
     {% else %}

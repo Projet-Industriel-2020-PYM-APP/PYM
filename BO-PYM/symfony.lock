@@ -108,6 +108,36 @@
     "facebook/webdriver": {
         "version": "1.6.0"
     },
+    "fig/http-message-util": {
+        "version": "1.1.4"
+    },
+    "firebase/php-jwt": {
+        "version": "v5.2.0"
+    },
+    "giggsey/libphonenumber-for-php": {
+        "version": "8.12.2"
+    },
+    "giggsey/locale": {
+        "version": "1.8"
+    },
+    "google/auth": {
+        "version": "v1.8.0"
+    },
+    "google/cloud-core": {
+        "version": "v1.36.2"
+    },
+    "google/cloud-storage": {
+        "version": "v1.20.1"
+    },
+    "google/crc32": {
+        "version": "v0.1.0"
+    },
+    "guzzlehttp/guzzle": {
+        "version": "6.5.3"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
     "guzzlehttp/psr7": {
         "version": "1.5.2"
     },
@@ -116,6 +146,18 @@
     },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
+    },
+    "kreait/clock": {
+        "version": "1.0.1"
+    },
+    "kreait/firebase-bundle": {
+        "version": "2.0.0"
+    },
+    "kreait/firebase-php": {
+        "version": "5.2.0"
+    },
+    "kreait/firebase-tokens": {
+        "version": "1.10.0"
     },
     "laminas/laminas-code": {
         "version": "3.4.1"
@@ -126,8 +168,14 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.3"
     },
+    "lcobucci/jwt": {
+        "version": "3.3.1"
+    },
     "monolog/monolog": {
         "version": "1.24.0"
+    },
+    "mtdowling/jmespath.php": {
+        "version": "2.5.0"
     },
     "nikic/php-parser": {
         "version": "v4.2.1"
@@ -168,8 +216,17 @@
     "psr/log": {
         "version": "1.1.0"
     },
+    "psr/simple-cache": {
+        "version": "1.0.1"
+    },
     "ralouphie/getallheaders": {
         "version": "2.0.5"
+    },
+    "riverline/multipart-parser": {
+        "version": "2.0.8"
+    },
+    "rize/uri-template": {
+        "version": "0.3.2"
     },
     "sensio/framework-extra-bundle": {
         "version": "5.2",

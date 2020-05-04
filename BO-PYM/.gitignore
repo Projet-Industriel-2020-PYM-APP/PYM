@@ -23,3 +23,5 @@ yarn-error.log
 ###> PhpStorm-related files ###
 .idea/**
 ###< PhpStorm-related files ###
+
+service_account.json

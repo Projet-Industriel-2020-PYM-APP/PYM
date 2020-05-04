@@ -1,0 +1,4 @@
+kreait_firebase:
+  projects:
+    app_pym:
+      credentials: '%kernel.project_dir%/config/service_account.json'

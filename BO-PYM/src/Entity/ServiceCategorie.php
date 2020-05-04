@@ -77,12 +77,12 @@ class ServiceCategorie
         return $this;
     }
 
-    public function getAction()
+    public function getAction(): ?Action
     {
         return $this->action;
     }
 
-    public function setAction($action): self
+    public function setAction(?Action $action): self
     {
         $this->action = $action;
 

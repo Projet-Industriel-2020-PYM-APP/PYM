@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ServiceCategorie index{% endblock %}
+
+{% block body %}
+    <h1>ServiceCategorie index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Primary_color</th>
+                <th>Img_url</th>
+                <th>Action</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for service_categorie in service_categories %}
+            <tr>
+                <td>{{ service_categorie.id }}</td>
+                <td>{{ service_categorie.name }}</td>
+                <td>{{ service_categorie.primaryColor }}</td>
+                <td>{{ service_categorie.imgUrl }}</td>
+                <td>{{ service_categorie.action }}</td>
+                <td>
+                    <a href="{{ path('service_categorie_show', {'id': service_categorie.id}) }}">show</a>
+                    <a href="{{ path('service_categorie_edit', {'id': service_categorie.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('service_categorie_new') }}">Create new</a>
+{% endblock %}

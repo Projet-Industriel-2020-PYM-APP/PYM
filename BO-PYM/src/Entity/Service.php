@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ServiceRepository")
  */
-class Service
+class Service implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -16,51 +18,43 @@ class Service
      * @ORM\Column(type="integer")
      */
     private $id;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $title;
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $categorie_id;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $subtitle;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $address;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $img_url;
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $actions;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $telephone;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $website;
 
     public function __construct()
     {
         $this->actions = new ArrayCollection();
     }
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $title;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $categorie_id;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $subtitle;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $address;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $img_url;
-
-    /**
-     * @ORM\Column(type="array", nullable=true)
-     */
-    private $actions;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $telephone;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $website;
 
     public function getId(): ?int
     {
@@ -127,7 +121,7 @@ class Service
         return $this;
     }
 
-    public function getActions(): ?array
+    public function getActions(): ?Collection
     {
         return $this->actions;
     }
@@ -179,5 +173,23 @@ class Service
         $this->website = $website;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'categorie_id' => $this->categorie_id,
+            'subtitle' => $this->subtitle,
+            'address' => $this->address,
+            'img_url' => $this->img_url,
+            'actions' => $this->actions,
+            'telephone' => $this->telephone,
+            'website' => $this->website,
+        ];
     }
 }

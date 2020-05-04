@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ServiceCategorie{% endblock %}
+
+{% block body %}
+    <h1>Create new ServiceCategorie</h1>
+
+    {{ include('service_categorie/_form.html.twig') }}
+
+    <a href="{{ path('service_categorie_index') }}">back to list</a>
+{% endblock %}

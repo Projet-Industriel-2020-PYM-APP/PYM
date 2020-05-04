@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ServiceCategorieRepository")
  */
-class ServiceCategorie
+class ServiceCategorie implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -87,5 +88,19 @@ class ServiceCategorie
         $this->action = $action;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'primary_color' => $this->primary_color,
+            'img_url' => $this->img_url,
+            'action' => $this->action,
+        ];
     }
 }

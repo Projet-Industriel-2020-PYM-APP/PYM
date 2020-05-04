@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-class Action
+use JsonSerializable;
+
+class Action implements JsonSerializable
 {
     private $htmlUrl;
     private $name;
@@ -46,27 +48,13 @@ class Action
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
-    public function toArray(): array
+    public function jsonSerialize()
     {
         return [
-            "name" => $this->name,
-            "html_url" => $this->htmlUrl
+            'name' => $this->name,
+            'html_url' => $this->html_url,
         ];
-    }
-
-    /**
-     * Categorie factory from Array
-     *
-     * @param array $data
-     * @return Action
-     */
-    public static function fromArray(array $data): self
-    {
-        $action = new Action();
-        $action->setName($data['name'] ?? null);
-        $action->setHtmlUrl($data['html_url'] ?? null);
-        return $action;
     }
 }

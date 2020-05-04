@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Pôle Yvon Morandat - Cartographie interactive</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    // Prevent scrolling when touching the canvas
+    canvas = document.getElementById("renderCanvas");
+    document.body.addEventListener("touchstart", (e) => {
+      if(e.target == canvas){
+          e.preventDefault();
+      }
+    }, { passive: false });
+    document.body.addEventListener("touchend", (e) => {
+      if(e.target == canvas)
+          e.preventDefault();
+    }, { passive: false });
+    document.body.addEventListener("touchmove", (e) => {
+      if(e.target == canvas){
+          e.preventDefault();
+      }
+    }, { passive: false });
+  });
+  </script>
+  <style>
+    html, body {
+        overflow: hidden;
+        width   : 100%;
+        height  : 100%;
+        margin  : 0;
+        padding : 0;
+    }
+
+    #renderCanvas {
+        width   : 100%;
+        height  : 100%;
+        touch-action: none;
+    }
+  </style>
+<link rel="stylesheet" href="styles.208ceee2e19b9fb87434.css"></head>
+<body>
+  <app-root></app-root>
+<script type="text/javascript" src="runtime.26209474bfa8dc87a77c.js"></script><script type="text/javascript" src="es2015-polyfills.c5dd28b362270c767b34.js" nomodule></script><script type="text/javascript" src="polyfills.8bbb231b43165d65d357.js"></script><script type="text/javascript" src="scripts.d2edf710ba7b409005db.js"></script><script type="text/javascript" src="main.2be94bc1fdcf207eee04.js"></script></body>
+</html>

@@ -1,9 +1,13 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Edit Post{% endblock %}
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('postEdit') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('postEdit') }}
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Post</h1>
+    <h1>edit Post</h1>
 
     {{ include('post/_form.html.twig', {'button_label': 'Update'}) }}
 

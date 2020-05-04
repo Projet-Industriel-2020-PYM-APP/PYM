@@ -43,10 +43,10 @@ Encore
   .addEntry('reference', './assets/js/reference.js')
   .addEntry('addedit', './assets/js/addedit.js')
   .addEntry('domaine', './assets/js/domaine.js')
-  .addEntry('PostIndex', './assets/js/PostIndex.js')
-  .addEntry('PostEdit', './assets/js/PostEdit.js')
-  .addEntry('PostNew', './assets/js/PostNew.js')
-  .addEntry('PostShow', './assets/js/PostShow')
+  .addEntry('postIndex', './assets/js/postIndex.js')
+  .addEntry('postEdit', './assets/js/postEdit.js')
+  .addEntry('postNew', './assets/js/postNew.js')
+  .addEntry('postShow', './assets/js/postShow.js')
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
 

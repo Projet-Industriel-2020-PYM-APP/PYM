@@ -1,3 +1,3 @@
-import'../css/addPoste.css';
-import'bootstrap';
-import'jquery';
+import '../css/postEdit.css';
+import 'bootstrap';
+import 'jquery';

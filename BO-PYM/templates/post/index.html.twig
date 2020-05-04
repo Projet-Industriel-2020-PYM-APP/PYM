@@ -1,43 +1,80 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Post index{% endblock %}
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('postIndex') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('postIndex') }}
+{% endblock %}
 
 {% block body %}
-    <h1>Post index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Published</th>
-                <th>Updated</th>
-                <th>Url</th>
-                <th>Title</th>
-                <th>Content</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for post in posts %}
-            <tr>
-                <td>{{ post.id }}</td>
-                <td>{{ post.published ? post.published|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ post.updated ? post.updated|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ post.url }}</td>
-                <td>{{ post.title }}</td>
-                <td>{{ post.content }}</td>
-                <td>
-                    <a href="{{ path('post_show', {'id': post.id}) }}">show</a>
-                    <a href="{{ path('post_edit', {'id': post.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('post_new') }}">Create new</a>
+    {% if app.user %}
+    <div class="posts col-10 my-4 mx-auto">
+        <div class="row justify-content-center">
+            <nav class="navbar navbar-dark bg-dark justify-content-between rounded">
+            {% if app.user.role =="Admin" %}
+                <a class="btn btn-outline-light add" href="{{path('post_new')}}" >Ajouter</a>
+            {% endif %}
+            </nav>
+        </div>
+        <div class="row justify-content-center">
+            <table class="table rounded" id="postsTable">
+                <thead class="thead-dark">
+                    <tr class="searchHide">
+                        <th>Id</th>
+                        <th>Published</th>
+                        <th>Updated</th>
+                        <th>Url</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>actions</th>
+                    </tr>
+                </thead>
+                <tbody id="postsBody">
+                {% for post in posts %}
+                    <tr class="searchHide">
+                        <td>{{ post.id }}</td>
+                        <td>{{ post.published ? post.published|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ post.updated ? post.updated|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ post.url }}</td>
+                        <td>{{ post.title }}</td>
+                        <td>{{ post.content }}</td>
+                        <td>
+                            <div class="btn-group action">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Action
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">              
+                                    {% if app.user.role =="Admin" %}
+                                    <a class="dropdown-item btn rounded" href="{{path('post_edit', {'id':post.id})}}">Modifier</a>
+                                    <a class="dropdown-item btn rounded" onclick="return confirm('Êtes vous sûr de vouloir supprimer cet élèment?')" href="{{path('post_delete',{'id': post.id})}}">Supprimer</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                <tr class="searchHide">
+                    <td colspan="7">
+                        <div class="alert alert-warning" role="alert">
+                            <p>Pas de posts</p>
+                            <div class="btn-group action" role="group" aria-label="Ajouter un post">
+                                <a class="btn rounded"
+                                    href="{{ path('post_new') }}">
+                                    <button class="btn btn-primary rounded" aria-expanded="false"
+                                            aria-haspopup="true" type="button">
+                                        Ajouter un post
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        Besoin d'être authentifié.
+    {% endif %}
 {% endblock %}

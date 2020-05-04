@@ -20,6 +20,8 @@ class PostController extends AbstractController
      */
     public function index(PostRepository $postRepository): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
         ]);
@@ -30,6 +32,8 @@ class PostController extends AbstractController
      */
     public function new(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -53,6 +57,8 @@ class PostController extends AbstractController
      */
     public function show(Post $post): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         return $this->render('post/show.html.twig', [
             'post' => $post,
         ]);
@@ -63,6 +69,8 @@ class PostController extends AbstractController
      */
     public function edit(Request $request, Post $post): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
@@ -83,11 +91,11 @@ class PostController extends AbstractController
      */
     public function delete(Request $request, Post $post): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($post);
-            $entityManager->flush();
-        }
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($post);
+        $entityManager->flush();
 
         return $this->redirectToRoute('post_index');
     }

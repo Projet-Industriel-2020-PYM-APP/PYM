@@ -1,6 +1,10 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Post{% endblock %}
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('postShow') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('postShow') }}
+{% endblock %}
 
 {% block body %}
     <h1>Post</h1>

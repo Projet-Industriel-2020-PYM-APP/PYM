@@ -200,6 +200,12 @@ class Batiment
         return $this->Longitude;
     }
 
+    public function getGPS(): array {
+        $newLatitude = $this->Latitude * 8.8414096916255E-06 + 43.4514367224670;
+        $newLongitude = $this->Longitude * 5.4333333333230E-05 + 5.44877766666667;
+        return [$newLatitude, $newLongitude];
+    }
+
     public function setLongitude(float $Longitude): self
     {
         $this->Longitude = $Longitude;

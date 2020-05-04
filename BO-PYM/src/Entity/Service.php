@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -15,6 +16,11 @@ class Service
      * @ORM\Column(type="integer")
      */
     private $id;
+
+    public function __construct()
+    {
+        $this->actions = new ArrayCollection();
+    }
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -44,7 +50,7 @@ class Service
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private $actions = [];
+    private $actions;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -129,6 +135,24 @@ class Service
     public function setActions(?array $actions): self
     {
         $this->actions = $actions;
+
+        return $this;
+    }
+
+    public function addActions(Action $action): self
+    {
+        if (!$this->actions->contains($action)) {
+            $this->actions[] = $action;
+        }
+
+        return $this;
+    }
+
+    public function removeActions(Action $action): self
+    {
+        if ($this->actions->contains($action)) {
+            $this->actions->removeElement($action);
+        }
 
         return $this;
     }

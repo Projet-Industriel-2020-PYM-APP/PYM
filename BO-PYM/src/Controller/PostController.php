@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,6 +41,9 @@ class PostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
+            $post->setPublished(new DateTime());
+            $post->setUpdated(new DateTime());
+            $post->setUrl(null);  // TODO: Add here Front-End url
             $entityManager->persist($post);
             $entityManager->flush();
 
@@ -75,6 +79,7 @@ class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $post->setUpdated(new DateTime());
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('post_index');
@@ -87,7 +92,7 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="post_delete", methods={"DELETE"})
+     * @Route("/{id}/delete", name="post_delete", methods={"GET"})
      */
     public function delete(Request $request, Post $post): Response
     {

@@ -15,15 +15,6 @@ class PostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('published', DateTimeType::class, [
-                'attr' => ['class' => 'reg rounded form-control'],
-            ])
-            ->add('updated', DateTimeType::class, [
-                'attr' => ['class' => 'reg rounded form-control'],
-            ])
-            ->add('url', UrlType::class, [
-                'attr' => ['class' => 'reg rounded form-control'],
-            ])
             ->add('title', TextType::class, [
                 'attr' => ['class' => 'reg rounded form-control'],
             ])

@@ -25,12 +25,12 @@ class ServiceCategorie implements JsonSerializable
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $primary_color;
+    private $primaryColor;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $img_url;
+    private $imgUrl;
 
     /**
      * @ORM\Column(type="object", nullable=true)
@@ -56,24 +56,24 @@ class ServiceCategorie implements JsonSerializable
 
     public function getPrimaryColor(): ?string
     {
-        return $this->primary_color;
+        return $this->primaryColor;
     }
 
-    public function setPrimaryColor(?string $primary_color): self
+    public function setPrimaryColor(?string $primaryColor): self
     {
-        $this->primary_color = $primary_color;
+        $this->primaryColor = $primaryColor;
 
         return $this;
     }
 
-    public function getImgUrl(): ?string
+    public function getImgUrl()
     {
-        return $this->img_url;
+        return $this->imgUrl;
     }
 
-    public function setImgUrl(?string $img_url): self
+    public function setImgUrl($imgUrl): self
     {
-        $this->img_url = $img_url;
+        $this->imgUrl = $imgUrl;
 
         return $this;
     }
@@ -98,8 +98,8 @@ class ServiceCategorie implements JsonSerializable
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'primary_color' => $this->primary_color,
-            'img_url' => $this->img_url,
+            'primary_color' => $this->primaryColor,
+            'img_url' => $this->imgUrl,
             'action' => $this->action,
         ];
     }

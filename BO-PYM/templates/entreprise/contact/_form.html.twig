@@ -1,0 +1,13 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        {{ form_widget(form) }}
+    </div>
+    <div class="col-1"></div>
+</div>
+<div class="btns row justify-content-around">
+    <a href="{{ path('entreprises') }}" class="btn btn-secondary btn-back">Annuler</a>
+    <button type="submit" class="btn btn-success btn-add">{{ button_label|default('Ajouter') }}</button>
+</div>
+{{ form_end(form) }}

@@ -1,34 +1,39 @@
-.card{
-    position: relative;
+@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
+@import './layout.css';
+
+.card {
     background: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.card-header{
+.card-header {
     color: white;
     text-align: center;
-    
+
 }
 
-.reg{
-    margin-top: 20px;
+.input-group-text > label {
+    margin-bottom: 0;
+}
+
+.reg {
     background: transparent;
     border: 3px solid #343a40;
     text-align: center;
 }
-.reg-end{
+
+.reg-end {
     margin-bottom: 20px;
 }
 
-.import{
+.import {
     display: block;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 30px;
-    background: #343a40;
 }
 
-.role{
+.role {
     padding: 10px 15px 10px 15px;
     color: #333;
     background: transparent;
@@ -38,5 +43,4 @@
     text-align: center;
     margin-bottom: 20px;
 }
-@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
-@import './layout.css';
+

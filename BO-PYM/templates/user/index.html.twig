@@ -27,8 +27,8 @@
 {% endblock %}
 {% block body %}
     {% if app.user %}
-    <div class="users">
-        <div class="row">
+    <div class="users container">
+        <div class="row justify-content-center">
             <nav class="navbar navbar-dark bg-dark justify-content-between rounded">
             {% if app.user.role =="Admin" %}
                 <a class="btn btn-outline-light add" href="{{path('user_add')}}" >Ajouter</a>
@@ -37,11 +37,11 @@
                 <input type="text" id="usersInput" onkeyup="usersSearch()" placeholder="Rechercher un utilisateur" class="my-2 my-sm-0 rounded"> 
             </nav>
         </div>
-        <div class="row">
+        <div class="row justify-content-center">
             <table class="table table-striped rounded" id="usersTable">
                 <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Adresse e-mail</th>
+                <tr>
+                    <th scope="col">Adresse e-mail</th>
                         <th scope="col">Rôle</th>
                         {% if app.user.role =="Admin" %}
                         <th scope="col">Action</th>

@@ -2,8 +2,6 @@
 @import './layout.css';
 
 .container-fluid{
-    margin-top: 20px;
-    margin-left: 20%;
     position: relative;
 }
 

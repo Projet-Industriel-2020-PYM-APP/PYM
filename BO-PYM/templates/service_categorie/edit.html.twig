@@ -1,13 +1,25 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Edit ServiceCategorie{% endblock %}
-
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('serviceCategorieForm') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('serviceCategorieForm') }}
+{% endblock %}
 {% block body %}
-    <h1>Edit ServiceCategorie</h1>
+    {% if app.user %}
+        <div class="col-10 mx-auto my-4">
+            <div class="card">
+                <div class="card-header bg-dark ">
+                    <h4>Modifier une catégorie</h4>
+                </div>
+                <div class="card-body">
+                    {{ include('service_categorie/_form.html.twig', {'button_label': 'Modifier'}) }}
+                </div>
+            </div>
+        </div>
 
-    {{ include('service_categorie/_form.html.twig', {'button_label': 'Update'}) }}
+    {% else %}
+        <h1>Vous n'avez pas accés à cette page.</h1>
+    {% endif %}
 
-    <a href="{{ path('service_categorie_index') }}">back to list</a>
-
-    {{ include('service_categorie/_delete_form.html.twig') }}
 {% endblock %}

@@ -10,5 +10,6 @@ import '../css/app.css';
 import 'bootstrap';
 // Need jQuery? Install it with "yarn add jquery", then uncomment to import it.
 import 'jquery';
+import '@fortawesome/fontawesome-free/js/all';
 
 console.log('Hello Webpack Encore! Edit me in assets/js/app.js');

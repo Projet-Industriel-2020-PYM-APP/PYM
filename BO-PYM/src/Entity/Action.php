@@ -54,7 +54,7 @@ class Action implements JsonSerializable
     {
         return [
             'name' => $this->name,
-            'html_url' => $this->html_url,
+            'html_url' => $this->htmlUrl,
         ];
     }
 }

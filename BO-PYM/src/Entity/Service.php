@@ -5,6 +5,9 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Symfony\Component\Validator\Constraints as Assert;
 use JsonSerializable;
 
 /**
@@ -23,9 +26,10 @@ class Service implements JsonSerializable
      */
     private $title;
     /**
-     * @ORM\Column(type="integer")
+     * @ManyToOne(targetEntity="ServiceCategorie")
+     * @JoinColumn(name="$categorie_id", referencedColumnName="id")
      */
-    private $categorie_id;
+    private $categorie;
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -37,7 +41,7 @@ class Service implements JsonSerializable
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $img_url;
+    private $imgUrl;
     /**
      * @ORM\Column(type="array", nullable=true)
      */
@@ -73,14 +77,14 @@ class Service implements JsonSerializable
         return $this;
     }
 
-    public function getCategorieId(): ?int
+    public function getCategorie(): ?ServiceCategorie
     {
-        return $this->categorie_id;
+        return $this->categorie;
     }
 
-    public function setCategorieId(int $categorie_id): self
+    public function setCategorie(ServiceCategorie $categorie): self
     {
-        $this->categorie_id = $categorie_id;
+        $this->categorie = $categorie;
 
         return $this;
     }
@@ -109,14 +113,14 @@ class Service implements JsonSerializable
         return $this;
     }
 
-    public function getImgUrl(): ?string
+    public function getImgUrl()
     {
-        return $this->img_url;
+        return $this->imgUrl;
     }
 
-    public function setImgUrl(?string $img_url): self
+    public function setImgUrl($imgUrl): self
     {
-        $this->img_url = $img_url;
+        $this->imgUrl = $imgUrl;
 
         return $this;
     }
@@ -126,14 +130,7 @@ class Service implements JsonSerializable
         return $this->actions;
     }
 
-    public function setActions(?array $actions): self
-    {
-        $this->actions = $actions;
-
-        return $this;
-    }
-
-    public function addActions(Action $action): self
+    public function addAction(Action $action): self
     {
         if (!$this->actions->contains($action)) {
             $this->actions[] = $action;
@@ -142,7 +139,7 @@ class Service implements JsonSerializable
         return $this;
     }
 
-    public function removeActions(Action $action): self
+    public function removeAction(Action $action): self
     {
         if ($this->actions->contains($action)) {
             $this->actions->removeElement($action);
@@ -181,15 +178,15 @@ class Service implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'categorie_id' => $this->categorie_id,
-            'subtitle' => $this->subtitle,
-            'address' => $this->address,
-            'img_url' => $this->img_url,
-            'actions' => $this->actions,
-            'telephone' => $this->telephone,
-            'website' => $this->website,
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'categorie_id' => $this->getCategorie()->getId(),
+            'subtitle' => $this->getSubtitle(),
+            'address' => $this->getAddress(),
+            'img_url' => $this->getImgUrl(),
+            'actions' => $this->getActions(),
+            'telephone' => $this->getTelephone(),
+            'website' => $this->getWebsite(),
         ];
     }
 }

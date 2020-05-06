@@ -14,6 +14,7 @@ use App\Form\EntrepriseType;
 use App\Service\FileUploader;
 use Intervention\Image\ImageManagerStatic as Image;
 use App\Form\EntrepriseEditType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,12 +33,10 @@ header("Access-Control-Allow-Origin: *");
 class EntrepriseController extends AbstractController
 {
     /**
-     * @Route("/entreprises/lister", name="entreprises")
+     * @Route("/entreprises", name="entreprises", methods={"GET"})
      */
     public function index()
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprises = $repository->findAll();
 
@@ -45,12 +44,14 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/ajouter",name="entreprise_add")
+     * @Route("/entreprises/add",name="entreprise_add", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param FileUploader $fileUploader
+     * @return RedirectResponse|Response
      */
     public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $entreprise = new Entreprise();
 
         $form = $this->createForm(EntrepriseType::class, $entreprise);
@@ -93,13 +94,15 @@ class EntrepriseController extends AbstractController
 
 
     /**
-     * @Route("/entreprises/modifier/{id}",name="entreprise_edit")
+     * @Route("/entreprises/{id}/edit",name="entreprise_edit", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param FileUploader $fileUploader
+     * @return RedirectResponse|Response
      */
     public function edit($id, Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise_to_edit = $repository->find($id);
 
@@ -140,13 +143,12 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/voir/{id}",name="entreprise_show")
+     * @Route("/entreprises/{id}",name="entreprise_show", methods={"GET"})
+     * @param $id
+     * @return Response
      */
     public function show($id)
     {
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id);
 
@@ -165,13 +167,14 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/{id}/ajouter_contact",name="entreprise_add_contact")
+     * @Route("/entreprises/{id}/contact/add",name="entreprise_add_contact", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse|Response
      */
     public function add_contact($id, Request $request, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id);
 
@@ -213,7 +216,10 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/ajouter_poste",name="entreprise_add_poste")
+     * @Route("/entreprises/poste/add",name="entreprise_add_poste", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse|Response
      */
     public function add_poste(Request $request, EntityManagerInterface $manager)
     {
@@ -224,13 +230,16 @@ class EntrepriseController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $manager->persist($poste);
             $manager->flush();
-            return $this->redirectToRoute('auth_connexion');
+            return $this->redirectToRoute('entreprises');
         }
         return $this->render('entreprise/poste/add.html.twig', ['form' => $form->createView()]);
     }
 
     /**
-     * @Route("/entreprises/ajouter_activite",name="entreprise_add_activite")
+     * @Route("/entreprises/activite/add",name="entreprise_add_activite", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse|Response
      */
     public function add_activite(Request $request, EntityManagerInterface $manager)
     {
@@ -241,19 +250,21 @@ class EntrepriseController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $manager->persist($activite);
             $manager->flush();
-            return $this->redirectToRoute('auth_connexion');
+            return $this->redirectToRoute('entreprises');
         }
         return $this->render('entreprise/activite/add.html.twig', ['form' => $form->createView()]);
     }
 
     /**
-     * @Route("/entreprises/{id_ent}/modifier_contact/{id_cont}",name="entreprise_edit_contact")
+     * @Route("/entreprises/{id_ent}/contact/{id_cont}/edit",name="entreprise_edit_contact", methods={"GET", "POST"})
+     * @param $id_ent
+     * @param $id_cont
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse|Response
      */
     public function edit_contact($id_ent, $id_cont, Request $request, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id_ent);
 
@@ -297,13 +308,14 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/{id_ent}/supprimer_contact/{id_cont}",name="entreprise_delete_contact")
+     * @Route("/entreprises/{id_ent}/contact/{id_cont}/delete",name="entreprise_delete_contact", methods={"GET", "POST"})
+     * @param $id_ent
+     * @param $id_cont
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
     public function delete_contact($id_ent, $id_cont, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id_ent);
 
@@ -329,9 +341,14 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/{id_ent}/supprimer_poste/{poste}/{id_cont}",name="entreprise_delete_poste")
+     * @Route("/entreprises/{id_ent}/contact/{id_cont}/poste/{id}/delete",name="entreprise_delete_poste", methods={"GET", "POST"})
+     * @param $id_ent
+     * @param $id_cont
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
-    public function delete_poste($id_ent, $id_cont, $poste, EntityManagerInterface $manager)
+    public function delete_poste($id_ent, $id_cont, $id, EntityManagerInterface $manager)
     {
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id_ent);
@@ -350,16 +367,20 @@ class EntrepriseController extends AbstractController
             );
         }
         $repos = $this->getDoctrine()->getRepository(Poste::class);
-        $poste_to_delete = $repos->findOneBy(['Nom' => $poste]);
+        $poste_to_delete = $repos->find($id);
         $contact->removePoste($poste_to_delete);
         $manager->flush();
         return $this->redirectToRoute('entreprises');
     }
 
     /**
-     * @Route("/entreprises/{id_ent}/supprimer_activite/{activite}",name="entreprise_delete_activite")
+     * @Route("/entreprises/{id_ent}/activite/{id}/delete",name="entreprise_delete_activite", methods={"GET", "POST"})
+     * @param $id_ent
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
-    public function delete_activite($id_ent, $activite, EntityManagerInterface $manager)
+    public function delete_activite($id_ent, $id, EntityManagerInterface $manager)
     {
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise = $repository->find($id_ent);
@@ -369,20 +390,17 @@ class EntrepriseController extends AbstractController
             );
         }
         $repos = $this->getDoctrine()->getRepository(Activite::class);
-        $activite_to_delete = $repos->findOneBy(['Nom' => $activite]);
+        $activite_to_delete = $repos->find($id);
         $entreprise->removeActivite($activite_to_delete);
         $manager->flush();
         return $this->redirectToRoute('entreprises');
     }
 
     /**
-     * @Route("/entreprises/supprimer/{id}",name="entreprise_delete")
+     * @Route("/entreprises/{id}/delete",name="entreprise_delete", methods={"GET", "POST"})
      */
     public function delete($id, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Entreprise::class);
         $entreprise_to_delete = $repository->find($id);
 
@@ -407,7 +425,7 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/api/entreprises")
+     * @Route("/api/entreprises", methods={"GET"})
      *
      * return array;
      */
@@ -446,7 +464,7 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/api/contacts")
+     * @Route("/api/contacts", methods={"GET"})
      *
      * return array;
      */

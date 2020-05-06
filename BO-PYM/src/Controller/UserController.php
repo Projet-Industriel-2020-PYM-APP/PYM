@@ -24,12 +24,10 @@ class UserController extends AbstractController
 
 
     /**
-     * @Route("/users/lister", name="users")
+     * @Route("/users", name="users", methods={"GET"})
      */
     public function index()
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
         $users = $repository->findAll();
 
@@ -39,13 +37,10 @@ class UserController extends AbstractController
 
 
     /**
-     * @Route("/users/modifier",name="user_edit")
+     * @Route("/users/me/edit",name="user_edit", methods={"GET", "POST"})
      */
     public function edit(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $user = $this->getUser();
 
         $form = $this->createFormBuilder($user)
@@ -79,7 +74,7 @@ class UserController extends AbstractController
             $manager->persist($user);
             $manager->flush();
 
-            return $this->redirectToRoute('auth_connexion');
+            return $this->redirectToRoute('entreprises');
         }
 
 
@@ -87,13 +82,10 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/modifier/{id}",name="user_edit_other")
+     * @Route("/users/{id}/edit",name="user_edit_other", methods={"GET", "POST"})
      */
     public function edit_other($id, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, Swift_Mailer $mailer)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
         $user_to_edit = $repository->find($id);
         if (!$user_to_edit) {
@@ -135,13 +127,10 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/supprimer/{id}",name="user_delete")
+     * @Route("/users/{id}/delete",name="user_delete", methods={"GET", "POST"})
      */
     public function delete($id, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
         $user_to_delete = $repository->find($id);
 

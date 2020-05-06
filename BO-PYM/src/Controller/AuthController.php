@@ -8,6 +8,7 @@ use App\Form\ResetPasswordType;
 
 use Swift_Mailer;
 use Swift_Message;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,12 +25,10 @@ class AuthController extends AbstractController
 {
 
     /**
-     * @Route("/utilisateurs/ajout", name="user_add")
+     * @Route("/utilisateurs/ajout", name="user_add", methods={"GET","POST"})
      */
     public function registration(Swift_Mailer $mailer, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $user = new Utilisateur();
 
         $form = $this->createForm(RegistrationType::class, $user);
@@ -75,18 +74,23 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @Route("/",name="auth_connexion")
+     * @Route("/login",name="auth_connexion", methods={"GET","POST"})
+     * @param AuthenticationUtils $authUtils
+     * @return Response
      */
     public function login(AuthenticationUtils $authUtils)
     {
         $error = $authUtils->getLastAuthenticationError();
+
+        $lastUsername = $authUtils->getLastUsername();
         return $this->render('auth/login.html.twig', [
+            'last_username' => $lastUsername,
             'error' => $error
         ]);
     }
 
     /**
-     * @Route("/deconnexion",name="auth_deconnexion")
+     * @Route("/deconnexion",name="auth_deconnexion", methods={"GET","POST"})
      */
     public function deconnexion()
     {
@@ -94,11 +98,15 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @Route("/reinitialisation_mot_de_passe",name="auth_resetpassword")
+     * @Route("/reinitialisation_mot_de_passe",name="auth_resetpassword", methods={"GET","POST"})
+     * @param EntityManagerInterface $manager
+     * @param Request $request
+     * @param Swift_Mailer $mailer
+     * @param UserPasswordEncoderInterface $encoder
+     * @return RedirectResponse|Response
      */
     public function reset_password(EntityManagerInterface $manager, Request $request, Swift_Mailer $mailer, UserPasswordEncoderInterface $encoder)
     {
-
         $user = new Utilisateur();
 
         $form = $this->createForm(ResetPasswordType::class, $user);

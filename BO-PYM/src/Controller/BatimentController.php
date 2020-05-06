@@ -28,12 +28,10 @@ header("Access-Control-Allow-Origin: *");
 class BatimentController extends AbstractController
 {
     /**
-     * @Route("/batiments/lister", name="batiments")
+     * @Route("/batiments", name="batiments", methods={"GET"})
      */
     public function index()
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Batiment::class);
         $batiments = $repository->findAll();
 
@@ -43,7 +41,7 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("/batiment/ajouter/0",name="batiment_add")
+     * @Route("/batiments/add",name="batiment_add", methods={"GET","POST"})
      * @param Request $request
      * @param EntityManagerInterface $manager
      * @param FileUploader $fileUploader
@@ -51,9 +49,6 @@ class BatimentController extends AbstractController
      */
     public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-
         $batiment = new Batiment;
 
         $form = $this->createForm(Batiment2Type::class, $batiment);
@@ -99,7 +94,7 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("batiment/modifier/{id}",name="batiment_edit")
+     * @Route("batiments/{id}/edit",name="batiment_edit", methods={"GET","POST"})
      * @param $id
      * @param EntityManagerInterface $manager
      * @param Request $request
@@ -108,8 +103,6 @@ class BatimentController extends AbstractController
      */
     public function edit($id, EntityManagerInterface $manager, Request $request, FileUploader $fileUploader)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Batiment::class);
         $batiment = $repository->find($id);
 
@@ -162,7 +155,7 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("batiments/{id}/ajouter_bureau",name="batiment_add_bureau")
+     * @Route("batiments/{id}/bureau/add",name="batiment_add_bureau", methods={"GET","POST"})
      * @param $id
      * @param Request $request
      * @param EntityManagerInterface $manager
@@ -170,9 +163,6 @@ class BatimentController extends AbstractController
      */
     public function add_bureau($id, Request $request, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Batiment::class);
         $batiment = $repository->find($id);
 
@@ -205,7 +195,7 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("/batiments/{id_bat}/modifier_bureau/{id_bur}",name="batiment_edit_bureau")
+     * @Route("/batiments/{id_bat}/bureau/{id_bur}/edit",name="batiment_edit_bureau", methods={"GET","POST"})
      * @param $id_bat
      * @param $id_bur
      * @param EntityManagerInterface $manager
@@ -214,9 +204,6 @@ class BatimentController extends AbstractController
      */
     public function edit_bureau($id_bat, $id_bur, EntityManagerInterface $manager, Request $request)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Batiment::class);
         $batiment = $repository->find($id_bat);
 
@@ -248,15 +235,13 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("batiments/{id_bur}/supprimer_bureau",name="batiment_delete_bureau")
+     * @Route("batiments/{id_bat}/bureau/{id_bur}/delete",name="batiment_delete_bureau", methods={"GET","POST"})
      * @param $id_bur
      * @param EntityManagerInterface $manager
      * @return RedirectResponse
      */
     public function delete_bureau($id_bur, EntityManagerInterface $manager)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Bureau::class);
         $bureau = $repository->find($id_bur);
 
@@ -272,16 +257,13 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("batiments/supprimer/{id}",name="batiment_delete")
+     * @Route("batiments/{id}/delete",name="batiment_delete")
      * @param $id
      * @param EntityManagerInterface $manager
      * @return RedirectResponse
      */
     public function delete($id, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Batiment::class);
         $batiment_to_delete = $repository->find($id);
 
@@ -302,7 +284,7 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("/api/batiments")
+     * @Route("/api/batiments", methods={"GET"})
      *
      * return array;
      */
@@ -368,7 +350,7 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("/api/bureaux")
+     * @Route("/api/bureaux", methods={"GET"})
      *
      * return array;
      */

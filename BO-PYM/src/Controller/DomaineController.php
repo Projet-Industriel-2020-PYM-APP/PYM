@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DomaineController extends AbstractController
 {
     /**
-     * @Route("/domaine", name="domaine")
+     * @Route("/domaine", name="domaine", methods={"GET"})
      */
     public function index()
     {
@@ -33,12 +33,10 @@ class DomaineController extends AbstractController
 
 
     /**
-     * @Route("/domaine/modifier/{id}",name="domaine_edit")
+     * @Route("/domaine/{id}/edit",name="domaine_edit", methods={"GET", "POST"})
      */
     public function edit($id, Request $request, FileUploader $fileUploader, EntityManagerInterface $manager)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Domaine::class);
         $domaine = $repository->find($id);
         $form = $this->createForm(DomaineType::class, $domaine);

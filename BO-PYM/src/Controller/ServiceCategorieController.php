@@ -28,9 +28,6 @@ class ServiceCategorieController extends AbstractController
      */
     public function index(ServiceCategorieRepository $serviceCategorieRepository, ServiceRepository $serviceRepository)
     {
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         return $this->render('service_categorie/index.html.twig', [
             'categories' => $serviceCategorieRepository->findAll(),
             'services' => $serviceRepository->findAll(),
@@ -46,8 +43,6 @@ class ServiceCategorieController extends AbstractController
      */
     public function new(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $serviceCategorie = new ServiceCategorie();
         $serviceCategorie->setPrimaryColor("#2196f3");
         $form = $this->createForm(ServiceCategorieType::class, $serviceCategorie);
@@ -87,7 +82,6 @@ class ServiceCategorieController extends AbstractController
         Request $request
     )
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $file = $serviceCategorie->getImgUrl();
         $serviceCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'service_categories/' . $file));
         $form = $this->createForm(ServiceCategorieType::class, $serviceCategorie);
@@ -125,8 +119,6 @@ class ServiceCategorieController extends AbstractController
      */
     public function delete($id, ServiceCategorie $serviceCategorie, EntityManagerInterface $manager, Request $request, ServiceCategorieRepository $serviceCategorieRepository, ServiceRepository $serviceRepository)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $categorie = $serviceCategorieRepository->find($id);
 
         $services_to_move = $serviceRepository->findBy(['categorie' => $categorie]);
@@ -164,8 +156,6 @@ class ServiceCategorieController extends AbstractController
         FileUploader $fileUploader
     )
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $service = new Service();
         $categorie = $serviceCategorieRepository->find($id);
         $service->setCategorie($categorie);
@@ -207,7 +197,6 @@ class ServiceCategorieController extends AbstractController
         FileUploader $fileUploader
     )
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $file = $service->getImgUrl();
         $service->setImgUrl(new File($this->getParameter('shared_directory') . 'services/' . $file));
         $form = $this->createForm(ServiceType::class, $service);
@@ -240,8 +229,6 @@ class ServiceCategorieController extends AbstractController
      */
     public function delete_service(Service $service, EntityManagerInterface $manager, Request $request)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $imgFile = $service->getImgUrl();
         if ($imgFile) {
             unlink($this->getParameter('shared_directory') . 'services/' . $imgFile);

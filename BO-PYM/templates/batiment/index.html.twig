@@ -184,7 +184,7 @@
                                                                 <div class="dropdown-menu dropdown-menu-right">
                                                                     {% if app.user.role =="Admin" %}
                                                                         <a class="dropdown-item btn rounded" href="{{path('batiment_edit_bureau',{'id_bat':batiment.id,'id_bur':bureau.id})}}">Modifer</a>
-                                                                        <a class="dropdown-item btn rounded" onclick="return confirm('Êtes vous sûr de vouloir supprimer cet élèment?')" href="{{path('batiment_delete_bureau',{'id_bur':bureau.id})}}">Supprimer</a>
+                                                                        <a class="dropdown-item btn rounded" onclick="return confirm('Êtes vous sûr de vouloir supprimer cet élèment?')" href="{{path('batiment_delete_bureau',{'id_bur':bureau.id, 'id_bat':batiment.id})}}">Supprimer</a>
                                                                     {% endif %}
                                                                 </div>
                                                             </div>

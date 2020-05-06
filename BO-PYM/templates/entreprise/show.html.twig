@@ -64,7 +64,7 @@
                                                     {% if app.user.role =="Admin" %}
                                                         <a type="button"
                                                            onclick="return confirm('Êtes vous sûr de vouloir supprimer cet élèment?')"
-                                                           href="{{ path('entreprise_delete_activite',{'id_ent':entreprise.id,'activite':activite.Nom}) }}"
+                                                           href="{{ path('entreprise_delete_activite',{'id_ent':entreprise.id,'id':activite.id}) }}"
                                                            class="btn">X</a>
                                                     {% endif %}
                                                 {% endfor %}
@@ -121,7 +121,7 @@
                                         {% for postes in contact.poste %}
                                             {{ postes.Nom }}
                                             {% if app.user.role =="Admin" %}
-                                                <a href="{{ path('entreprise_delete_poste',{'id_ent':entreprise.id,'poste':postes.Nom,'id_cont':contact.id}) }}"
+                                                <a href="{{ path('entreprise_delete_poste',{'id_ent':entreprise.id,'id':postes.id,'id_cont':contact.id}) }}"
                                                    onclick="return confirm('Êtes vous sûr de vouloir supprimer cet élèment?')"
                                                    type="button">X</a>
                                             {% endif %}

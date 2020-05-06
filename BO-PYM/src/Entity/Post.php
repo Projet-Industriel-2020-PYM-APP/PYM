@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
  */
-class Post
+class Post implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -37,7 +39,7 @@ class Post
     private $title;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="text", length=65535, nullable=true)
      */
     private $content;
 
@@ -104,5 +106,20 @@ class Post
         $this->content = $content;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'=> $this->getId(),
+            'published' => $this->getPublished()->format(DateTime::ISO8601),
+            'updated' => $this->getUpdated()->format(DateTime::ISO8601),
+            'url'=> $this->getUrl(),
+            'title' => $this->getTitle(),
+            'content' => $this->getContent(),
+        ];
     }
 }

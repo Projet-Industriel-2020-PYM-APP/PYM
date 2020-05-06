@@ -7,34 +7,28 @@ use App\Form\PostType;
 use App\Repository\PostRepository;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/post")
- */
 class PostController extends AbstractController
 {
     /**
-     * @Route("/", name="post_index", methods={"GET"})
+     * @Route("/post", name="post_index", methods={"GET"})
      */
     public function index(PostRepository $postRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         return $this->render('post/index.html.twig', [
             'posts' => $postRepository->findAll(),
         ]);
     }
 
     /**
-     * @Route("/new", name="post_new", methods={"GET","POST"})
+     * @Route("/post/new", name="post_new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -57,24 +51,10 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="post_show", methods={"GET"})
-     */
-    public function show(Post $post): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        return $this->render('post/show.html.twig', [
-            'post' => $post,
-        ]);
-    }
-
-    /**
-     * @Route("/{id}/edit", name="post_edit", methods={"GET","POST"})
+     * @Route("/post/{id}/edit", name="post_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Post $post): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
@@ -92,7 +72,7 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/delete", name="post_delete", methods={"GET"})
+     * @Route("/post/{id}/delete", name="post_delete", methods={"GET"})
      */
     public function delete(Request $request, Post $post): Response
     {
@@ -103,5 +83,14 @@ class PostController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('post_index');
+    }
+
+    /**
+     * @Route("/api/posts", name="get_posts", methods={"GET"})
+     */
+    public function get_posts(PostRepository $postRepository): Response
+    {
+        $posts = $postRepository->findAll();
+        return new JsonResponse($posts);
     }
 }

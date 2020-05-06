@@ -6,38 +6,38 @@
 {% endblock %}
 {% block title %}<title>PYM 3D</title>{% endblock %}
 {% if app.user %}
-<div class="layout">
-    <nav class="navbar top navbar-expand-lg layout-navbar navbar-dark bg-dark col-12">
-        <a class="navbar-brand title-layout-navbar" href="{{ path('auth_connexion')}}">Pôle Yvon Morandat</a>
-        <div class="mr-auto mt-2 mt-lg-0"></div>
-        <div class="my-2 my-lg-0 user-edit">
-            <a href="{{ path('user_edit')}}" class="edit">Modifier Mon profil</a>
-        </div>
-        <div class="header-border"></div>
-        <div class="my-2 my-lg-0 user-logout">
-            <a href="{{ path('auth_deconnexion')}}" class="logout">Se déconnecter</a>
-        </div>
-    </nav>
-    <div class="row">
-        <div class="col-2">
-            <div class="sidebar">
-                    <a class="list-group-item rounded-0" href="{{ path('entreprises')}}">Entreprises</a>
-                    <a class="list-group-item rounded-0" href="{{path('batiments')}}">Bâtiments</a>
-                    <a class="list-group-item rounded-0" href="{{path('domaine')}}">Domaine</a>
-                    <a class="list-group-item rounded-0" href="{{path('service_categorie_index')}}">Services</a>
-                    <a class="list-group-item rounded-0" href="{{ path('users')}}">Utilisateurs</a>
-                    <a class="list-group-item rounded-0" href="{{ path('reference_tables')}}">Tables de référence</a>
-                    <a class="list-group-item rounded-0" href="{{ path("post_index")}}">Actualités</a>
+    <div class="layout">
+        <nav class="navbar top navbar-expand-lg layout-navbar navbar-dark bg-dark col-12">
+            <a class="navbar-brand title-layout-navbar" href="{{ path('auth_connexion') }}">Pôle Yvon Morandat</a>
+            <div class="mr-auto mt-2 mt-lg-0"></div>
+            <div class="my-2 my-lg-0 user-edit">
+                <a href="{{ path('user_edit') }}" class="edit">Modifier Mon profil</a>
+            </div>
+            <div class="header-border"></div>
+            <div class="my-2 my-lg-0 user-logout">
+                <a href="{{ path('auth_deconnexion') }}" class="logout">Se déconnecter</a>
+            </div>
+        </nav>
+        <div class="row">
+            <div class="col-2">
+                <div class="sidebar">
+                    <a class="list-group-item rounded-0" href="{{ path("post_index") }}">Actualités</a>
+                    <a class="list-group-item rounded-0" href="{{ path('entreprises') }}">Entreprises</a>
+                    <a class="list-group-item rounded-0" href="{{ path('batiments') }}">Bâtiments</a>
+                    <a class="list-group-item rounded-0" href="{{ path('domaine') }}">Domaine</a>
+                    <a class="list-group-item rounded-0" href="{{ path('service_categorie_index') }}">Services</a>
+                    <a class="list-group-item rounded-0" href="{{ path('users') }}">Utilisateurs</a>
+                    <a class="list-group-item rounded-0" href="{{ path('reference_tables') }}">Tables de référence</a>
+                </div>
+            </div>
+            <div class="col-10 body-page">
+                <div class="my-4 d-flex justify-content-center">
+                    {% block body %}
+                    {% endblock %}
+                </div>
             </div>
         </div>
-        <div class="col-10 body-page">
-            <div class="my-4 d-flex justify-content-center">
-            {% block body %}
-            {% endblock %}
-            </div>
-        </div>   
     </div>
-</div>
 
 {% else %}
     {% block bodyauth %} {% endblock %}

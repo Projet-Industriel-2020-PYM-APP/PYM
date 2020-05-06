@@ -20,13 +20,12 @@
             <table class="table rounded" id="postsTable">
                 <thead class="thead-dark">
                     <tr class="searchHide">
-                        <th>Id</th>
-                        <th>Published</th>
-                        <th>Updated</th>
-                        <th>Url</th>
-                        <th>Title</th>
-                        <th>Content</th>
-                        <th>actions</th>
+                        <th>N°</th>
+                        <th>Publication</th>
+                        <th>Mise à jour</th>
+                        <th>Titre</th>
+                        <th>Longueur du texte</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="postsBody">
@@ -35,9 +34,8 @@
                         <td>{{ post.id }}</td>
                         <td>{{ post.published ? post.published|date('Y-m-d H:i:s') : '' }}</td>
                         <td>{{ post.updated ? post.updated|date('Y-m-d H:i:s') : '' }}</td>
-                        <td>{{ post.url }}</td>
                         <td>{{ post.title }}</td>
-                        <td>{{ post.content }}</td>
+                        <td>{{ post.content|length }}</td>
                         <td>
                             <div class="btn-group action">
                                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -1,15 +1,20 @@
 {% extends 'layout.html.twig' %}
 {% block stylesheets %}
-    {{ encore_entry_link_tags('postNew') }}
+    {{ encore_entry_link_tags('postForm') }}
 {% endblock %}
 {% block javascripts %}
-    {{ encore_entry_script_tags('postNew') }}
+    {{ encore_entry_script_tags('postForm') }}
 {% endblock %}
 
 {% block body %}
-    <h1>Create new Post</h1>
-
-    {{ include('post/_form.html.twig') }}
-
-    <a href="{{ path('post_index') }}">back to list</a>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-3">
+                <h1>Créer une publication</h1>
+            </div>
+            <div class="col-lg-9">
+                {{ include('post/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
 {% endblock %}

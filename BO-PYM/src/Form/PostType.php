@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Post;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -16,10 +17,16 @@ class PostType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'attr' => ['class' => 'reg rounded form-control'],
+                'attr' => [
+                    'maxlength' => 255,
+                    'class' => 'reg rounded form-control'
+                ],
             ])
-            ->add('content', TextType::class, [  // TODO : Change to editor
-                'attr' => ['class' => 'reg rounded form-control'],
+            ->add('content', CKEditorType::class, [
+                'attr' => [
+                    'maxlength' => 65535,
+                    'class' => 'reg rounded form-control'
+                ],
             ])
         ;
     }

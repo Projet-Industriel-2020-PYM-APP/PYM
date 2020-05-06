@@ -1,3 +1,3 @@
-import '../css/postEdit.css';
+import '../css/postForm.css';
 import 'bootstrap';
 import 'jquery';

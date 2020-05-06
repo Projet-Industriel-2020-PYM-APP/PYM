@@ -46,7 +46,7 @@ class DomaineController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $file = new File($domaine->getFichier());
-            $filename = $fileUploader->upload($file, "domaine", 1);
+            $filename = $fileUploader->upload($file, "domaine", 'domaine');
             $domaine->setFichier($filename);
             $manager->persist($domaine);
             $manager->flush();

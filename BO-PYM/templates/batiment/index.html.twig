@@ -98,8 +98,8 @@
 {% endblock %}
 {% block body %}
     {% if app.user %}
-        <div class="batiments">
-            <div class="row">
+        <div class="batiments container">
+            <div class="row justify-content-center">
                 <nav class="navbar navbar-dark bg-dark justify-content-between rounded">
                     {% if app.user.role =="Admin" %}
                         <a class="btn btn-outline-light add" href="{{path('batiment_add')}}">Ajouter</a>
@@ -108,7 +108,7 @@
                     <input class="my-2 my-sm-0 rounded" id="batimentsInput" onkeyup="batimentsSearch()" placeholder=" Rechercher un bâtiment" type="text">
                 </nav>
             </div>
-            <div class="row">
+            <div class="row justify-content-center">
                 <table class="table rounded" id="batimentsTable">
                     <thead class="thead-dark">
                         <tr class="searchHide">

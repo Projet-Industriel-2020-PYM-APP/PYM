@@ -1,11 +1,6 @@
 @import '../../node_modules/bootstrap/dist/css/bootstrap.css';
 @import './layout.css';
 
-.container-fluid{
-    margin-top: 20px;
-    margin-left: 20%;
-}
-
 /* .scrolling-bar thead{
     width: 97%;
 }

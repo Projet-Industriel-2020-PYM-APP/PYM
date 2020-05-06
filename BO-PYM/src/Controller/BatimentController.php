@@ -11,6 +11,7 @@ use App\Entity\TypeBatiment;
 use App\Service\FileUploader;
 use App\Form\Batiment2Type;
 use App\Entity\FormeParametrique;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,6 +44,10 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("/batiment/ajouter/0",name="batiment_add")
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param FileUploader $fileUploader
+     * @return RedirectResponse|Response
      */
     public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
     {
@@ -74,7 +79,7 @@ class BatimentController extends AbstractController
                             $nom_batiment[$i] = "_";
                         }
                     }
-                    $filename = $fileUploader->upload($model, $nom_batiment);
+                    $filename = $fileUploader->upload($model, $nom_batiment, 'modeles');
                     $batiment->setRepresentation3D($filename);
                     break;
                 case "Forme Paramétrique":
@@ -95,6 +100,11 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiment/modifier/{id}",name="batiment_edit")
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @param Request $request
+     * @param FileUploader $fileUploader
+     * @return RedirectResponse|Response
      */
     public function edit($id, EntityManagerInterface $manager, Request $request, FileUploader $fileUploader)
     {
@@ -134,7 +144,7 @@ class BatimentController extends AbstractController
                 }
                 if ($model != null) {
                     unlink("uploads/modeles" . $old_value);
-                    $filename = $fileUploader->upload($model, $nom_batiment);
+                    $filename = $fileUploader->upload($model, $nom_batiment, 'modeles');
                     $batiment->setRepresentation3D($filename);
 
                 } else {
@@ -153,6 +163,10 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/{id}/ajouter_bureau",name="batiment_add_bureau")
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse|Response
      */
     public function add_bureau($id, Request $request, EntityManagerInterface $manager)
     {
@@ -192,6 +206,11 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("/batiments/{id_bat}/modifier_bureau/{id_bur}",name="batiment_edit_bureau")
+     * @param $id_bat
+     * @param $id_bur
+     * @param EntityManagerInterface $manager
+     * @param Request $request
+     * @return RedirectResponse|Response
      */
     public function edit_bureau($id_bat, $id_bur, EntityManagerInterface $manager, Request $request)
     {
@@ -230,6 +249,9 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/{id_bur}/supprimer_bureau",name="batiment_delete_bureau")
+     * @param $id_bur
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
     public function delete_bureau($id_bur, EntityManagerInterface $manager)
     {
@@ -251,6 +273,9 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/supprimer/{id}",name="batiment_delete")
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
     public function delete($id, EntityManagerInterface $manager)
     {

@@ -22,12 +22,9 @@
                             </div>
                             <div class="col-1"></div>
                         </div>
-                        <div class="btns row">
-                            <div class="col-1"></div>
-                            <a href="{{ path('users')}}" class="btn btn-secondary btn-back col-3">Annuler</a>
-                            <div class="col-4"></div>
-                            <button type="submit" class="btn btn-success btn-add col-3">Ajouter</button>
-                            <div class="col-1"></div>
+                        <div class="btns row justify-content-around">
+                            <a href="{{ path('users')}}" class="btn btn-secondary btn-back">Annuler</a>
+                            <button type="submit" class="btn btn-success btn-add">Ajouter</button>
                         </div>
                         {{form_end(form) }}
                     </div>

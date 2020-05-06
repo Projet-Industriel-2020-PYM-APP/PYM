@@ -1,0 +1,86 @@
+@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
+@import './layout.css';
+
+.categories .navbar {
+  width: 90%;
+  position: relative;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.categories input {
+  color: white;
+  background: transparent;
+  padding: 6px 20px 6px 30px;
+  border: 2px solid #ffffff;
+}
+
+.categories table {
+  margin-top: 30px;
+  position: relative;
+  height: auto;
+  width: 90%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.categories th {
+  text-align: center;
+}
+
+.categories td {
+  text-align: center;
+}
+.dropdown-menu a {
+  text-align: center;
+}
+.dropdown-menu a:hover {
+  background: #343a40;
+  color: white;
+}
+
+.clickabletd {
+  cursor: pointer;
+}
+.categories {
+  height: auto;
+}
+
+.serviceHead {
+  background: #2962ff;
+}
+
+.serviceHead tr {
+  color: #ffffff;
+}
+
+.Actions table {
+  width: 100%;
+}
+
+.serviceBody tr {
+  height: 1em;
+}
+
+#categorieTable #categorieBody > tr:nth-child(4n + 1) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+#categorieTable #categorieBody > tr:nth-child(4n + 3) {
+  background: rgba(0, 0, 0, 0);
+}
+
+/* #categorieTable #batBody>tr:hover {
+    background: rgba(0, 0, 0, 0.08);
+} */
+
+#categorieTable #categorieBody .searchHide:hover {
+  background-color: rgba(0, 0, 250, 0.08);
+}
+
+.imgUrl {
+  max-height: 100px;
+  max-width: 500px;
+}
+
+.accordion-head > .collapsed > i:before{
+  content: "\f105";
+}

@@ -1,3 +1,7 @@
+@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
+@import '../../node_modules/@fortawesome/fontawesome-free/css/all.css';
+@import './layout.css';
+
 .index{
     margin-left: 20%;
 }
@@ -39,5 +43,3 @@
     background: #343a40;
     color: white;
 }
-@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
-@import './layout.css';

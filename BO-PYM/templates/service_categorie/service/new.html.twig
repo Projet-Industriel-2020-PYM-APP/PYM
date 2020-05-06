@@ -1,0 +1,46 @@
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('serviceForm') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('serviceForm') }}
+{% endblock %}
+{% macro printAction(action) %}
+    {# Template for Action Tile #}
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">{{ form_label(action) }}</span>
+        </div>
+
+        {{ form_errors(action) }}
+        {{ form_widget(action.name) }}
+        {{ form_widget(action.htmlUrl) }}
+        <div class="input-group-append" id="button-addon4">
+            <button class="btn btn-secondary delete-action-widget" type="button"
+                    aria-label="Enlever">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+{% endmacro %}
+{% import _self as formMacros %}
+{% block body %}
+    {% if app.user %}
+        <div class="container">
+            <div class="col-10 mx-auto py-4 overflow-auto">
+                <div class="card">
+                    <div class="card-header bg-dark ">
+                        <h4>Ajouter un service</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ include('service_categorie/service/_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <h1>Vous n'avez pas accès à cette page.</h1>
+    {% endif %}
+
+{% endblock %}

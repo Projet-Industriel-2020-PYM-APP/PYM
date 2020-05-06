@@ -1,0 +1,67 @@
+<table class="table rounded">
+    <thead class="serviceHead">
+    <tr>
+        <th colspan="6">Services</th>
+    </tr>
+    <tr>
+        <th scope="col">Titre</th>
+        <th scope="col">Sous-titre</th>
+        <th scope="col">Adresse</th>
+        <th scope="col">Arrière-Plan</th>
+        <th scope="col">Nombre d'actions</th>
+        <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody class="serviceBody">
+    {% for service in services|filter(e => e.categorie.id == category.id) %}
+
+    <tr>
+        <td>{{ service.title }}</td>
+        <td>{{ service.subtitle }}</td>
+        <td>{{ service.address }}</td>
+        <td>
+            {% if service.imgUrl is not null and service.imgUrl is defined %}
+            <img class="img-fluid imgUrl" src="{{ asset('uploads/services/' ~ service.imgUrl) }}"
+                 alt="{{ asset('uploads/services/' ~ service.imgUrl) }}"/>
+            {% else %}
+                Pas d'image.
+            {% endif %}
+        </td>
+        <td>{{ service.actions|length }}</td>
+        <td>
+            <div class="btn-group action">
+                <button aria-expanded="false" aria-haspopup="true"
+                        class="btn btn-secondary dropdown-toggle"
+                        data-toggle="dropdown" type="button">Action
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    {% if app.user.role =="Admin" %}
+                        <a class="dropdown-item btn rounded"
+                           href="{{ path('service_edit',{'id_cat': category.id, 'id':service.id}) }}">Modifer</a>
+                        <a class="dropdown-item btn rounded"
+                           href="{{ path('service_delete', {'id_cat': category.id, 'id':service.id}) }}">Supprimer</a>
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="7">
+            <div class="alert alert-warning" role="alert">
+                <p>Pas de service</p>
+                <div class="btn-group action" role="group" aria-label="Ajouter un service">
+                    <a class="btn rounded"
+                       href="{{ path('service_add', {'id': category.id}) }}">
+                        <button class="btn btn-primary rounded" aria-expanded="false"
+                                aria-haspopup="true" type="button">
+                            Ajouter un service
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </td>
+    <tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -75,7 +75,7 @@ class EntrepriseController extends AbstractController
                     $nom_entreprise[$i] = "_";
                 }
             }
-            $filename = $fileUploader->upload($file, $nom_entreprise);
+            $filename = $fileUploader->upload($file, $nom_entreprise, 'logos');
             //$img=Image::make('uploads/logos/'.$filename);
             //$img->resize(500,500);
             //$img->save('uploads/logos/'.$filename);
@@ -120,7 +120,7 @@ class EntrepriseController extends AbstractController
             if ($new_file != null) {
                 unlink("uploads/logos/" . $file);
                 $nom_entreprise = $entreprise_to_edit->getNom();
-                $filename = $fileUploader->upload($new_file, $nom_entreprise);
+                $filename = $fileUploader->upload($new_file, $nom_entreprise, 'logos');
                 $entreprise_to_edit->setLogo($filename);
             } else {
                 $logo = $entreprise_to_edit->getLogo();

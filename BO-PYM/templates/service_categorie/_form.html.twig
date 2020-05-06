@@ -1,0 +1,37 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        {{ form_row(form.name) }}
+        {{ form_row(form.primaryColor) }}
+        <div class="my-2">
+            {{ form_label(form.imgUrl) }}
+            <div class="input-group reg rounded">
+                <div class="custom-file">
+                    <label class="custom-file-label" for="service_imgUrl">Ouvrir un fichier</label>
+                    {{ form_errors(form.imgUrl) }}
+                    {{ form_widget(form.imgUrl) }}
+                </div>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">{{ form_label(form.action) }}</span>
+            </div>
+            {{ form_errors(form.action) }}
+            {{ form_widget(form.action.name) }}
+            {{ form_widget(form.action.htmlUrl) }}
+        </div>
+    </div>
+    <div class="col-1"></div>
+</div>
+
+<div class="btn-toolbar justify-content-end mt-2" role="toolbar" aria-label="Form Controls">
+    <div class="btn-group mr-4" role="group" aria-label="First group">
+        <a href="{{ path('service_categorie_index') }}" class="btn btn-secondary btn-back">Annuler</a>
+    </div>
+    <div class="btn-group mr-4" role="group" aria-label="Second group">
+        <button type="submit" class="btn btn-success btn-add">{{ button_label|default('Ajouter') }}</button>
+    </div>
+</div>
+{{ form_end(form) }}

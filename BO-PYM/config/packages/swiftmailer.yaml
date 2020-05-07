@@ -4,5 +4,5 @@ swiftmailer:
     port: 587
     host: SSL0.OVH.NET
     username: account-security-noreply@map-pym.com
-    password: Semag13120? 
+    password: Semag13120?
     spool: { type: 'memory'}

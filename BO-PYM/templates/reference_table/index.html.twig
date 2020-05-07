@@ -6,7 +6,7 @@
     {{ encore_entry_script_tags('reference') }}
     <script>
         function activitesSearch() {
-            var input, filter, table, tr, td, i, txtValue;
+            let input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("activitesInput");
             filter = input.value.toUpperCase();
             table = document.getElementById("activitesTable");
@@ -25,7 +25,7 @@
         }
 
         function postesSearch() {
-            var input, filter, table, tr, td, i, txtValue;
+            let input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("postesInput");
             filter = input.value.toUpperCase();
             table = document.getElementById("postesTable");
@@ -58,7 +58,7 @@
                                 <div class="mr-sm-2"></div>
                                 <input type="text" id="activitesInput" onkeyup="activitesSearch()"
                                        placeholder=" Rechercher une activite"
-                                       class="my-2 my-sm-0 rounded">
+                                       class="my-2 my-sm-0 rounded" aria-label="Barre de recherche">
                             </nav>
                         </div>
                         <div class="row">
@@ -112,7 +112,8 @@
                                     un poste</a>
                                 <div class="mr-sm-2"></div>
                                 <input type="text" id="postesInput" onkeyup="postesSearch()"
-                                       placeholder=" Rechercher un poste" class="my-2 my-sm-0 rounded">
+                                       placeholder=" Rechercher un poste" class="my-2 my-sm-0 rounded"
+                                       aria-label="Barre de recherche">
                             </nav>
                         </div>
                         <div class="row">

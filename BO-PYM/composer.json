@@ -2,7 +2,7 @@
   "type": "project",
   "license": "proprietary",
   "require": {
-    "php": "^7.1.3",
+    "php": "^7.2",
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
@@ -24,6 +24,7 @@
     "symfony/process": "5.0.*",
     "symfony/security-bundle": "5.0.*",
     "symfony/serializer-pack": "*",
+    "symfony/string": "5.0.*",
     "symfony/swiftmailer-bundle": "^3.2",
     "symfony/translation": "5.0.*",
     "symfony/twig-bundle": "5.0.*",

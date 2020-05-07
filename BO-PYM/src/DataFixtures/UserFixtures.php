@@ -23,7 +23,7 @@ class UserFixtures extends Fixture
         $user->setUsername('example@example.com');
         $user->setRole('Admin');
         $user->setEmail('example@example.com');
-
+        $user->setIsEmailVerified(false);
 
         $password = $this->encoder->encodePassword($user, '12345678');
         $user->setPassword($password);

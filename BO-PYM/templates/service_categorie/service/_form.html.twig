@@ -4,10 +4,6 @@
 {% macro printAction(action) %}
     {# Template for Action Tile #}
     <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text">{{ form_label(action) }}</span>
-        </div>
-
         {{ form_errors(action) }}
         {{ form_widget(action.name) }}
         {{ form_widget(action.htmlUrl) }}

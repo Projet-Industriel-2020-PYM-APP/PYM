@@ -9,7 +9,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
@@ -50,7 +49,10 @@ class ServiceCategorieType extends AbstractType
                 ],
                 'attr' => [ 'class' => 'custom-file-input' ],
             ])
-            ->add('action', ActionType::class);
+            ->add('action', ActionType::class, [
+                'required' => true,
+                'label_attr' => [ 'class' => 'col-sm-2' ],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

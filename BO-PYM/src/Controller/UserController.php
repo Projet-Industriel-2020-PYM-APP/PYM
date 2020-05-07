@@ -5,16 +5,17 @@ namespace App\Controller;
 use App\Form\UserEditType;
 
 use App\Entity\Utilisateur;
+use DateInterval;
+use DateTime;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -24,12 +25,10 @@ class UserController extends AbstractController
 
 
     /**
-     * @Route("/users/lister", name="users")
+     * @Route("/users", name="users", methods={"GET"})
      */
     public function index()
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
         $users = $repository->findAll();
 
@@ -39,13 +38,14 @@ class UserController extends AbstractController
 
 
     /**
-     * @Route("/users/modifier",name="user_edit")
+     * @Route("/users/me/edit",name="user_edit", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param UserPasswordEncoderInterface $encoder
+     * @return RedirectResponse|Response
      */
     public function edit(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $user = $this->getUser();
 
         $form = $this->createFormBuilder($user)
@@ -70,8 +70,6 @@ class UserController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-
             $hash = $encoder->encodePassWord($user, $user->getPassword());
             $user->setPassword($hash);
 
@@ -79,7 +77,7 @@ class UserController extends AbstractController
             $manager->persist($user);
             $manager->flush();
 
-            return $this->redirectToRoute('auth_connexion');
+            return $this->redirectToRoute('entreprises');
         }
 
 
@@ -87,14 +85,18 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/modifier/{id}",name="user_edit_other")
+     * @Route("/users/{id}/edit",name="user_edit_other", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param UserPasswordEncoderInterface $encoder
+     * @param Swift_Mailer $mailer
+     * @return RedirectResponse|Response
      */
     public function edit_other($id, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, Swift_Mailer $mailer)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
+        /** @var Utilisateur $user_to_edit */
         $user_to_edit = $repository->find($id);
         if (!$user_to_edit) {
             throw $this->createNotFoundException(
@@ -118,7 +120,7 @@ class UserController extends AbstractController
                 ->setTo($user_to_edit->getEmail())
                 ->setBody(
                     $this->renderView(
-                        "auth/email/resetpassword.html.twig",
+                        "auth/email/resetpassword_admin.html.twig",
                         ['password' => $password]
                     )
                 );
@@ -135,18 +137,63 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/supprimer/{id}",name="user_delete")
+     * @Route("/users/{id}/delete",name="user_delete", methods={"GET", "POST"})
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
     public function delete($id, EntityManagerInterface $manager)
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
         $user_to_delete = $repository->find($id);
 
         $manager->remove($user_to_delete);
         $manager->flush();
+
+        return $this->redirectToRoute('users');
+    }
+
+    /**
+     * Send an email to confirm the email address.
+     *
+     * The method accept a Bearer Token generated with /api/auth/register or /api/auth/login.
+     * It reset the email verification state to false.
+     * It generate an url and send it to the owner of the email address.
+     *
+     * @Route("/users/me/email_verification", name="auth_email_verification", methods={"POST"})
+     * @param Swift_Mailer $mailer
+     * @return Response
+     */
+    public function emailVerification(
+        Swift_Mailer $mailer
+    )
+    {
+        $em = $this->getDoctrine()->getManager();
+        /** @var Utilisateur $user */
+        $user = $this->getUser();
+        $user->setIsEmailVerified(false);
+        try {
+            $user->setRefreshToken(bin2hex(random_bytes(64)));
+        } catch (Exception $e) {
+            $user->setRefreshToken(uniqid("", true));
+        }
+        $expirationDate = new DateTime();
+        $expirationDate->add(new DateInterval('PT1H'));
+        $user->setRefreshTokenExpiresAt($expirationDate);
+        $em->flush();
+
+        $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
+            ->setFrom('account-security-noreply@map-pym.com')
+            ->setTo($user->getEmail())
+            ->setContentType("text/html")
+            ->setBody(
+                $this->renderView(
+                    "auth/email/confirm_email.html.twig",
+                    ['token' => $user->getRefreshToken()]
+                )
+            );
+
+        $mailer->send($message);
 
         return $this->redirectToRoute('users');
     }

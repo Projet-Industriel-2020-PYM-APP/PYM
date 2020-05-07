@@ -5,24 +5,19 @@ namespace App\Controller;
 use App\Entity\Poste;
 use App\Form\PosteType;
 use App\Entity\Activite;
-use App\Entity\Entreprise;
 use App\Form\ActiviteType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ReferenceTableController extends AbstractController
 {
     /**
-     * @Route("/tables_reference/lister", name="reference_tables")
+     * @Route("/tables_reference", name="reference_tables", methods={"GET"})
      */
     public function index()
     {
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Activite::class);
         $activites = $repository->findAll();
 
@@ -36,12 +31,13 @@ class ReferenceTableController extends AbstractController
     }
 
     /**
-     * @Route("tables_reference/ajouter_activite",name="reference_table_add_activite")
+     * @Route("tables_reference/activite/add",name="reference_table_add_activite", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function add_activite(Request $request, EntityManagerInterface $manager)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $activite = new Activite;
         $form = $this->createForm(ActiviteType::class, $activite);
         $form->handleRequest($request);
@@ -55,12 +51,14 @@ class ReferenceTableController extends AbstractController
     }
 
     /**
-     * @Route("tables_reference/modifier_activite/{id}",name="reference_table_edit_activite")
+     * @Route("tables_reference/activite/{id}/edit",name="reference_table_edit_activite", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function edit_activite($id, Request $request, EntityManagerInterface $manager)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Activite::class);
         $activite = $repository->findOneBy(['id' => $id]);
 
@@ -77,12 +75,13 @@ class ReferenceTableController extends AbstractController
 
 
     /**
-     * @Route("tables_reference/ajouter_poste",name="reference_table_add_poste")
+     * @Route("tables_reference/poste/add",name="reference_table_add_poste", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function add_poste(Request $request, EntityManagerInterface $manager)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $poste = new Poste;
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
@@ -97,12 +96,13 @@ class ReferenceTableController extends AbstractController
 
 
     /**
-     * @Route("/tables_reference/supprimer_activite/{id}",name="reference_table_delete_activite")
+     * @Route("/tables_reference/activite/{id}/delete",name="reference_table_delete_activite", methods={"GET", "POST"})
+     * @param EntityManagerInterface $manager
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete_activite(EntityManagerInterface $manager, $id)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Activite::class);
         $activite_to_delete = $repository->findOneBy(['id' => $id]);
 
@@ -114,12 +114,14 @@ class ReferenceTableController extends AbstractController
 
 
     /**
-     * @Route("tables_reference/modifier_poste/{id}",name="reference_table_edit_poste")
+     * @Route("tables_reference/poste/{id}/edit",name="reference_table_edit_poste", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function edit_poste($id, Request $request, EntityManagerInterface $manager)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Poste::class);
         $poste = $repository->findOneBy(['id' => $id]);
 
@@ -135,12 +137,13 @@ class ReferenceTableController extends AbstractController
     }
 
     /**
-     * @Route("/tables_reference/supprimer_poste/{id}",name="reference_table_delete_poste")
+     * @Route("/tables_reference/poste/{id}/delete",name="reference_table_delete_poste", methods={"GET", "POST"})
+     * @param EntityManagerInterface $manager
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete_poste(EntityManagerInterface $manager, $id)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $repository = $this->getDoctrine()->getRepository(Poste::class);
         $poste_to_delete = $repository->findOneBy(['id' => $id]);
 

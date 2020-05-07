@@ -46,6 +46,9 @@ Encore
     .addEntry('reference', './assets/js/reference.js')
     .addEntry('addedit', './assets/js/addedit.js')
     .addEntry('domaine', './assets/js/domaine.js')
+    .addEntry('postIndex', './assets/js/postIndex.js')
+    .addEntry('postForm', './assets/js/postForm.js')
+    .addEntry('postShow', './assets/js/postShow.js')
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
 
@@ -70,7 +73,14 @@ Encore
     .configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
         config.corejs = 3;
-    });
+    })
+    .copyFiles([
+        { from: './node_modules/ckeditor/', to: 'ckeditor/[path][name].[ext]', pattern: /\.(js|css)$/, includeSubdirectories: false },
+        { from: './node_modules/ckeditor/adapters', to: 'ckeditor/adapters/[path][name].[ext]' },
+        { from: './node_modules/ckeditor/lang', to: 'ckeditor/lang/[path][name].[ext]' },
+        { from: './node_modules/ckeditor/plugins', to: 'ckeditor/plugins/[path][name].[ext]' },
+        { from: './node_modules/ckeditor/skins', to: 'ckeditor/skins/[path][name].[ext]' }
+    ]);
 
 // enables Sass/SCSS support
 //.enableSassLoader()

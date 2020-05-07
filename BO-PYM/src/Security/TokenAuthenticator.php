@@ -24,12 +24,6 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         $this->em = $em;
     }
 
-    private function _startsWith($string, $startString)
-    {
-        $len = strlen($startString);
-        return (substr($string, 0, $len) === $startString);
-    }
-
     public function supports(Request $request)
     {
         return $request->headers->has('Authorization')

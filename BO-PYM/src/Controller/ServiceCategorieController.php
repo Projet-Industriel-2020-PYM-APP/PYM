@@ -53,7 +53,7 @@ class ServiceCategorieController extends AbstractController
             $imgFile = $form->get('imgUrl')->getData();
 
             if ($imgFile) {
-                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);;
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $newFilename = $fileUploader->upload($imgFile, $originalFilename, 'service_categories');
                 $serviceCategorie->setImgUrl($newFilename);
             }
@@ -92,7 +92,7 @@ class ServiceCategorieController extends AbstractController
 
             if ($imgFile) {
                 unlink($this->getParameter('shared_directory') . 'service_categories/' . $imgFile);
-                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);;
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $newFilename = $fileUploader->upload($imgFile, $originalFilename, 'service_categories');
                 $serviceCategorie->setImgUrl($newFilename);
             }
@@ -113,11 +113,11 @@ class ServiceCategorieController extends AbstractController
      * @param string $id Categorie ID
      * @param ServiceCategorie $serviceCategorie
      * @param EntityManagerInterface $manager
-     * @param Request $request HTTP Request
      * @param ServiceCategorieRepository $serviceCategorieRepository
+     * @param ServiceRepository $serviceRepository
      * @return Response
      */
-    public function delete($id, ServiceCategorie $serviceCategorie, EntityManagerInterface $manager, Request $request, ServiceCategorieRepository $serviceCategorieRepository, ServiceRepository $serviceRepository)
+    public function delete($id, ServiceCategorie $serviceCategorie, EntityManagerInterface $manager, ServiceCategorieRepository $serviceCategorieRepository, ServiceRepository $serviceRepository)
     {
         $categorie = $serviceCategorieRepository->find($id);
 
@@ -168,7 +168,7 @@ class ServiceCategorieController extends AbstractController
             $imgFile = $form->get('imgUrl')->getData();
 
             if ($imgFile) {
-                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);;
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $newFilename = $fileUploader->upload($imgFile, $originalFilename, 'services');
                 $service->setImgUrl($newFilename);
             }
@@ -207,7 +207,7 @@ class ServiceCategorieController extends AbstractController
 
             if ($imgFile) {
                 unlink($this->getParameter('shared_directory') . 'services/' . $imgFile);
-                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);;
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $newFilename = $fileUploader->upload($imgFile, $originalFilename, 'services');
                 $service->setImgUrl($newFilename);
             }
@@ -224,10 +224,9 @@ class ServiceCategorieController extends AbstractController
      * @Route("/service_categorie/{id_cat}/services/{id}/delete",name="service_delete", methods={"GET"})
      * @param Service $service
      * @param EntityManagerInterface $manager
-     * @param Request $request
      * @return Response
      */
-    public function delete_service(Service $service, EntityManagerInterface $manager, Request $request)
+    public function delete_service(Service $service, EntityManagerInterface $manager)
     {
         $imgFile = $service->getImgUrl();
         if ($imgFile) {

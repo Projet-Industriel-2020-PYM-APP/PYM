@@ -5,11 +5,9 @@ namespace App\Controller;
 use App\Entity\Poste;
 use App\Form\PosteType;
 use App\Entity\Activite;
-use App\Entity\Entreprise;
 use App\Form\ActiviteType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -34,6 +32,9 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/activite/add",name="reference_table_add_activite", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function add_activite(Request $request, EntityManagerInterface $manager)
     {
@@ -51,6 +52,10 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/activite/{id}/edit",name="reference_table_edit_activite", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function edit_activite($id, Request $request, EntityManagerInterface $manager)
     {
@@ -71,6 +76,9 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/poste/add",name="reference_table_add_poste", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function add_poste(Request $request, EntityManagerInterface $manager)
     {
@@ -89,6 +97,9 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("/tables_reference/activite/{id}/delete",name="reference_table_delete_activite", methods={"GET", "POST"})
+     * @param EntityManagerInterface $manager
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete_activite(EntityManagerInterface $manager, $id)
     {
@@ -104,6 +115,10 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/poste/{id}/edit",name="reference_table_edit_poste", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function edit_poste($id, Request $request, EntityManagerInterface $manager)
     {
@@ -123,6 +138,9 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("/tables_reference/poste/{id}/delete",name="reference_table_delete_poste", methods={"GET", "POST"})
+     * @param EntityManagerInterface $manager
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function delete_poste(EntityManagerInterface $manager, $id)
     {

@@ -8,7 +8,7 @@
 {% endblock %}
 {% block body %}
     <div class="domaine container">
-        <img class="img-fluid row" height="25%" width="25%" src="{{asset('uploads/domaine/' ~ file)}}"/>
+        <img class="img-fluid row" height="25%" width="25%" src="{{asset('uploads/domaine/' ~ file)}}" alt="{{asset('uploads/domaine/' ~ file)}}"/>
         <a class="btn btn-primary row" href="{{path('domaine_edit',{'id':1})}}" >Modifier</a>
     </div>
 {% endblock %}

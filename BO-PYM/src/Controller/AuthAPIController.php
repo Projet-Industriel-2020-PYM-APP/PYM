@@ -7,19 +7,17 @@ use App\Form\ResetPasswordType;
 use App\Repository\UtilisateurRepository;
 use DateInterval;
 use DateTime;
+use Exception;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\Regex;
 
 class AuthAPIController extends AbstractController
 {
@@ -86,7 +84,7 @@ class AuthAPIController extends AbstractController
         $user->setRole('User');
         try {
             $user->setToken(bin2hex(random_bytes(64)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning($e);
             $user->setToken(uniqid("", true));
         }
@@ -95,7 +93,7 @@ class AuthAPIController extends AbstractController
         $user->setTokenExpiresAt($expirationDate);
         try {
             $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning($e);
             $user->setRefreshToken(uniqid("", true));
         }
@@ -133,10 +131,9 @@ class AuthAPIController extends AbstractController
      * It generate an url and send it to the owner of the email address.
      *
      * @Route("/api/auth/email_verification", methods={"POST"})
-     * @param Request $request
      * @return Response
      */
-    public function emailVerification(Request $request)
+    public function emailVerification()
     {
         $em = $this->getDoctrine()->getManager();
         /** @var Utilisateur $user */
@@ -144,7 +141,7 @@ class AuthAPIController extends AbstractController
         $user->setIsEmailVerified(false);
         try {
             $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning($e);
             $user->setRefreshToken(uniqid("", true));
         }
@@ -190,7 +187,7 @@ class AuthAPIController extends AbstractController
         }
         try {
             $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning($e);
             $user->setRefreshToken(uniqid("", true));
         }
@@ -302,6 +299,6 @@ class AuthAPIController extends AbstractController
      */
     public function logout()
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }

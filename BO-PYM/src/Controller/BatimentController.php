@@ -6,21 +6,14 @@ use App\Entity\Bureau;
 use App\Entity\Batiment;
 use App\Form\BureauType;
 use App\Entity\Entreprise;
-use App\Form\BatimentType;
-use App\Entity\TypeBatiment;
 use App\Service\FileUploader;
 use App\Form\Batiment2Type;
-use App\Entity\FormeParametrique;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 header("Access-Control-Allow-Origin: *");
@@ -78,10 +71,11 @@ class BatimentController extends AbstractController
                     $batiment->setRepresentation3D($filename);
                     break;
                 case "Forme Paramétrique":
-                    if ($batiment->getFormeParametrique() == null) {
-                        // return new Response("Veuillez saisir une forme paramétrique.");
-                    }
-
+                    //if ($batiment->getFormeParametrique() == null) {
+                    //
+                    //     return new Response("Veuillez saisir une forme paramétrique.");
+                    //}
+                    break;
             }
 
             $manager->persist($batiment);
@@ -164,6 +158,7 @@ class BatimentController extends AbstractController
     public function add_bureau($id, Request $request, EntityManagerInterface $manager)
     {
         $repository = $this->getDoctrine()->getRepository(Batiment::class);
+        /** @var Batiment $batiment */
         $batiment = $repository->find($id);
 
         if (!$batiment) {

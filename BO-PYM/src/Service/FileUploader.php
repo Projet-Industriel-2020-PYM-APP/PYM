@@ -54,6 +54,7 @@ class FileUploader
                 $this->logger->alert($e);
             }
         }
+        return null;
     }
 
     public function getTargetDirectory()

@@ -7,6 +7,7 @@ use App\Form\UserEditType;
 use App\Entity\Utilisateur;
 use DateInterval;
 use DateTime;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -137,6 +138,9 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id}/delete",name="user_delete", methods={"GET", "POST"})
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
     public function delete($id, EntityManagerInterface $manager)
     {
@@ -170,7 +174,7 @@ class UserController extends AbstractController
         $user->setIsEmailVerified(false);
         try {
             $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $user->setRefreshToken(uniqid("", true));
         }
         $expirationDate = new DateTime();

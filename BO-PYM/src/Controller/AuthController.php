@@ -7,6 +7,7 @@ use App\Form\RegistrationType;
 use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -106,10 +107,9 @@ class AuthController extends AbstractController
      * @param EntityManagerInterface $manager
      * @param Request $request
      * @param Swift_Mailer $mailer
-     * @param UserPasswordEncoderInterface $encoder
      * @return RedirectResponse|Response
      */
-    public function reset_password(EntityManagerInterface $manager, Request $request, Swift_Mailer $mailer, UserPasswordEncoderInterface $encoder)
+    public function reset_password(EntityManagerInterface $manager, Request $request, Swift_Mailer $mailer)
     {
         $form = $this->createFormBuilder()
             ->add('email', EmailType::class, [
@@ -137,7 +137,7 @@ class AuthController extends AbstractController
             }
             try {
                 $user->setRefreshToken(bin2hex(random_bytes(64)));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 # if it was not possible to gather sufficient entropy.
                 $user->setRefreshToken(uniqid("", true));
             }

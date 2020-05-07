@@ -98,7 +98,6 @@ class Batiment2Type extends AbstractType
             ->add('FormeParametrique',EntityType::class,[
                 'class'=>FormeParametrique::class,
                 'choice_value'=>'Nom',
-                'placeholder'=>' ',
                 'required'=>false,
                 'placeholder'=>'Type de forme',
                 'label' => ' ',

@@ -6,9 +6,9 @@
     {{ encore_entry_script_tags('contactAdd') }}
     <script>
         function toggle() {
-            contentNumero = document.getElementById("numero");
-            contentEtage = document.getElementById("etage")
-            if (contentEtage.hidden == true) {
+            const contentNumero = document.getElementById("numero");
+            const contentEtage = document.getElementById("etage");
+            if (contentEtage.hidden === true) {
                 contentEtage.hidden = false;
                 contentEtage.height = "auto";
                 contentNumero.hidden = false;

@@ -15,6 +15,10 @@ class TypeBatimentFixtures extends Fixture
         $manager->persist($entity);
 
         $entity = new TypeBatiment();
+        $entity->setNom('Batiment');
+        $manager->persist($entity);
+
+        $entity = new TypeBatiment();
         $entity->setNom('PAV');
         $manager->persist($entity);
 

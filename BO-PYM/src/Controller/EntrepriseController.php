@@ -12,20 +12,13 @@ use App\Entity\Entreprise;
 use App\Form\ActiviteType;
 use App\Form\EntrepriseType;
 use App\Service\FileUploader;
-use Intervention\Image\ImageManagerStatic as Image;
-use App\Form\EntrepriseEditType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 header("Access-Control-Allow-Origin: *");
@@ -61,6 +54,7 @@ class EntrepriseController extends AbstractController
 
             $repo = $this->getDoctrine()->getRepository(Activite::class);
             if ($form->get('activites')->getData() != null) {
+                /** @var Activite $activite */
                 $activite = $repo->findOneBy(['Nom' => $form->get('activites')->getData()->getNom()]);
                 if (!$activite) {
                     throw $this->createNotFoundException('No activity found');
@@ -126,7 +120,6 @@ class EntrepriseController extends AbstractController
                 $filename = $fileUploader->upload($new_file, $nom_entreprise, 'logos');
                 $entreprise_to_edit->setLogo($filename);
             } else {
-                $logo = $entreprise_to_edit->getLogo();
                 $entreprise_to_edit->setLogo($old_value);
             }
 
@@ -193,6 +186,7 @@ class EntrepriseController extends AbstractController
 
             $repo = $this->getDoctrine()->getRepository(Poste::class);
             if ($form->get('poste')->getData() != null) {
+                /** @var Poste $poste */
                 $poste = $repo->findOneBy(['Nom' => $form->get('poste')->getData()->getNom()]);
                 if (!$poste) {
                     throw $this->createNotFoundException('No poste found ');
@@ -398,6 +392,9 @@ class EntrepriseController extends AbstractController
 
     /**
      * @Route("/entreprises/{id}/delete",name="entreprise_delete", methods={"GET", "POST"})
+     * @param $id
+     * @param EntityManagerInterface $manager
+     * @return RedirectResponse
      */
     public function delete($id, EntityManagerInterface $manager)
     {

@@ -183,12 +183,12 @@ class Utilisateur implements UserInterface
 
     public function isTokenExpired(): bool
     {
-        return $this->getTokenExpiresAt() <= new \DateTime();
+        return $this->getTokenExpiresAt() <= new DateTime();
     }
 
     public function isRefreshTokenExpired(): bool
     {
-        return $this->getRefreshTokenExpiresAt() <= new \DateTime();
+        return $this->getRefreshTokenExpiresAt() <= new DateTime();
     }
 
     /**
@@ -246,11 +246,13 @@ class Utilisateur implements UserInterface
 
     public function getRoles()
     {
-        if ($this->getRole() == "Admin"):
+        if ($this->getRole() == "Admin") {
             return ['ROLE_ADMIN'];
-        elseif ($this->getRole() == "User"):
+        } elseif ($this->getRole() == "User") {
             return ['ROLE_USER'];
-        endif;
+        } else {
+            return 'ROLE_USER';
+        }
     }
 
     public function getRole(): ?string

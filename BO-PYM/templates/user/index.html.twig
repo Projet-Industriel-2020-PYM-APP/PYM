@@ -6,7 +6,7 @@
     {{ encore_entry_script_tags('userIndex') }}
     <script>
         function usersSearch() {
-            var input, filter, table, tr, td, i, txtValue;
+            let input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("usersInput");
             filter = input.value.toUpperCase();
             table = document.getElementById("usersTable");
@@ -35,7 +35,7 @@
                     {% endif %}
                     <div class="mr-sm-2"></div>
                     <input type="text" id="usersInput" onkeyup="usersSearch()" placeholder="Rechercher un utilisateur"
-                           class="my-2 my-sm-0 rounded">
+                           class="my-2 my-sm-0 rounded" aria-label="Barre de recherche">
                 </nav>
             </div>
             <div class="row justify-content-center">
@@ -54,9 +54,9 @@
                     {% for user in users %}
                         <tr>
                             {# <td scope="row">{{user.username}}</td> #}
-                            <td scope="row">{{ user.email }}</td>
-                            <td scope="row">{{ user.role }}</td>
-                            <td scope="row">{{ user.isEmailVerified ? 'Oui' : 'Non' }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role }}</td>
+                            <td>{{ user.isEmailVerified ? 'Oui' : 'Non' }}</td>
                             {% if app.user.role =="Admin" %}
                                 <td>
                                     <div class="btn-group action">

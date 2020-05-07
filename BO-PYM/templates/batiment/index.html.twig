@@ -154,8 +154,7 @@
                             </td>
                         </tr>
                         <tr class="Bureaux" hidden>
-                            <th colspan="5">
-                            <td>
+                            <td colspan="5">
                                 <table class="table table-stripped rounded">
                                     {% if batiment.Bureaux|length==0 %}
                                         <tr>
@@ -174,7 +173,9 @@
                                     {% else %}
                                         <thead class="burHead">
                                         <tr>
-                                            <th scope="col" class="bureaux-index">Entreprises</th>
+                                            <th colspan="4" scope="col" class="bureaux-index">Entreprises</th>
+                                        </tr>
+                                        <tr>
                                             <th scope="col">Nom</th>
                                             <th scope="col">Etage</th>
                                             <th scope="col">Numéro</th>
@@ -184,7 +185,6 @@
                                         {% for bureau in batiment.Bureaux %}
                                             <tbody class="table-info burBody">
                                             <tr>
-                                                <td></td>
                                                 <td>{{ bureau.entreprise.Nom }}</td>
                                                 <td>{{ bureau.etage }}</td>
                                                 <td>{{ bureau.numero }}</td>

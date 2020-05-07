@@ -195,6 +195,9 @@
     "ocramius/package-versions": {
         "version": "1.8.0"
     },
+    "ocramius/package-versions": {
+        "version": "1.8.0"
+    },
     "ocramius/proxy-manager": {
         "version": "2.1.1"
     },

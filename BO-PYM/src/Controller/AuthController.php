@@ -4,21 +4,19 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Form\RegistrationType;
-use App\Form\ResetPasswordType;
-
+use DateInterval;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Swift_Mailer;
 use Swift_Message;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 
 class AuthController extends AbstractController
@@ -26,6 +24,11 @@ class AuthController extends AbstractController
 
     /**
      * @Route("/utilisateurs/ajout", name="user_add", methods={"GET","POST"})
+     * @param Swift_Mailer $mailer
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param UserPasswordEncoderInterface $encoder
+     * @return RedirectResponse|Response
      */
     public function registration(Swift_Mailer $mailer, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
@@ -108,15 +111,20 @@ class AuthController extends AbstractController
      */
     public function reset_password(EntityManagerInterface $manager, Request $request, Swift_Mailer $mailer, UserPasswordEncoderInterface $encoder)
     {
-        $user = new Utilisateur();
+        $form = $this->createFormBuilder()
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'class' => 'reset-password rounded',
+                    'placeholder' => "Adresse e-mail"
+                ],
+                'label' => ' '
+            ])->getForm();
 
-        $form = $this->createForm(ResetPasswordType::class, $user);
         $form->handleRequest($request);
 
-        $email = $user->getEmail();
-
         if ($form->isSubmitted() && $form->isValid()) {
-
+            $data = $form->getData();
+            $email = $data['email'];
             $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
             $user = $repository->findOneBy(['email' => $email]);
 
@@ -127,32 +135,27 @@ class AuthController extends AbstractController
                     'error' => $error
                 ]);
             }
-
-            $chaine = 'azertyuiopqsdfghjklmwxcvbn123456789';
-            $nb_lettre = strlen($chaine);
-            $nb_car = mt_rand(8, 12);
-            $password = '';
-            for ($i = 0; $i < $nb_car; $i++) {
-                $pos = mt_rand(0, $nb_lettre - 1);
-                $car = $chaine[$pos];
-                $password .= $car;
+            try {
+                $user->setRefreshToken(bin2hex(random_bytes(64)));
+            } catch (\Exception $e) {
+                # if it was not possible to gather sufficient entropy.
+                $user->setRefreshToken(uniqid("", true));
             }
+            $expirationDate = new DateTime();
+            $expirationDate->add(new DateInterval('PT1H'));
+            $user->setRefreshTokenExpiresAt($expirationDate);
+            $manager->flush();
 
-            $hash = $encoder->encodePassWord($user, $password);
-            $user->setPassword($hash);
-
-            $message = (new Swift_Message('Récupération du mot de passe'))
+            $message = (new Swift_Message("Confirmer le changement de mot de passe."))
                 ->setFrom('account-security-noreply@map-pym.com')
-                ->setTo($email)
+                ->setTo($user->getEmail())
+                ->setContentType("text/html")
                 ->setBody(
                     $this->renderView(
-                        "auth/email/resetpassword_admin.html.twig",
-                        ['password' => $password]
+                        "auth/email/reset_password.html.twig",
+                        ['token' => $user->getRefreshToken()]
                     )
                 );
-
-            $manager->persist($user);
-            $manager->flush();
 
             $mailer->send($message);
 

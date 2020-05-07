@@ -11,10 +11,6 @@
     text-align: center;
 }
 
-.input-group-text > label {
-    margin-bottom: 0;
-}
-
 .reg{
     border: 3px solid #343a40;
 }

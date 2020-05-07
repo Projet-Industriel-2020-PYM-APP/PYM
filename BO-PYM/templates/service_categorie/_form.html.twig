@@ -14,13 +14,13 @@
                 </div>
             </div>
         </div>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">{{ form_label(form.action) }}</span>
-            </div>
+        <div class="form-group row">
+            {{ form_label(form.action) }}
             {{ form_errors(form.action) }}
-            {{ form_widget(form.action.name) }}
-            {{ form_widget(form.action.htmlUrl) }}
+            <div class="input-group col-sm-10">
+                {{ form_widget(form.action.name) }}
+                {{ form_widget(form.action.htmlUrl) }}
+            </div>
         </div>
     </div>
     <div class="col-1"></div>

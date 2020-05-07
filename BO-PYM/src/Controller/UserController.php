@@ -5,16 +5,16 @@ namespace App\Controller;
 use App\Form\UserEditType;
 
 use App\Entity\Utilisateur;
+use DateInterval;
+use DateTime;
 use Swift_Mailer;
 use Swift_Message;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -38,6 +38,10 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/me/edit",name="user_edit", methods={"GET", "POST"})
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param UserPasswordEncoderInterface $encoder
+     * @return RedirectResponse|Response
      */
     public function edit(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
     {
@@ -81,10 +85,17 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id}/edit",name="user_edit_other", methods={"GET", "POST"})
+     * @param $id
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @param UserPasswordEncoderInterface $encoder
+     * @param Swift_Mailer $mailer
+     * @return RedirectResponse|Response
      */
     public function edit_other($id, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, Swift_Mailer $mailer)
     {
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
+        /** @var Utilisateur $user_to_edit */
         $user_to_edit = $repository->find($id);
         if (!$user_to_edit) {
             throw $this->createNotFoundException(
@@ -134,6 +145,51 @@ class UserController extends AbstractController
 
         $manager->remove($user_to_delete);
         $manager->flush();
+
+        return $this->redirectToRoute('users');
+    }
+
+    /**
+     * Send an email to confirm the email address.
+     *
+     * The method accept a Bearer Token generated with /api/auth/register or /api/auth/login.
+     * It reset the email verification state to false.
+     * It generate an url and send it to the owner of the email address.
+     *
+     * @Route("/users/me/email_verification", name="auth_email_verification", methods={"POST"})
+     * @param Swift_Mailer $mailer
+     * @return Response
+     */
+    public function emailVerification(
+        Swift_Mailer $mailer
+    )
+    {
+        $em = $this->getDoctrine()->getManager();
+        /** @var Utilisateur $user */
+        $user = $this->getUser();
+        $user->setIsEmailVerified(false);
+        try {
+            $user->setRefreshToken(bin2hex(random_bytes(64)));
+        } catch (\Exception $e) {
+            $user->setRefreshToken(uniqid("", true));
+        }
+        $expirationDate = new DateTime();
+        $expirationDate->add(new DateInterval('PT1H'));
+        $user->setRefreshTokenExpiresAt($expirationDate);
+        $em->flush();
+
+        $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
+            ->setFrom('account-security-noreply@map-pym.com')
+            ->setTo($user->getEmail())
+            ->setContentType("text/html")
+            ->setBody(
+                $this->renderView(
+                    "auth/email/confirm_email.html.twig",
+                    ['token' => $user->getRefreshToken()]
+                )
+            );
+
+        $mailer->send($message);
 
         return $this->redirectToRoute('users');
     }

@@ -100,12 +100,12 @@ class Utilisateur implements UserInterface
         return $this;
     }
 
-    public function getRefreshTokenExpiresAt(): ?string
+    public function getRefreshTokenExpiresAt(): ?DateTime
     {
         return $this->refreshTokenExpiresAt;
     }
 
-    public function setRefreshTokenExpiresAt(?string $refreshTokenExpiresAt): self
+    public function setRefreshTokenExpiresAt(?DateTime $refreshTokenExpiresAt): self
     {
         $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
         return $this;

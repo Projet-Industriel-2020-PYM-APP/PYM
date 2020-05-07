@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Form\ResetPasswordType;
 use App\Repository\UtilisateurRepository;
 use DateInterval;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,16 +16,32 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class AuthAPIController extends AbstractController
 {
+    private $logger;
+    private $mailer;
+    private $repository;
+
+    public function __construct(
+        LoggerInterface $logger,
+        Swift_Mailer $mailer,
+        UtilisateurRepository $repository
+    )
+    {
+        $this->logger = $logger;
+        $this->mailer = $mailer;
+        $this->repository = $repository;
+    }
+
     /**
      * Returns a token by triggering the LoginApiAuthenticator.
      *
-     * @Route("/api/auth/login", name="auth_api_login")
+     * @Route("/api/auth/login", name="auth_api_login", methods={"GET", "POST"})
      * @param AuthenticationUtils $authenticationUtils
      * @return Response
      */
@@ -32,8 +49,7 @@ class AuthAPIController extends AbstractController
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $this->logger->alert($error);
 
         return Response::create(
             "Please send a HTTP POST Request with in application/x-www-form-urlencoded with post-data email=[email]&password=[password]",
@@ -47,33 +63,45 @@ class AuthAPIController extends AbstractController
      *
      * It also send an email.
      *
-     * @Route("/api/auth/register", name="auth_api_register", methods={"POST"})
-     * @param Swift_Mailer $mailer
+     * @Route("/api/auth/register", methods={"POST"})
      * @param Request $request
-     * @param EntityManagerInterface $em
      * @param UserPasswordEncoderInterface $encoder
      * @return Response
      */
-    public function register(Swift_Mailer $mailer, Request $request, EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
+    public function register(
+        Request $request,
+        UserPasswordEncoderInterface $encoder
+    )
     {
+        $em = $this->getDoctrine()->getManager();
+        // Fill data
         $user = new Utilisateur();
-        $user->setEmail($request->request->get('email'));
+        $user->setEmail($request->query->get('email'));
         $user->setUsername($user->getEmail());
         $user->setPassword($encoder->encodePassword(
             $user,
-            $request->request->get('password')
+            $request->query->get('password')
         ));
         $user->setIsEmailVerified(false);
         $user->setRole('User');
         try {
             $user->setToken(bin2hex(random_bytes(64)));
         } catch (\Exception $e) {
-            # if it was not possible to gather sufficient entropy.
+            $this->logger->warning($e);
             $user->setToken(uniqid("", true));
         }
         $expirationDate = new DateTime();
         $expirationDate->add(new DateInterval('P1D'));
         $user->setTokenExpiresAt($expirationDate);
+        try {
+            $user->setRefreshToken(bin2hex(random_bytes(64)));
+        } catch (\Exception $e) {
+            $this->logger->warning($e);
+            $user->setRefreshToken(uniqid("", true));
+        }
+        $expirationDate = new DateTime();
+        $expirationDate->add(new DateInterval('PT1H'));
+        $user->setRefreshTokenExpiresAt($expirationDate);
 
         $em->persist($user);
         $em->flush();
@@ -84,11 +112,11 @@ class AuthAPIController extends AbstractController
             ->setBody(
                 $this->renderView(
                     "auth/email/confirm_email.html.twig",
-                    ['confirm_email_url' => '']  # TODO: Here
+                    ['token' => $user->getRefreshToken()]
                 )
             );
 
-        $mailer->send($message);
+        $this->mailer->send($message);
 
         return Response::create(
             $user->getToken(),
@@ -104,50 +132,39 @@ class AuthAPIController extends AbstractController
      * It reset the email verification state to false.
      * It generate an url and send it to the owner of the email address.
      *
-     * @Route("/api/auth/email_verification", name="auth_api_email_verification", methods={"POST"})
-     * @param Swift_Mailer $mailer
+     * @Route("/api/auth/email_verification", methods={"POST"})
      * @param Request $request
-     * @param EntityManagerInterface $em
-     * @param UtilisateurRepository $repository
      * @return Response
      */
-    public function emailVerification(Swift_Mailer $mailer, Request $request, EntityManagerInterface $em, UtilisateurRepository $repository, UrlGeneratorInterface $urlGenerator)
+    public function emailVerification(Request $request)
     {
-        $authorizationHeader = $request->headers->get('Authorization');
-        if (is_null($authorizationHeader)) {
-            throw $this->createAccessDeniedException();
-        }
-        $token = substr($authorizationHeader, 7);
-        $user = $repository->findOneBy(["token"=> $token]);
+        $em = $this->getDoctrine()->getManager();
+        /** @var Utilisateur $user */
+        $user = $this->getUser();
         $user->setIsEmailVerified(false);
         try {
             $user->setRefreshToken(bin2hex(random_bytes(64)));
         } catch (\Exception $e) {
-            # if it was not possible to gather sufficient entropy.
+            $this->logger->warning($e);
             $user->setRefreshToken(uniqid("", true));
         }
         $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('P1H'));
+        $expirationDate->add(new DateInterval('PT1H'));
         $user->setRefreshTokenExpiresAt($expirationDate);
-
-        $confirmationLink = $urlGenerator->generate(
-            'auth_confirm_email',
-            ['token' => $user->getRefreshToken()]
-        );
+        $em->flush();
 
         $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
             ->setFrom('account-security-noreply@map-pym.com')
             ->setTo($user->getEmail())
+            ->setContentType("text/html")
             ->setBody(
                 $this->renderView(
                     "auth/email/confirm_email.html.twig",
-                    ['confirm_email_url' => $confirmationLink]
+                    ['token' => $user->getRefreshToken()]
                 )
             );
 
-        $mailer->send($message);
-
-        $em->flush();
+        $this->mailer->send($message);
 
         return Response::create(
             "Sent",
@@ -157,47 +174,43 @@ class AuthAPIController extends AbstractController
     }
 
     /**
-     * @Route("/api/auth/forgot_password", name="auth_api_email_verification", methods={"POST"})
-     * @param Swift_Mailer $mailer
+     * @Route("/auth/forgot_password", name="auth_forgot_password", methods={"POST"})
      * @param Request $request
-     * @param UtilisateurRepository $repository
-     * @param UrlGeneratorInterface $urlGenerator
      * @return Response
      */
-    public function forgotPassword(Swift_Mailer $mailer, Request $request, UtilisateurRepository $repository, UrlGeneratorInterface $urlGenerator)
+    public function forgotPassword(Request $request)
     {
-        $email = $request->headers->get('email');
-        $user = $repository->findOneBy(["email"=> $email]);
+        $em = $this->getDoctrine()->getManager();
+        $email = $request->query->get('email');
+        $user = $this->repository->findOneBy(["email" => $email]);
         if (is_null($user)) {
             throw $this->createNotFoundException(
-                'Email not found' / $email
+                'Email not found : ' . $email
             );
         }
         try {
             $user->setRefreshToken(bin2hex(random_bytes(64)));
         } catch (\Exception $e) {
-            # if it was not possible to gather sufficient entropy.
+            $this->logger->warning($e);
             $user->setRefreshToken(uniqid("", true));
         }
         $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('P1H'));
+        $expirationDate->add(new DateInterval('PT1H'));
         $user->setRefreshTokenExpiresAt($expirationDate);
+        $em->flush();
 
-        $confirmationLink = $urlGenerator->generate(
-            'auth_reset_password',
-            ['token' => $user->getRefreshToken()]
-        );
-        $message = (new Swift_Message("Confirmer le changement d'addresse email."))
+        $message = (new Swift_Message("Confirmer le changement de mot de passe."))
             ->setFrom('account-security-noreply@map-pym.com')
             ->setTo($user->getEmail())
+            ->setContentType("text/html")
             ->setBody(
                 $this->renderView(
                     "auth/email/reset_password.html.twig",
-                    ['confirm_email_url' => $confirmationLink]
+                    ['token' => $user->getRefreshToken()]
                 )
             );
 
-        $mailer->send($message);
+        $this->mailer->send($message);
 
         return Response::create(
             "Sent",
@@ -209,14 +222,12 @@ class AuthAPIController extends AbstractController
     /**
      * @Route("/auth/confirm_email/{token}", name="auth_confirm_email", methods={"GET"})
      * @param string $token
-     * @param EntityManagerInterface $em
-     * @param UtilisateurRepository $repository
-     * @param UserPasswordEncoderInterface $encoder
      * @return Response
      */
-    public function confirmEmail(string $token, EntityManagerInterface $em, UtilisateurRepository $repository, UserPasswordEncoderInterface $encoder)
+    public function confirmEmail(string $token)
     {
-        $user = $repository->findOneBy(["refreshToken"=> $token]);
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->repository->findOneBy(["refreshToken" => $token]);
         if (is_null($user)) {
             throw $this->createNotFoundException('User not found');
         }
@@ -234,52 +245,25 @@ class AuthAPIController extends AbstractController
      * @Route("/auth/reset_password/{token}", name="auth_reset_password", methods={"GET", "POST"})
      * @param string $token
      * @param Request $request
-     * @param EntityManagerInterface $em
-     * @param UtilisateurRepository $repository
      * @param UserPasswordEncoderInterface $encoder
      * @return Response
      */
-    public function resetPassword(string $token, Request $request, EntityManagerInterface $em, UtilisateurRepository $repository, UserPasswordEncoderInterface $encoder)
+    public function resetPassword(
+        string $token,
+        Request $request,
+        UserPasswordEncoderInterface $encoder
+    )
     {
-        $user = $repository->findOneBy(["refreshToken"=> $token]);
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->repository->findOneBy(["refreshToken" => $token]);
         if (is_null($user)) {
-            throw $this->createNotFoundException('User not found');
+            throw $this->createNotFoundException('User not found.');
         }
         if ($user->isRefreshTokenExpired()) {
             throw $this->createAccessDeniedException('Link has expired.');
         }
 
-        $form = $this->createFormBuilder($user)
-            ->add('password', PasswordType::class, [
-                'row_attr' => [
-                    'class' => 'form-group'
-                ],
-                'label_attr' => [
-                    'class' => 'h5'
-                ],
-                'attr' => [
-                    'placeholder' => "Mot de passe",
-                    'class' => 'reg rounded form-control'
-                ],
-                'label' => "Mot de passe",
-            ])
-            ->add('confirm_password', PasswordType::class, [
-                'row_attr' => [
-                    'class' => 'form-group'
-                ],
-                'label_attr' => [
-                    'class' => 'h5'
-                ],
-                'attr' => [
-                    'placeholder' => "Mot de passe",
-                    'class' => 'reg rounded form-control'
-                ],
-                'label' => "Mot de passe",
-            ])
-            ->add('_submit', SubmitType::class, [
-                'label' => 'Changer de mot de passe'
-            ])
-            ->getForm();
+        $form = $this->createForm(ResetPasswordType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -289,6 +273,17 @@ class AuthAPIController extends AbstractController
             $user->setRefreshTokenExpiresAt(new DateTime());
             $user->setRefreshToken(null);
             $em->flush();
+
+            $message = (new Swift_Message("Mot de passe modifié."))
+                ->setFrom('account-security-noreply@map-pym.com')
+                ->setTo($user->getEmail())
+                ->setBody(
+                    $this->renderView(
+                        "auth/email/confirmed_email.html.twig"
+                    )
+                );
+
+            $this->mailer->send($message);
 
             return $this->render(
                 "auth/confirmed_reset_password.html.twig"
@@ -303,7 +298,7 @@ class AuthAPIController extends AbstractController
     }
 
     /**
-     * @Route("/api/auth/logout", name="auth_api_logout")
+     * @Route("/api/auth/logout", name="auth_api_logout", methods={"GET", "POST"})
      */
     public function logout()
     {

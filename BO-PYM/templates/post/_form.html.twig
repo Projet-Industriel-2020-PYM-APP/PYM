@@ -1,0 +1,12 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+
+    <div class="btn-toolbar my-4 justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="Cancel Group">
+            <a class="btn btn-light" href="{{ path('post_index') }}">Annuler</a>
+        </div>
+        <div class="btn-group mr-2" role="group" aria-label="Publish Group">
+            <button class="btn btn-primary">{{ button_label|default('Publier') }}</button>
+        </div>
+    </div>
+{{ form_end(form) }}

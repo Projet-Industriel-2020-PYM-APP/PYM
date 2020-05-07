@@ -1,5 +1,11 @@
 var Encore = require('@symfony/webpack-encore');
 
+// Manually configure the runtime environment if not already configured yet by the "encore" command.
+// It's useful when you use tools that rely on webpack.config.js file.
+if (!Encore.isRuntimeEnvironmentConfigured()) {
+    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
+}
+
 Encore
     // directory where compiled assets will be stored
     .setOutputPath('public/build/')
@@ -15,7 +21,7 @@ Encore
      * (including one that's included on every page - e.g. "app")
      *
      * Each entry will result in one JavaScript file (e.g. app.js)
-     * and one CSS file (e.g. app.css) if you JavaScript imports CSS.
+     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/js/app.js')
     .addEntry('login', './assets/js/login.js')
@@ -29,6 +35,9 @@ Encore
     .addEntry('entrepriseShow', './assets/js/entrepriseShow.js')
     .addEntry('entrepriseNew', './assets/js/entrepriseNew.js')
     .addEntry('entrepriseEdit', './assets/js/entrepriseEdit.js')
+    .addEntry('serviceForm', './assets/js/serviceForm.js')
+    .addEntry('serviceCategorieForm', './assets/js/serviceCategorieForm.js')
+    .addEntry('serviceCategorieIndex', './assets/js/serviceCategorieIndex.js')
     .addEntry('contactAdd', './assets/js/contactAdd.js')
     .addEntry('addActivite', './assets/js/addActivite.js')
     .addEntry('addPoste', './assets/js/addPoste.js')
@@ -37,7 +46,9 @@ Encore
     .addEntry('reference', './assets/js/reference.js')
     .addEntry('addedit', './assets/js/addedit.js')
     .addEntry('domaine', './assets/js/domaine.js')
-    // When enabled, Webpack "splits" your files into sm
+    .addEntry('postIndex', './assets/js/postIndex.js')
+    .addEntry('postForm', './assets/js/postForm.js')
+    .addEntry('postShow', './assets/js/postShow.js')
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
 
@@ -58,18 +69,34 @@ Encore
     // enables hashed filenames (e.g. app.abc123.css)
     .enableVersioning(Encore.isProduction())
 
-    // enables Sass/SCSS support
-    //.enableSassLoader()
+    // enables @babel/preset-env polyfills
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = 3;
+    })
+    .copyFiles([
+        { from: './node_modules/ckeditor/', to: 'ckeditor/[path][name].[ext]', pattern: /\.(js|css)$/, includeSubdirectories: false },
+        { from: './node_modules/ckeditor/adapters', to: 'ckeditor/adapters/[path][name].[ext]' },
+        { from: './node_modules/ckeditor/lang', to: 'ckeditor/lang/[path][name].[ext]' },
+        { from: './node_modules/ckeditor/plugins', to: 'ckeditor/plugins/[path][name].[ext]' },
+        { from: './node_modules/ckeditor/skins', to: 'ckeditor/skins/[path][name].[ext]' }
+    ]);
 
-    // uncomment if you use TypeScript
-    //.enableTypeScriptLoader()
+// enables Sass/SCSS support
+//.enableSassLoader()
 
-    // uncomment if you're having problems with a jQuery plugin
-    //.autoProvidejQuery()
+// uncomment if you use TypeScript
+//.enableTypeScriptLoader()
 
-    // uncomment if you use API Platform Admin (composer req api-admin)
-    //.enableReactPreset()
-    //.addEntry('admin', './assets/js/admin.js')
-;
+// uncomment to get integrity="..." attributes on your script & link tags
+// requires WebpackEncoreBundle 1.4 or higher
+//.enableIntegrityHashes(Encore.isProduction())
+
+// uncomment if you're having problems with a jQuery plugin
+//.autoProvidejQuery()
+
+// uncomment if you use API Platform Admin (composer req api-admin)
+//.enableReactPreset()
+//.addEntry('admin', './assets/js/admin.js')
 
 module.exports = Encore.getWebpackConfig();

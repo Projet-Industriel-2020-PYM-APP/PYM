@@ -3,48 +3,60 @@
 // src/Service/FileUploader.php
 namespace App\Service;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FileUploader
 {
     private $targetDirectory;
+    private $slugger;
+    private $logger;
 
-    public function __construct($targetDirectory)
+    public function __construct(string $targetDirectory, SluggerInterface $slugger, LoggerInterface $logger)
     {
         $this->targetDirectory = $targetDirectory;
+        $this->slugger = $slugger;
+        $this->logger = $logger;
     }
 
-    public function upload($file,$name,$domaine=0)
+    /**
+     * Upload a file.
+     *
+     * The file is uploaded in the directory specified in the services.yml, appended with $directory.
+     * If $safe is true, the $name will go through a slugger and will be appended a unique Id.
+     *
+     * @param UploadedFile $file
+     * @param string $name
+     * @param string $directory
+     * @param bool $safe
+     * @return string
+     */
+    public function upload(UploadedFile $file, string $name, string $directory, bool $safe = true)
     {
-        if (is_null($file)){
-
-        }
-        else{
-            
-            
-            try {
-                if ($file->guessExtension()=="txt"){
-                    $fileName =$name.'.'."babylon";
-                   $file->move($this->getTargetDirectory().'modeles',$fileName); 
-                }
-                elseif($domaine != 0){
-                    $fileName = $name.'.'.$file->guessExtension();
-                    $file->move($this->getTargetDirectory().'domaine',$fileName);
-                }
-                else {
-                    $fileName = $name.'.'.$file->guessExtension();
-                    $file->move($this->getTargetDirectory().'logos',$fileName);
-                }
-            } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
+        if ($file) {
+            $newName = $name;
+            if ($safe) {
+                $safeFilename = $this->slugger->slug($newName);
+                $newName = $safeFilename.'-'.uniqid();
             }
-
-        return $fileName;
+            try {
+                if ($file->guessExtension() == "txt" && $directory == "modeles") {
+                    $newFileName = $newName . '.' . "babylon";
+                    $file->move($this->getTargetDirectory() . $directory, $newFileName);
+                } else {
+                    $newFileName = $newName . '.' . $file->guessExtension();
+                    $file->move($this->getTargetDirectory() . $directory, $newFileName);
+                }
+                return $newFileName;
+            } catch (FileException $e) {
+                $this->logger->alert($e);
+            }
         }
+        return null;
     }
-    
+
     public function getTargetDirectory()
     {
         return $this->targetDirectory;

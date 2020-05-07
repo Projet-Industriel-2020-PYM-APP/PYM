@@ -1,29 +1,51 @@
 {% extends "base.html.twig" %}
 {% block title %}<title>PYM 3D</title>{% endblock %}
 {% block stylesheets %}
-    {{ encore_entry_link_tags('login') }}  
+    {{ encore_entry_link_tags('login') }}
 {% endblock %}
 {% block javascripts %}
     {{ encore_entry_script_tags('login') }}
 {% endblock %}
 {% block bodyauth %}
-    {% if not app.user %}           
-    <body class="login" cz-shortcut-listen="true">
-        <form class="form-signin" action="{{path('auth_connexion')}}" method="post">
-            <img class="mb4 img-fluid" src="{{asset('Logo_PYM.png') }}" alt="" >
+    {% if not app.user %}
+        <body class="login mx-auto" cz-shortcut-listen="true">
+        <form class="form-signin container mx-auto my-5" method="post">
+            <img class="mb4 img-fluid" src="{{ asset('Logo_PYM.png') }}" alt="">
             <div class="h3 mb-3 font-weight-normal">Connexion</div>
-            <input required="" autofocus="" name="_username" type="email" class="form-control" id="inputEmail" placeholder="Adresse e-mail">
-            <input required="" autofocus=""  name="_password" type="password" class="form-control" id="inputPassword" placeholder="Mot de passe">
-            {% if error %}
-            <div class="alert alert-danger" role="alert">
-                Email ou mot de passe incorrect !
+            <div class="login-form input-group mb-3 mx-auto">
+                <input value="{{ last_username }}" name="email" type="email" class="form-control"
+                       id="inputEmail"
+                       placeholder="Adresse e-mail" required autofocus aria-label="Email"
+                       aria-describedby="email-addon">
             </div>
+            <div class="login-form input-group mb-3 mx-auto">
+                <input name="password" type="password" class="form-control" id="inputPassword"
+                       placeholder="Mot de passe" aria-label="Mot de Passe" aria-describedby="password-addon"
+                       required autofocus>
+            </div>
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('authenticate') }}">
+            {#
+                Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                See https://symfony.com/doc/current/security/remember_me.html
+
+                <div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" name="_remember_me"> Remember me
+                    </label>
+                </div>
+            #}
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    Email ou mot de passe incorrect !
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                </div>
             {% endif %}
-            <button type="submit" class="btn btl-lg btn-primary btn-block btn-login">Se connecter</button>
-            <a href="{{ path('auth_resetpassword')}}" class="forgot"> Mot de passe oublié</a>
+            <button type="submit" class="login-form btn btn-primary btn-block mx-auto">Se connecter</button>
+            <a href="{{ path('auth_resetpassword') }}" class="btn btn-link forgot my-3"> Mot de passe oublié</a>
         </form>
-    </body>
+        </body>
     {% else %}
-    
+
     {% endif %}
 {% endblock %}

@@ -14,18 +14,28 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api
+            anonymous: true
+            provider: in_database
+            guard:
+                authenticators:
+                    - App\Security\TokenAuthenticator
+                    - App\Security\LoginApiAuthenticator
+                entry_point: App\Security\LoginApiAuthenticator
+            logout:
+                path: auth_api_logout
         main:
             anonymous: true
-
             provider: in_database
-
-            form_login:
-                login_path: auth_connexion
-                check_path: auth_connexion
-            
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+                entry_point: App\Security\LoginFormAuthenticator
             logout:
                 path: auth_deconnexion
                 target: auth_connexion
+
 
             # activate different ways to authenticate
 
@@ -38,5 +48,80 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: /admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # Home
+        - { path: ^/$, roles: IS_AUTHENTICATED_FULLY }
+
+        # Auth
+        - { path: ^/utilisateurs/ajout$, roles: ROLE_ADMIN }
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/reinitialisation_mot_de_passe$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/deconnexion$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # Auth API
+        - { path: ^/api/auth/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/auth/register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/auth/email_verification$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/auth/forgot_password$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/confirm_email, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/reset_password, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/auth/logout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # User
+        - { path: ^/users$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/users/me/edit$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/users/me/email_verification$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/users/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/users/[0-9]+/delete$, roles: ROLE_ADMIN }
+
+        # Batiments
+        - { path: ^/batiments$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/batiments/add$, roles: ROLE_ADMIN }
+        - { path: ^/batiments/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/batiments/[0-9]+/delete$, roles: ROLE_ADMIN }
+        - { path: ^/batiments/[0-9]+/bureau/add$, roles: ROLE_ADMIN }
+        - { path: ^/batiments/[0-9]+/bureau/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/batiments/[0-9]+/bureau/[0-9]+/delete$, roles: ROLE_ADMIN }
+        # API
+        - { path: ^/api/batiments$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/bureaux$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+        # Domaine
+        - { path: ^/domaine$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/domaine/[0-9]+/edit$, roles: ROLE_ADMIN }
+
+        # Entreprises
+        - { path: ^/entreprises$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/entreprises/[0-9]+$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/entreprises/add$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/delete$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/contact/add$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/contact/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/contact/[0-9]+/delete$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/poste/add$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/contact/[0-9]+/poste/[0-9]+/delete$, roles: ROLE_ADMIN }  # Fix this
+        - { path: ^/entreprises/[0-9]+/activite/add$, roles: ROLE_ADMIN }
+        - { path: ^/entreprises/[0-9]+/activite/[0-9]+/delete$, roles: ROLE_ADMIN }  # Fix this
+        # API
+        - { path: ^/api/entreprises$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/contacts$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+        # Reference Table
+        - { path: ^/tables_reference$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tables_reference/activite/add$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tables_reference/activite/[0-9]+/edit$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tables_reference/activite/[0-9]+/delete$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tables_reference/poste/add$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tables_reference/poste/[0-9]+/edit$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/tables_reference/poste/[0-9]+/delete$, roles: IS_AUTHENTICATED_FULLY }
+
+        # Services
+        - { path: ^/service_categorie$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/service_categorie/new$, roles: ROLE_ADMIN }
+        - { path: ^/service_categorie/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/service_categorie/[0-9]+/delete$, roles: ROLE_ADMIN }
+        - { path: ^/service_categorie/[0-9]+/services/add$, roles: ROLE_ADMIN }
+        - { path: ^/service_categorie/[0-9]+/services/[0-9]+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/service_categorie/[0-9]+/services/[0-9]+/delete$, roles: ROLE_ADMIN }
+        # API
+        - { path: ^/api/service_categories$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/services$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+

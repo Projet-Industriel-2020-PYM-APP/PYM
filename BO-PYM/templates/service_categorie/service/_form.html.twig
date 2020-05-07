@@ -1,0 +1,76 @@
+{% block javascripts %}
+    {{ encore_entry_script_tags('serviceForm') }}
+{% endblock %}
+{% macro printAction(action) %}
+    {# Template for Action Tile #}
+    <div class="input-group">
+        {{ form_errors(action) }}
+        {{ form_widget(action.name) }}
+        {{ form_widget(action.htmlUrl) }}
+        <div class="input-group-append" id="button-addon4">
+            <button class="btn btn-secondary delete-action-widget" type="button"
+                    aria-label="Enlever">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+{% endmacro %}
+{% import _self as formMacros %}
+
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-10">
+        {{ form_row(form.title) }}
+        {{ form_row(form.subtitle) }}
+        <div class="row my-2">
+            {{ form_label(form.imgUrl) }}
+            <div class="input-group reg rounded">
+                <div class="custom-file">
+                    <label class="custom-file-label" for="service_imgUrl">Ouvrir un fichier</label>
+                    {{ form_errors(form.imgUrl) }}
+                    {{ form_widget(form.imgUrl) }}
+                </div>
+            </div>
+        </div>
+        {{ form_row(form.address) }}
+        {{ form_row(form.telephone) }}
+        {{ form_row(form.website) }}
+        <div class="row mt-2 justify-content-between align-items-center">
+            <div class="col-10">
+                {{ form_label(form.actions) }}
+            </div>
+            <div class="col-1">
+                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                    <div class="btn-group mr-2" role="group" aria-label="First group">
+                        <button type="button"
+                                class="btn add-action-widget"
+                                data-list-selector="#actions-list">
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="actions-list" class="container"
+             data-prototype="{{ formMacros.printAction(form.actions.vars.prototype)|e('html_attr') }}"
+             data-widget-tags="{{ '<div class="data-tag"></div>'|e }}"
+             data-widget-counter="{{ form.actions|length }}">
+            {% for action in form.actions %}
+                <div class="data-tag">
+                    {{ formMacros.printAction(action) }}
+                </div>
+            {% else %}
+                {% do form.actions.setRendered %}
+            {% endfor %}
+        </div>
+        {{ form_row(form.categorie) }}
+    </div>
+    <div class="col-1"></div>
+</div>
+<div class="btns row justify-content-around">
+    <a href="{{ path('service_categorie_index') }}"
+       class="btn btn-secondary btn-back">Annuler</a>
+    <button type="submit" class="btn btn-success btn-add">{{ button_label|default('Ajouter') }}</button>
+</div>
+{{ form_end(form) }}

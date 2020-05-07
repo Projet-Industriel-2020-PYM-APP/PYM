@@ -1,0 +1,10 @@
+@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
+@import './layout.css';
+
+.reg{
+    background: transparent;
+    border: 3px solid #343a40;
+}
+.reg-end{
+    margin-bottom: 30px;
+}

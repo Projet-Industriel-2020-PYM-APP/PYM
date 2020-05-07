@@ -6,9 +6,9 @@
     {{ encore_entry_script_tags('addedit') }}
     <script>
         function toggle() {
-            contentNumero = document.getElementById("numero");
-            contentEtage = document.getElementById("etage")
-            if (contentEtage.hidden == true) {
+            const contentNumero = document.getElementById("numero");
+            const contentEtage = document.getElementById("etage");
+            if (contentEtage.hidden === true) {
                 contentEtage.hidden = false;
                 contentEtage.height = "auto";
                 contentNumero.hidden = false;
@@ -48,12 +48,9 @@
                         </div>
                         <div class="col-1"></div>
                     </div>
-                    <div class="btns row">
-                        <div class="col-1"></div>
-                        <a href="{{path('batiments')}}" class="btn btn-secondary btn-back col-3">Annuler</a>
-                        <div class="col-4"></div>
-                        <button class="btn btn-success btn-add col-3" type="submit">Modifier</button>
-                        <div class="col-1"></div>
+                    <div class="btns row justify-content-around">
+                        <a href="{{path('batiments')}}" class="btn btn-secondary btn-back">Annuler</a>
+                        <button class="btn btn-success btn-add" type="submit">Ajouter</button>
                     </div>
                     {{form_end(form) }}
                 </div>

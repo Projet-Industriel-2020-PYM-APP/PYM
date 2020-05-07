@@ -1,36 +1,45 @@
 {% extends 'layout.html.twig' %}
 {% block stylesheets %}
-    {{encore_entry_link_tags('userEdit')}}
+    {{ encore_entry_link_tags('userEdit') }}
 {% endblock %}
 {% block javascripts %}
-    {{encore_entry_script_tags('userEdit')}}
+    {{ encore_entry_script_tags('userEdit') }}
 {% endblock %}
 
 {% block body %}
     {% if app.user %}
-            <div class="card">
-                <div class="card-header bg-dark ">
-                    <h4>Modifier un utilisateur</h4> 
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-1"></div>
-                        <div class="col-10">
-                            {{ form_start(form) }}
-                            {{ form_widget(form)}}
-                        </div>
-                        <div class="col-1"></div>
-                    </div>
-                    <div class="btns row">
-                        <div class="col-1"></div>
-                        <a href="{{ path('users')}}" class="btn btn-secondary btn-back col-3">Annuler</a>
-                        <div class="col-4"></div>
-                        <button type="submit" class="btn btn-success btn-add col-3">Modifier</button>
-                        <div class="col-1"></div>
-                    </div>
-                    {{form_end(form) }}
-                </div>
+        <div class="card">
+            <div class="card-header bg-dark ">
+                <h4>Modifier un utilisateur</h4>
             </div>
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    {% if not user.isEmailVerified %}
+                    <form action="{{ path('auth_email_verification') }}" method="post">
+                        <div class="alert alert-warning" role="alert">
+                            E-mail non vérifié 🙁
+                        </div>
+                        <button class="btn btn-primary" type="submit">Envoyer un mail de confirmation</button>
+                    </form>
+                    {% else %}
+                        <div class="alert alert-success" role="alert">
+                           E-mail vérifié 😉 !
+                        </div>
+                    {% endif %}
+                </div>
+                {{ form_start(form) }}
+                <div class="row justify-content-center">
+                    <div class="col-10">
+                        {{ form_widget(form) }}
+                    </div>
+                </div>
+                <div class="btns row justify-content-around">
+                    <a href="{{ path('users') }}" class="btn btn-secondary btn-back">Annuler</a>
+                    <button type="submit" class="btn btn-success btn-add">Modifier</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
     {% else %}
 
 

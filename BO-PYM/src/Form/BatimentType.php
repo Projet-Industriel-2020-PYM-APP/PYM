@@ -9,8 +9,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -51,7 +49,6 @@ class BatimentType extends AbstractType
                  'label'=>'Etat'
             ])
             ;
-        ;
 
         $formModifier = function(FormInterface $form, TypeBatiment $type=null){
             if ($type=="Batiment"){

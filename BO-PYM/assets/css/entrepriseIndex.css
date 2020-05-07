@@ -1,13 +1,7 @@
 @import '../../node_modules/bootstrap/dist/css/bootstrap.css';
 @import './layout.css';
 
-.entreprises{
-    margin-left: 20%;
-}
-
 .entreprises .navbar{
-    margin-top: 20px;
-    margin-bottom: 20px;
     width: 90%;
     position: relative;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -49,10 +43,6 @@
 }
 .entreprises .Contacts{
     height: auto;
-    width: max-content;
-}
-.entreprises .contacts-index{
-    border-right: 2px solid white;
 }
 
 .contactHead {

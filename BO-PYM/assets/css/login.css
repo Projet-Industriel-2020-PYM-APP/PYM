@@ -3,28 +3,19 @@ body{
     font-family: 'Roboto', sans-serif;
     
 }
+
+.form-signin > .login-form {
+    width: 75%;
+}
+
 .login{
     width: 25%;
     text-align: center;
     float: none;
-    margin: 0 auto;
-    margin-top: 150px;
 }
 .login .form-control{
     float: none;
-    margin: 0 auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
     width: 75%;
-
-}
-.btn-login{
-
-    width: 75%;
-    float: none;
-    margin: 0 auto;
-    margin-bottom: 20px;
-    margin-top: 20px;
 }
 
 .title-layout-navbar{

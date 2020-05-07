@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr" class="h-100">
+<body>
+<p>Bienvenue sur l'application Pôle Yvon Morandat ! <br/>
+    <br/>
+    Confirmez votre adresse e-mail pour commencer dans l'application du Pôle Yvon Morandat : <br/>
+    <br/>
+    <a href="{{ url('auth_confirm_email', {'token': token}) }}">Confirmer mon adresse</a><br/>
+    <br/>
+    Ou suivez l'adresse :<br/>
+    <br/>
+    <a href="{{ url('auth_confirm_email', {'token': token}) }}">{{ url('auth_confirm_email', {'token': token}) }}</a><br/>
+</p>
+</body>
+</html>

@@ -14,28 +14,28 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api
+            anonymous: true
+            provider: in_database
+            guard:
+                authenticators:
+                    - App\Security\TokenAuthenticator
+                    - App\Security\LoginApiAuthenticator
+                entry_point: App\Security\LoginApiAuthenticator
+            logout:
+                path: auth_api_logout
         main:
             anonymous: true
-
             provider: in_database
-
-            # form_login:
-            #    login_path: auth_connexion
-            #    check_path: auth_connexion
-            #    csrf_token_generator: security.csrf.token_manager
-
-            # logout:
-            #     path: auth_deconnexion
-            #     target: auth_connexion
-
             guard:
                 authenticators:
                     - App\Security\LoginFormAuthenticator
                 entry_point: App\Security\LoginFormAuthenticator
             logout:
                 path: auth_deconnexion
-                # where to redirect after logout
-                # target: app_any_route
+                target: auth_connexion
+
 
             # activate different ways to authenticate
 
@@ -56,6 +56,14 @@ security:
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/reinitialisation_mot_de_passe$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/deconnexion$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # Auth API
+        - { path: ^/auth/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/email_verification$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/auth/forgot_password$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/confirm_email, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/reset_password, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/auth/logout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         # User
         - { path: ^/users$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/users/me/edit$, roles: IS_AUTHENTICATED_FULLY }
@@ -104,7 +112,7 @@ security:
         - { path: ^/tables_reference/poste/[0-9]+/edit$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/tables_reference/poste/[0-9]+/delete$, roles: IS_AUTHENTICATED_FULLY }
 
-        # Reference Table
+        # Services
         - { path: ^/service_categorie$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/service_categorie/new$, roles: ROLE_ADMIN }
         - { path: ^/service_categorie/[0-9]+/edit$, roles: ROLE_ADMIN }
@@ -114,5 +122,5 @@ security:
         - { path: ^/service_categorie/[0-9]+/services/[0-9]+/delete$, roles: ROLE_ADMIN }
         # API
         - { path: ^/api/service_categories$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/services$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/services$, roles: IS_AUTHENTICATED_FULLY }
 

@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UtilisateurRepository")
@@ -13,37 +13,156 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class Utilisateur implements UserInterface
 {
     /**
+     * @Assert\EqualTo(propertyPath="password",message="Les mots de passe doivent être identiques." )
+     */
+    public $confirm_password;
+    /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
     private $id;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $email;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
     private $username;
-
-    /** 
+    /**
      * @ORM\Column(type="string", length=255)
      * @Assert\EqualTo(propertyPath="confirm_password",message="Les mots de passe doivent être identiques.")
      */
     private $password;
     /**
-     * @Assert\EqualTo(propertyPath="password",message="Les mots de passe doivent être identiques." )
-     */
-    public $confirm_password;
-
-    /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, options={"default": "User"})
      * @Assert\Choice({"Admin","User"})
      */
     private $role;
+
+    /**
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    private $token;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $tokenExpiresAt;
+
+    /**
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    private $refreshToken;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $refreshTokenExpiresAt;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default": false})
+     */
+    private $isEmailVerified;
+
+    /**
+     * Get a token to use temporarily.
+     *
+     * This is mostly used for email confirmation or password reset.
+     *
+     * @return string|null
+     */
+    public function getRefreshToken(): ?string
+    {
+        return $this->refreshToken;
+    }
+
+    /**
+     * You should use a token randomizer.
+     * Do not forget to getRefreshTokenExpiresAt.
+     *
+     * Example :
+     *
+     * ```php
+     * $user->setRefreshToken(bin2hex(random_bytes(64));
+     * $expirationDate = new DateTime();
+     * $expirationDate->add(new DateInterval('P1D'));
+     * $user->getRefreshTokenExpiresAt($expirationDate);
+     * ```
+     *
+     * @param string|null $refreshToken
+     * @return $this
+     */
+    public function setRefreshToken(?string $refreshToken): self
+    {
+        $this->refreshToken = $refreshToken;
+        return $this;
+    }
+
+    public function getRefreshTokenExpiresAt(): ?string
+    {
+        return $this->refreshTokenExpiresAt;
+    }
+
+    public function setRefreshTokenExpiresAt(?string $refreshTokenExpiresAt): self
+    {
+        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsEmailVerified(): bool
+    {
+        return $this->isEmailVerified;
+    }
+
+    /**
+     * @param bool $isEmailVerified
+     * @return Utilisateur
+     */
+    public function setIsEmailVerified(bool $isEmailVerified)
+    {
+        $this->isEmailVerified = $isEmailVerified;
+        return $this;
+    }
+
+    /**
+     * This is used to get access to the account.
+     * This is equivalent to a email+password authentication.
+     *
+     * You can generate a token using the setter and your own token randomizer :
+     *
+     * ```php
+     * $user->setToken(bin2hex(random_bytes(64));
+     * ```
+     *
+     * @return string|null
+     */
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    /**
+     * You should use a token randomizer.
+     *
+     * Example :
+     *
+     * ```php
+     * $user->setToken(bin2hex(random_bytes(64));
+     * ```
+     * @param string|null $token
+     * @return Utilisateur
+     */
+    public function setToken(?string $token): self
+    {
+        $this->token = $token;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -58,6 +177,35 @@ class Utilisateur implements UserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function isTokenExpired(): bool
+    {
+        return $this->getTokenExpiresAt() <= new \DateTime();
+    }
+
+    public function isRefreshTokenExpired(): bool
+    {
+        return $this->getRefreshTokenExpiresAt() <= new \DateTime();
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getTokenExpiresAt()
+    {
+        return $this->tokenExpiresAt;
+    }
+
+    /**
+     * @param DateTime $tokenExpiresAt
+     * @return Utilisateur
+     */
+    public function setTokenExpiresAt(DateTime $tokenExpiresAt): self
+    {
+        $this->tokenExpiresAt = $tokenExpiresAt;
 
         return $this;
     }
@@ -86,17 +234,21 @@ class Utilisateur implements UserInterface
         return $this;
     }
 
-    public function eraseCredentials(){
+    public function eraseCredentials()
+    {
 
     }
 
-    public function getSalt(){
+    public function getSalt()
+    {
 
     }
-    public function getRoles(){
-        if ($this->getRole()=="Admin"):
+
+    public function getRoles()
+    {
+        if ($this->getRole() == "Admin"):
             return ['ROLE_ADMIN'];
-        elseif ($this->getRole()=="User"):
+        elseif ($this->getRole() == "User"):
             return ['ROLE_USER'];
         endif;
     }

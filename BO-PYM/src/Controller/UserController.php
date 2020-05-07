@@ -65,8 +65,6 @@ class UserController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-
             $hash = $encoder->encodePassWord($user, $user->getPassword());
             $user->setPassword($hash);
 
@@ -110,7 +108,7 @@ class UserController extends AbstractController
                 ->setTo($user_to_edit->getEmail())
                 ->setBody(
                     $this->renderView(
-                        "auth/email/resetpassword.html.twig",
+                        "auth/email/resetpassword_admin.html.twig",
                         ['password' => $password]
                     )
                 );

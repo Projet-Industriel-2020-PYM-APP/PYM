@@ -50,6 +50,7 @@ class AuthController extends AbstractController
             $user->setPassword($hash);
             $user->setUsername($user->getEmail());
             $user->setRole("Admin");
+            $user->setIsEmailVerified(false);
             $manager->persist($user);
             $manager->flush();
 
@@ -58,7 +59,7 @@ class AuthController extends AbstractController
                 ->setTo($user->getEmail())
                 ->setBody(
                     $this->renderView(
-                        "auth/email/resetpassword.html.twig",
+                        "auth/email/resetpassword_admin.html.twig",
                         ['password' => $password, 'role' => $user->getRoles()]
                     )
                 );
@@ -121,7 +122,7 @@ class AuthController extends AbstractController
 
             if (!$user) {
                 $error = "Email non existant";
-                return $this->render('auth/resetpassword.html.twig', [
+                return $this->render('auth/resetpassword_admin.html.twig', [
                     'form' => $form->createView(),
                     'error' => $error
                 ]);
@@ -145,7 +146,7 @@ class AuthController extends AbstractController
                 ->setTo($email)
                 ->setBody(
                     $this->renderView(
-                        "auth/email/resetpassword.html.twig",
+                        "auth/email/resetpassword_admin.html.twig",
                         ['password' => $password]
                     )
                 );
@@ -158,7 +159,7 @@ class AuthController extends AbstractController
             return $this->redirectToRoute('auth_connexion');
         }
         $error = null;
-        return $this->render('auth/resetpassword.html.twig', [
+        return $this->render('auth/resetpassword_admin.html.twig', [
             'form' => $form->createView(),
             'error' => $error
         ]);

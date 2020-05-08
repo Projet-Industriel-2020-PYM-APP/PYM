@@ -188,8 +188,8 @@ class BookingController extends AbstractController
         $entityManager->persist($booking);
         $entityManager->flush();
 
-        return new Response(
-            "Added.",
+        return new JsonResponse(
+            $booking,
             Response::HTTP_CREATED,
             ['Location' => '/api/bookings/' . $booking->getId()]
         );
@@ -224,7 +224,7 @@ class BookingController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->flush();
 
-        return new Response("Updated {merged}.");
+        return new JsonResponse($booking);
     }
 
 

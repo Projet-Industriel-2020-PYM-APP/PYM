@@ -1,13 +1,18 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 
-{% block title %}Edit Booking{% endblock %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('bookingForm') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('bookingForm') }}
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Booking</h1>
+    <div class="card">
+        <div class="container">
+            <h1 class="mt-3">Modifier une réservation</h1>
 
-    {{ include('booking/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('booking_index') }}">back to list</a>
-
-    {{ include('booking/_delete_form.html.twig') }}
+            {{ include('booking/_form.html.twig', {'button_label': 'Modifier'}) }}
+        </div>
+    </div>
 {% endblock %}

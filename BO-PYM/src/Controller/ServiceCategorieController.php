@@ -6,6 +6,7 @@ use App\Entity\Service;
 use App\Entity\ServiceCategorie;
 use App\Form\ServiceCategorieType;
 use App\Form\ServiceType;
+use App\Repository\BookingRepository;
 use App\Repository\ServiceCategorieRepository;
 use App\Repository\ServiceRepository;
 use App\Service\FileUploader;
@@ -22,17 +23,20 @@ class ServiceCategorieController extends AbstractController
 {
     private $serviceCategorieRepository;
     private $serviceRepository;
+    private $bookingRepository;
     private $fileUploader;
 
     public function __construct(
         ServiceCategorieRepository $serviceCategorieRepository,
         ServiceRepository $serviceRepository,
+        BookingRepository $bookingRepository,
         FileUploader $fileUploader
     )
     {
         $this->serviceCategorieRepository = $serviceCategorieRepository;
         $this->serviceRepository = $serviceRepository;
         $this->fileUploader = $fileUploader;
+        $this->bookingRepository = $bookingRepository;
     }
 
     /**
@@ -45,6 +49,7 @@ class ServiceCategorieController extends AbstractController
         return $this->render('service_categorie/index.html.twig', [
             'categories' => $this->serviceCategorieRepository->findAll(),
             'services' => $this->serviceRepository->findAll(),
+            'bookings' => $this->bookingRepository->findAll(),
         ]);
     }
 

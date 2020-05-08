@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BookingRepository")
@@ -31,6 +32,9 @@ class Booking implements JsonSerializable
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\Expression(
+     *     "this.getStartDate() < this.getEndDate()",
+     *     message="La date de début doit être avant la date de fin.")
      */
     private $endDate;
 

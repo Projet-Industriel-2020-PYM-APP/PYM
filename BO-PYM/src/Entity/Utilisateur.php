@@ -100,17 +100,6 @@ class Utilisateur implements UserInterface
         return $this;
     }
 
-    public function getRefreshTokenExpiresAt(): ?DateTime
-    {
-        return $this->refreshTokenExpiresAt;
-    }
-
-    public function setRefreshTokenExpiresAt(?DateTime $refreshTokenExpiresAt): self
-    {
-        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
-        return $this;
-    }
-
     /**
      * @return bool
      */
@@ -186,11 +175,6 @@ class Utilisateur implements UserInterface
         return $this->getTokenExpiresAt() <= new DateTime();
     }
 
-    public function isRefreshTokenExpired(): bool
-    {
-        return $this->getRefreshTokenExpiresAt() <= new DateTime();
-    }
-
     /**
      * @return DateTime
      */
@@ -207,6 +191,22 @@ class Utilisateur implements UserInterface
     {
         $this->tokenExpiresAt = $tokenExpiresAt;
 
+        return $this;
+    }
+
+    public function isRefreshTokenExpired(): bool
+    {
+        return $this->getRefreshTokenExpiresAt() <= new DateTime();
+    }
+
+    public function getRefreshTokenExpiresAt(): ?DateTime
+    {
+        return $this->refreshTokenExpiresAt;
+    }
+
+    public function setRefreshTokenExpiresAt(?DateTime $refreshTokenExpiresAt): self
+    {
+        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
         return $this;
     }
 

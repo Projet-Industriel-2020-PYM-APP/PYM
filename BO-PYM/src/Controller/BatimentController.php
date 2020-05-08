@@ -2,31 +2,52 @@
 
 namespace App\Controller;
 
-use App\Entity\Bureau;
 use App\Entity\Batiment;
-use App\Form\BureauType;
-use App\Entity\Entreprise;
-use App\Service\FileUploader;
+use App\Entity\Bureau;
 use App\Form\Batiment2Type;
+use App\Form\BureauType;
+use App\Repository\BatimentRepository;
+use App\Repository\BureauRepository;
+use App\Repository\EntrepriseRepository;
+use App\Service\FileUploader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 header("Access-Control-Allow-Origin: *");
 
 class BatimentController extends AbstractController
 {
+    private $batimentRepository;
+    private $entrepriseRepository;
+    private $bureauRepository;
+    private $fileUploader;
+
+    public function __construct(
+        BatimentRepository $batimentRepository,
+        EntrepriseRepository $entrepriseRepository,
+        BureauRepository $bureauRepository,
+        FileUploader $fileUploader
+    )
+    {
+        $this->batimentRepository = $batimentRepository;
+        $this->entrepriseRepository = $entrepriseRepository;
+        $this->bureauRepository = $bureauRepository;
+        $this->fileUploader = $fileUploader;
+    }
+
     /**
      * @Route("/batiments", name="batiments", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @return Response
      */
     public function index()
     {
-        $repository = $this->getDoctrine()->getRepository(Batiment::class);
-        $batiments = $repository->findAll();
+        $batiments = $this->batimentRepository->findAll();
 
         return $this->render('batiment/index.html.twig', [
             'batiments' => $batiments
@@ -35,13 +56,13 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("/batiments/add",name="batiment_add", methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param FileUploader $fileUploader
      * @return RedirectResponse|Response
      */
-    public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
+    public function add(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $batiment = new Batiment;
 
         $form = $this->createForm(Batiment2Type::class, $batiment);
@@ -67,7 +88,7 @@ class BatimentController extends AbstractController
                             $nom_batiment[$i] = "_";
                         }
                     }
-                    $filename = $fileUploader->upload($model, $nom_batiment, 'modeles');
+                    $filename = $this->fileUploader->upload($model, $nom_batiment, 'modeles');
                     $batiment->setRepresentation3D($filename);
                     break;
                 case "Forme Paramétrique":
@@ -89,22 +110,14 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/{id}/edit",name="batiment_edit", methods={"GET","POST"})
-     * @param $id
-     * @param EntityManagerInterface $manager
+     * @IsGranted("ROLE_ADMIN")
+     * @param Batiment $batiment
      * @param Request $request
-     * @param FileUploader $fileUploader
      * @return RedirectResponse|Response
      */
-    public function edit($id, EntityManagerInterface $manager, Request $request, FileUploader $fileUploader)
+    public function edit(Batiment $batiment, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Batiment::class);
-        $batiment = $repository->find($id);
-
-        if (!$batiment) {
-            throw $this->createNotFoundException(
-                'No batiment found for id' / $id
-            );
-        }
+        $manager = $this->getDoctrine()->getManager();
         $old_value = $batiment->getRepresentation3D();
 
         $form = $this->createForm(Batiment2Type::class, $batiment);
@@ -129,9 +142,12 @@ class BatimentController extends AbstractController
                         $nom_batiment[$i] = "_";
                     }
                 }
-                if ($model != null) {
-                    unlink("uploads/modeles" . $old_value);
-                    $filename = $fileUploader->upload($model, $nom_batiment, 'modeles');
+                if ($model !== null) {
+                    $path = "uploads/modeles" . $old_value;
+                    if(file_exists($path)){
+                        unlink($path);
+                    }
+                    $filename = $this->fileUploader->upload($model, $nom_batiment, 'modeles');
                     $batiment->setRepresentation3D($filename);
 
                 } else {
@@ -150,24 +166,15 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/{id}/bureau/add",name="batiment_add_bureau", methods={"GET","POST"})
-     * @param $id
+     * @IsGranted("ROLE_ADMIN")
+     * @param Batiment $batiment
      * @param Request $request
-     * @param EntityManagerInterface $manager
      * @return RedirectResponse|Response
      */
-    public function add_bureau($id, Request $request, EntityManagerInterface $manager)
+    public function add_bureau(Batiment $batiment, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Batiment::class);
-        /** @var Batiment $batiment */
-        $batiment = $repository->find($id);
-
-        if (!$batiment) {
-            throw $this->createNotFoundException(
-                'No batiment found for id' / $id
-            );
-        }
-        $repo = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprises = $repo->findAll();
+        $manager = $this->getDoctrine()->getManager();
+        $entreprises = $this->entrepriseRepository->findAll();
 
         $bureau = new Bureau;
 
@@ -190,30 +197,21 @@ class BatimentController extends AbstractController
     }
 
     /**
-     * @Route("/batiments/{id_bat}/bureau/{id_bur}/edit",name="batiment_edit_bureau", methods={"GET","POST"})
+     * @Route("/batiments/{id_bat}/bureau/{id}/edit",name="batiment_edit_bureau", methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param $id_bat
-     * @param $id_bur
-     * @param EntityManagerInterface $manager
+     * @param Bureau $bureau
      * @param Request $request
      * @return RedirectResponse|Response
      */
-    public function edit_bureau($id_bat, $id_bur, EntityManagerInterface $manager, Request $request)
+    public function edit_bureau(int $id_bat, Bureau $bureau, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Batiment::class);
-        $batiment = $repository->find($id_bat);
+        $manager = $this->getDoctrine()->getManager();
+        $batiment = $this->batimentRepository->find($id_bat);
 
         if (!$batiment) {
             throw $this->createNotFoundException(
                 'No batiment found for id' / $id_bat
-            );
-        }
-
-        $repo = $this->getDoctrine()->getRepository(Bureau::class);
-        $bureau = $repo->find($id_bur);
-
-        if (!$bureau) {
-            throw $this->createNotFoundException(
-                'No bureau found for id' / $id_bur
             );
         }
 
@@ -225,26 +223,20 @@ class BatimentController extends AbstractController
             return $this->redirectToRoute('batiments');
         }
 
-        return $this->render('batiment/bureau/edit.html.twig', ['form' => $form->createView(), 'bureau' => $bureau]);
+        return $this->render('batiment/bureau/edit.html.twig',
+            ['form' => $form->createView(), 'bureau' => $bureau]);
 
     }
 
     /**
-     * @Route("batiments/{id_bat}/bureau/{id_bur}/delete",name="batiment_delete_bureau", methods={"GET","POST"})
-     * @param $id_bur
-     * @param EntityManagerInterface $manager
+     * @Route("batiments/{id_bat}/bureau/{id}/delete",name="batiment_delete_bureau", methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
+     * @param Bureau $bureau
      * @return RedirectResponse
      */
-    public function delete_bureau($id_bur, EntityManagerInterface $manager)
+    public function delete_bureau(Bureau $bureau)
     {
-        $repository = $this->getDoctrine()->getRepository(Bureau::class);
-        $bureau = $repository->find($id_bur);
-
-        if (!$bureau) {
-            throw $this->createNotFoundException(
-                'No bureau found for id' / $id_bur
-            );
-        }
+        $manager = $this->getDoctrine()->getManager();
         $manager->remove($bureau);
         $manager->flush();
 
@@ -253,26 +245,26 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/{id}/delete",name="batiment_delete")
-     * @param $id
-     * @param EntityManagerInterface $manager
+     * @IsGranted("ROLE_ADMIN")
+     * @param Batiment $batiment
      * @return RedirectResponse
      */
-    public function delete($id, EntityManagerInterface $manager)
+    public function delete(Batiment $batiment)
     {
-        $repository = $this->getDoctrine()->getRepository(Batiment::class);
-        $batiment_to_delete = $repository->find($id);
+        $manager = $this->getDoctrine()->getManager();
+        $bureaux_to_delete = $this->bureauRepository->findBy(['Batiment' => $batiment]);
 
-        $repo = $this->getDoctrine()->getRepository(Bureau::class);
-        $bureaux_to_delete = $repo->findBy(['Batiment' => $batiment_to_delete]);
         for ($i = 0, $size = sizeof($bureaux_to_delete) - 1; $i <= $size; $i++) {
             $manager->remove($bureaux_to_delete[$i]);
         }
-        if ($batiment_to_delete->getTypeBatiment() == "Batiment") {
-            unlink("uploads/modeles/" . $batiment_to_delete->getRepresentation3D());
+        if ($batiment->getTypeBatiment() == "Batiment") {
+            $path = "uploads/modeles/" . $batiment->getRepresentation3D();
+            if(file_exists($path)){
+                unlink($path);
+            }
         }
 
-        $manager->remove($batiment_to_delete);
-
+        $manager->remove($batiment);
         $manager->flush();
 
         return $this->redirectToRoute('batiments');
@@ -280,92 +272,26 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("/api/batiments", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      *
-     * return array;
+     * @return JsonResponse
      */
     public function SendAllBatimentAction()
     {
-        $batiments = $this->getDoctrine()->getRepository(Batiment::class)->findAll();
-        $arrayCollection = array();
-        foreach ($batiments as $item) {
-            if ($item->getEtat() == true)
-                if ($item->getTypeBatiment()->getNom() == "Forme Paramétrique") {
-                    array_push($arrayCollection, array(
-                        'id' => $item->getId(),
-                        'nom' => $item->getNom(),
-                        'nbEtage' => $item->getNbEtage(),
-                        'description' => $item->getDescription(),
-                        'accesHandicape' => $item->getAccesHandicape(),
-                        'url' => $item->getRepresentation3D(),
-                        'x' => $item->getLongitude(),
-                        'y' => $item->getLatitude(),
-                        'latitude' => $item->getGPS()[0],
-                        'longitude' => $item->getGPS()[1],
-                        'largeur' => $item->getLargeur(),
-                        'longueur' => $item->getLongueur(),
-                        'rayon' => $item->getRayon(),
-                        'hauteur' => $item->getHauteur(),
-                        'angle' => $item->getAngle(),
-                        'scale' => 1,
-                        'type' => $item->getTypeBatiment()->getNom(),
-                        'formeParamétrique' => $item->getFormeParametrique()->getNom(),
-                        'adresse' => $item->getAdresse(),
-                        'accessoire' => $item->getAccessoire(),
-                    ));
-                } else {
-                    array_push($arrayCollection, array(
-                        'id' => $item->getId(),
-                        'nom' => $item->getNom(),
-                        'nbEtage' => $item->getNbEtage(),
-                        'description' => $item->getDescription(),
-                        'accesHandicape' => $item->getAccesHandicape(),
-                        'url' => $item->getRepresentation3D(),
-                        'x' => $item->getLongitude(),
-                        'y' => $item->getLatitude(),
-                        'latitude' => $item->getGPS()[0],
-                        'longitude' => $item->getGPS()[1],
-                        'largeur' => $item->getLargeur(),
-                        'longueur' => $item->getLongueur(),
-                        'rayon' => $item->getRayon(),
-                        'hauteur' => $item->getHauteur(),
-                        'angle' => $item->getAngle(),
-                        'scale' => $item->getEchelle(),
-                        'type' => $item->getTypeBatiment()->getNom(),
-                        'formeParamétrique' => null,
-                        'adresse' => $item->getAdresse(),
-                        'accessoire' => $item->getAccessoire(),
-                    ));
-
-                }
-
-        }
-        $response = new JsonResponse($arrayCollection);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        $batiments = $this->batimentRepository->findAll();
+        return new JsonResponse($batiments);
     }
 
     /**
-     * @Route("/api/bureaux", methods={"GET"})
      *
-     * return array;
+     * @Route("/api/bureaux", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
+     *
+     * @return JsonResponse
      */
     public function SendAllBureauAction()
     {
-        $bureaux = $this->getDoctrine()->getRepository(Bureau::class)->findAll();
-        $arrayCollection = array();
-        foreach ($bureaux as $item) {
-            array_push($arrayCollection, array(
-                'id' => $item->getId(),
-                'idBatiment' => $item->getBatiment()->getId(),
-                'idEntreprise' => $item->getEntreprise()->getId(),
-                'entreprise' => $item->getEntreprise()->getNom(),
-                'urlEntreprise' => $item->getEntreprise()->getLogo(),
-                'etage' => $item->getEtage(),
-                'numero' => $item->getNumero(),
-            ));
-        }
-        $response = new JsonResponse($arrayCollection);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        $bureaux = $this->bureauRepository->findAll();
+        return new JsonResponse($bureaux);
     }
 }

@@ -2,49 +2,78 @@
 
 namespace App\Controller;
 
-use App\Entity\Poste;
-use App\Entity\Bureau;
-use App\Entity\Contact;
-use App\Form\PosteType;
 use App\Entity\Activite;
-use App\Form\ContactType;
+use App\Entity\Contact;
 use App\Entity\Entreprise;
+use App\Entity\Poste;
 use App\Form\ActiviteType;
+use App\Form\ContactType;
 use App\Form\EntrepriseType;
+use App\Form\PosteType;
+use App\Repository\ActiviteRepository;
+use App\Repository\BureauRepository;
+use App\Repository\ContactRepository;
+use App\Repository\EntrepriseRepository;
+use App\Repository\PosteRepository;
 use App\Service\FileUploader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 header("Access-Control-Allow-Origin: *");
 
 class EntrepriseController extends AbstractController
 {
+    private $entrepriseRepository;
+    private $posteRepository;
+    private $fileUploader;
+    private $activiteRepository;
+    private $contactRepository;
+    private $bureauRepository;
+
+    public function __construct(
+        EntrepriseRepository $entrepriseRepository,
+        ActiviteRepository $activiteRepository,
+        PosteRepository $posteRepository,
+        ContactRepository $contactRepository,
+        BureauRepository $bureauRepository,
+        FileUploader $fileUploader
+    )
+    {
+        $this->entrepriseRepository = $entrepriseRepository;
+        $this->activiteRepository = $activiteRepository;
+        $this->posteRepository = $posteRepository;
+        $this->bureauRepository = $bureauRepository;
+        $this->fileUploader = $fileUploader;
+        $this->contactRepository = $contactRepository;
+    }
+
     /**
      * @Route("/entreprises", name="entreprises", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function index()
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprises = $repository->findAll();
-
-        return $this->render("entreprise/index.html.twig", ['entreprises' => $entreprises]);
+        return $this->render(
+            "entreprise/index.html.twig",
+            ['entreprises' => $this->entrepriseRepository->findAll()]
+        );
     }
 
     /**
      * @Route("/entreprises/add",name="entreprise_add", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param FileUploader $fileUploader
      * @return RedirectResponse|Response
      */
-    public function add(Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
+    public function add(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $entreprise = new Entreprise();
 
         $form = $this->createForm(EntrepriseType::class, $entreprise);
@@ -52,15 +81,12 @@ class EntrepriseController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repo = $this->getDoctrine()->getRepository(Activite::class);
-            if ($form->get('activites')->getData() != null) {
-                /** @var Activite $activite */
-                $activite = $repo->findOneBy(['Nom' => $form->get('activites')->getData()->getNom()]);
+            if ($form->get('activites')->getData() !== null) {
+                $activite = $this->activiteRepository->findOneBy(['Nom' => $form->get('activites')->getData()->getNom()]);
                 if (!$activite) {
                     throw $this->createNotFoundException('No activity found');
                 }
                 $entreprise->addActivite($activite);
-                $manager->persist($activite);
             }
 
             $file = $entreprise->getLogo();
@@ -70,7 +96,7 @@ class EntrepriseController extends AbstractController
                     $nom_entreprise[$i] = "_";
                 }
             }
-            $filename = $fileUploader->upload($file, $nom_entreprise, 'logos');
+            $filename = $this->fileUploader->upload($file, $nom_entreprise, 'logos');
             //$img=Image::make('uploads/logos/'.$filename);
             //$img->resize(500,500);
             //$img->save('uploads/logos/'.$filename);
@@ -89,42 +115,37 @@ class EntrepriseController extends AbstractController
 
     /**
      * @Route("/entreprises/{id}/edit",name="entreprise_edit", methods={"GET", "POST"})
-     * @param $id
+     * @IsGranted("ROLE_ADMIN")
+     * @param Entreprise $entreprise
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param FileUploader $fileUploader
      * @return RedirectResponse|Response
      */
-    public function edit($id, Request $request, EntityManagerInterface $manager, FileUploader $fileUploader)
+    public function edit(Entreprise $entreprise, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise_to_edit = $repository->find($id);
-
-        if (!$entreprise_to_edit) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id
-            );
-        }
-        $file = $entreprise_to_edit->getLogo();
-        $entreprise_to_edit->setLogo(new File('uploads/logos/' . $file));
-        $old_value = $entreprise_to_edit->getLogo();
-        $form = $this->createForm(EntrepriseType::class, $entreprise_to_edit);
+        $manager = $this->getDoctrine()->getManager();
+        $file = $entreprise->getLogo();
+        $entreprise->setLogo(new File('uploads/logos/' . $file));
+        $old_value = $entreprise->getLogo();
+        $form = $this->createForm(EntrepriseType::class, $entreprise);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
 
             $new_file = $form->get('Logo')->getData();
-            if ($new_file != null) {
-                unlink("uploads/logos/" . $file);
-                $nom_entreprise = $entreprise_to_edit->getNom();
-                $filename = $fileUploader->upload($new_file, $nom_entreprise, 'logos');
-                $entreprise_to_edit->setLogo($filename);
+            if ($new_file !== null) {
+                $path = "uploads/logos/" . $file;
+                if ($file && file_exists($path)) {
+                    unlink($path);
+                }
+                $nom_entreprise = $entreprise->getNom();
+                $filename = $this->fileUploader->upload($new_file, $nom_entreprise, 'logos');
+                $entreprise->setLogo($filename);
             } else {
-                $entreprise_to_edit->setLogo($old_value);
+                $entreprise->setLogo($old_value);
             }
 
-            if ($form->get('activites')->getData() != null) {
-                $entreprise_to_edit->addActivite($form->get('activites')->getData());
+            if ($form->get('activites')->getData() !== null) {
+                $entreprise->addActivite($form->get('activites')->getData());
             }
 
             $manager->flush();
@@ -132,69 +153,57 @@ class EntrepriseController extends AbstractController
             return $this->redirectToRoute('entreprises');
         }
 
-        return $this->render('entreprise/edit.html.twig', ['entreprise' => $entreprise_to_edit, 'form' => $form->createView(), 'file' => $file]);
+        return $this->render('entreprise/edit.html.twig', [
+            'entreprise' => $entreprise,
+            'form' => $form->createView(),
+            'file' => $file
+        ]);
     }
 
     /**
      * @Route("/entreprises/{id}",name="entreprise_show", methods={"GET"})
-     * @param $id
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param Entreprise $entreprise
      * @return Response
      */
-    public function show($id)
+    public function show(Entreprise $entreprise)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise = $repository->find($id);
-
-        if (!$entreprise) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id
-            );
-        }
-
         $file = $entreprise->getLogo();
-
         $contacts = $entreprise->getContact();
         $activites = $entreprise->getActivites();
 
-        return $this->render('entreprise/show.html.twig', ['entreprise' => $entreprise, 'file' => $file, 'contacts' => $contacts, 'activites' => $activites]);
+        return $this->render('entreprise/show.html.twig', [
+            'entreprise' => $entreprise,
+            'file' => $file,
+            'contacts' => $contacts,
+            'activites' => $activites
+        ]);
     }
 
     /**
      * @Route("/entreprises/{id}/contact/add",name="entreprise_add_contact", methods={"GET", "POST"})
-     * @param $id
+     * @IsGranted("ROLE_ADMIN")
+     * @param Entreprise $entreprise
      * @param Request $request
-     * @param EntityManagerInterface $manager
      * @return RedirectResponse|Response
      */
-    public function add_contact($id, Request $request, EntityManagerInterface $manager)
+    public function add_contact(Entreprise $entreprise, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise = $repository->find($id);
-
-        if (!$entreprise) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id
-            );
-        }
-
+        $manager = $this->getDoctrine()->getManager();
         $contact = new Contact;
 
         $form = $this->createForm(ContactType::class, $contact);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $repo = $this->getDoctrine()->getRepository(Poste::class);
-            if ($form->get('poste')->getData() != null) {
-                /** @var Poste $poste */
-                $poste = $repo->findOneBy(['Nom' => $form->get('poste')->getData()->getNom()]);
+            if ($form->get('poste')->getData() !== null) {
+                $poste = $this->posteRepository->findOneBy(['Nom' => $form->get('poste')->getData()->getNom()]);
                 if (!$poste) {
                     throw $this->createNotFoundException('No poste found ');
                 }
                 $contact->addPoste($poste);
                 $manager->persist($poste);
             }
-
             $entreprise->addContact($contact);
 
             $manager->persist($contact);
@@ -211,12 +220,13 @@ class EntrepriseController extends AbstractController
 
     /**
      * @Route("/entreprises/poste/add",name="entreprise_add_poste", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param Request $request
-     * @param EntityManagerInterface $manager
      * @return RedirectResponse|Response
      */
-    public function add_poste(Request $request, EntityManagerInterface $manager)
+    public function add_poste(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $poste = new Poste;
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
@@ -231,12 +241,13 @@ class EntrepriseController extends AbstractController
 
     /**
      * @Route("/entreprises/activite/add",name="entreprise_add_activite", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param Request $request
-     * @param EntityManagerInterface $manager
      * @return RedirectResponse|Response
      */
-    public function add_activite(Request $request, EntityManagerInterface $manager)
+    public function add_activite(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $activite = new Activite;
         $form = $this->createForm(ActiviteType::class, $activite);
         $form->handleRequest($request);
@@ -250,17 +261,17 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/{id_ent}/contact/{id_cont}/edit",name="entreprise_edit_contact", methods={"GET", "POST"})
-     * @param $id_ent
-     * @param $id_cont
+     * @Route("/entreprises/{id_ent}/contact/{id}/edit",name="entreprise_edit_contact", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
+     * @param int $id_ent
+     * @param Contact $contact
      * @param Request $request
-     * @param EntityManagerInterface $manager
      * @return RedirectResponse|Response
      */
-    public function edit_contact($id_ent, $id_cont, Request $request, EntityManagerInterface $manager)
+    public function edit_contact(int $id_ent, Contact $contact, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise = $repository->find($id_ent);
+        $manager = $this->getDoctrine()->getManager();
+        $entreprise = $this->entrepriseRepository->find($id_ent);
 
         if (!$entreprise) {
             throw $this->createNotFoundException(
@@ -268,24 +279,12 @@ class EntrepriseController extends AbstractController
             );
         }
 
-        $repo = $this->getDoctrine()->getRepository(Contact::class);
-        $contact = $repo->find($id_cont);
-
-        if (!$contact) {
-            throw $this->createNotFoundException(
-                'No contact found for id' / $id_cont
-            );
-        }
-
-
         $form = $this->createForm(ContactType::class, $contact);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            if ($form->get('poste')->getData() != null) {
-                $repos = $this->getDoctrine()->getRepository(Poste::class);
-                $poste = $repos->findOneBy(['Nom' => $form->get('poste')->getData()->getNom()]);
+            if ($form->get('poste')->getData() !== null) {
+                $poste = $this->posteRepository->findOneBy(['Nom' => $form->get('poste')->getData()->getNom()]);
                 if (!$poste) {
                     throw $this->createNotFoundException(
                         'No poste found'
@@ -302,29 +301,19 @@ class EntrepriseController extends AbstractController
     }
 
     /**
-     * @Route("/entreprises/{id_ent}/contact/{id_cont}/delete",name="entreprise_delete_contact", methods={"GET", "POST"})
-     * @param $id_ent
-     * @param $id_cont
-     * @param EntityManagerInterface $manager
+     * @Route("/entreprises/{id_ent}/contact/{id}/delete",name="entreprise_delete_contact", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
+     * @param int $id_ent
+     * @param Contact $contact
      * @return RedirectResponse
      */
-    public function delete_contact($id_ent, $id_cont, EntityManagerInterface $manager)
+    public function delete_contact(int $id_ent, Contact $contact)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise = $repository->find($id_ent);
-
+        $manager = $this->getDoctrine()->getManager();
+        $entreprise = $this->entrepriseRepository->find($id_ent);
         if (!$entreprise) {
             throw $this->createNotFoundException(
                 'No entreprise found for id' / $id_ent
-            );
-        }
-
-        $repo = $this->getDoctrine()->getRepository(Contact::class);
-        $contact = $repo->find($id_cont);
-
-        if (!$contact) {
-            throw $this->createNotFoundException(
-                'No contact found for id' / $id_cont
             );
         }
 
@@ -336,86 +325,78 @@ class EntrepriseController extends AbstractController
 
     /**
      * @Route("/entreprises/{id_ent}/contact/{id_cont}/poste/{id}/delete",name="entreprise_delete_poste", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param $id_ent
      * @param $id_cont
-     * @param $id
-     * @param EntityManagerInterface $manager
+     * @param Poste $poste
      * @return RedirectResponse
      */
-    public function delete_poste($id_ent, $id_cont, $id, EntityManagerInterface $manager)
+    public function delete_poste(int $id_ent, int $id_cont, Poste $poste)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise = $repository->find($id_ent);
+        $manager = $this->getDoctrine()->getManager();
+        $entreprise = $this->entrepriseRepository->find($id_ent);
         if (!$entreprise) {
             throw $this->createNotFoundException(
                 'No entreprise found for id' / $id_ent
             );
         }
 
-        $repo = $this->getDoctrine()->getRepository(Contact::class);
-        $contact = $repo->find($id_cont);
-
+        $contact = $this->contactRepository->find($id_cont);
         if (!$contact) {
             throw $this->createNotFoundException(
                 'No contact found for id' / $id_cont
             );
         }
-        $repos = $this->getDoctrine()->getRepository(Poste::class);
-        $poste_to_delete = $repos->find($id);
-        $contact->removePoste($poste_to_delete);
+
+        $contact->removePoste($poste);
         $manager->flush();
         return $this->redirectToRoute('entreprises');
     }
 
     /**
      * @Route("/entreprises/{id_ent}/activite/{id}/delete",name="entreprise_delete_activite", methods={"GET", "POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param $id_ent
-     * @param $id
-     * @param EntityManagerInterface $manager
+     * @param Activite $activite
      * @return RedirectResponse
      */
-    public function delete_activite($id_ent, $id, EntityManagerInterface $manager)
+    public function delete_activite($id_ent, Activite $activite)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise = $repository->find($id_ent);
+        $manager = $this->getDoctrine()->getManager();
+        $entreprise = $this->entrepriseRepository->find($id_ent);
         if (!$entreprise) {
             throw $this->createNotFoundException(
                 'No entreprise found for id' / $id_ent
             );
         }
-        $repos = $this->getDoctrine()->getRepository(Activite::class);
-        $activite_to_delete = $repos->find($id);
-        $entreprise->removeActivite($activite_to_delete);
+        $entreprise->removeActivite($activite);
         $manager->flush();
         return $this->redirectToRoute('entreprises');
     }
 
     /**
      * @Route("/entreprises/{id}/delete",name="entreprise_delete", methods={"GET", "POST"})
-     * @param $id
-     * @param EntityManagerInterface $manager
+     * @IsGranted("ROLE_ADMIN")
+     * @param Entreprise $entreprise
      * @return RedirectResponse
      */
-    public function delete($id, EntityManagerInterface $manager)
+    public function delete(Entreprise $entreprise)
     {
-        $repository = $this->getDoctrine()->getRepository(Entreprise::class);
-        $entreprise_to_delete = $repository->find($id);
+        $manager = $this->getDoctrine()->getManager();
 
-        $repo = $this->getDoctrine()->getRepository(Contact::class);
-        $contacts_to_delete = $repo->findBy(['entreprise' => $entreprise_to_delete]);
-        for ($i = 0, $size = sizeof($contacts_to_delete) - 1; $i <= $size; $i++) {
-            $manager->remove($contacts_to_delete[$i]);
+        $contacts = $this->contactRepository->findBy(['entreprise' => $entreprise]);
+        foreach ($contacts as $contact) $manager->remove($contact);
+
+        $bureaux = $this->bureauRepository->findBy(['entreprise' => $entreprise]);
+        foreach ($bureaux as $bureau) $manager->remove($bureau);
+
+        $file = $entreprise->getLogo();
+        $path = "uploads/logos/" . $file;
+        if ($file && file_exists($path)) {
+            unlink($path);
         }
 
-        $repo2 = $this->getDoctrine()->getRepository(Bureau::class);
-        $bureaux = $repo2->findBy(['entreprise' => $entreprise_to_delete]);
-        for ($i = 0, $size = sizeof($bureaux) - 1; $i <= $size; $i++) {
-            $manager->remove($bureaux[$i]);
-        }
-
-        unlink("uploads/logos/" . $entreprise_to_delete->getLogo());
-
-        $manager->remove($entreprise_to_delete);
+        $manager->remove($entreprise);
         $manager->flush();
 
         return $this->redirectToRoute('entreprises');
@@ -423,64 +404,23 @@ class EntrepriseController extends AbstractController
 
     /**
      * @Route("/api/entreprises", methods={"GET"})
-     *
-     * return array;
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
+     * @return JsonResponse
      */
     public function SendAllEntrepriseAction()
     {
-        $entreprises = $this->getDoctrine()->getRepository(Entreprise::class)->findAll();
-        $arrayCollection = array();
-        foreach ($entreprises as $item) {
-            if ($item->getBureaux()[0] == null) {
-                array_push($arrayCollection, array(
-                    'id' => $item->getId(),
-                    'nom' => $item->getNom(),
-                    'site_internet' => $item->getSiteInternet(),
-                    'nb_salaries' => $item->getNbSalaries(),
-                    'telephone' => $item->getTelephone(),
-                    'mail' => $item->getMail(),
-                    'logo' => $item->getLogo(),
-                    'idBatiment' => 0,
-                ));
-            } else {
-                array_push($arrayCollection, array(
-                    'id' => $item->getId(),
-                    'nom' => $item->getNom(),
-                    'site_internet' => $item->getSiteInternet(),
-                    'nb_salaries' => $item->getNbSalaries(),
-                    'telephone' => $item->getTelephone(),
-                    'mail' => $item->getMail(),
-                    'logo' => $item->getLogo(),
-                    'idBatiment' => $item->getBureaux()[0]->getBatiment()->getId(),
-                ));
-            }
-        }
-        $response = new JsonResponse($arrayCollection);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        $entreprises = $this->entrepriseRepository->findAll();
+        return new JsonResponse($entreprises);
     }
 
     /**
      * @Route("/api/contacts", methods={"GET"})
-     *
-     * return array;
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
+     * @return JsonResponse
      */
     public function SendAllContactAction()
     {
-        $contacts = $this->getDoctrine()->getRepository(Contact::class)->findAll();
-        $arrayCollection = array();
-        foreach ($contacts as $item) {
-            array_push($arrayCollection, array(
-                'id' => $item->getId(),
-                'nom' => $item->getNom(),
-                'prenom' => $item->getPrenom(),
-                'telephone' => $item->getTelephone(),
-                'mail' => $item->getMail(),
-                'idEntreprise' => $item->getEntreprise()->getId(),
-            ));
-        }
-        $response = new JsonResponse($arrayCollection);
-        $response->headers->set('Content-Type', 'application/json');
-        return $response;
+        $contacts = $this->contactRepository->findAll();
+        return new JsonResponse($contacts);
     }
 }

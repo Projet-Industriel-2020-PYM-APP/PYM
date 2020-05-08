@@ -6,6 +6,7 @@ use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use DateTime;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,18 +15,29 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PostController extends AbstractController
 {
+    private $postRepository;
+
+    public function __construct(PostRepository $postRepository)
+    {
+        $this->postRepository = $postRepository;
+    }
+
     /**
      * @Route("/post", name="post_index", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
-    public function index(PostRepository $postRepository): Response
+    public function index(): Response
     {
         return $this->render('post/index.html.twig', [
-            'posts' => $postRepository->findAll(),
+            'posts' => $this->postRepository->findAll(),
         ]);
     }
 
     /**
      * @Route("/post/new", name="post_new", methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
+     * @param Request $request
+     * @return Response
      */
     public function new(Request $request): Response
     {
@@ -52,6 +64,10 @@ class PostController extends AbstractController
 
     /**
      * @Route("/post/{id}/edit", name="post_edit", methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
+     * @param Request $request
+     * @param Post $post
+     * @return Response
      */
     public function edit(Request $request, Post $post): Response
     {
@@ -73,8 +89,11 @@ class PostController extends AbstractController
 
     /**
      * @Route("/post/{id}/delete", name="post_delete", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
+     * @param Post $post
+     * @return Response
      */
-    public function delete(Request $request, Post $post): Response
+    public function delete(Post $post): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -87,10 +106,11 @@ class PostController extends AbstractController
 
     /**
      * @Route("/api/posts", name="get_posts", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      */
-    public function get_posts(PostRepository $postRepository): Response
+    public function get_posts(): Response
     {
-        $posts = $postRepository->findAll();
+        $posts = $this->postRepository->findAll();
         return new JsonResponse($posts);
     }
 }

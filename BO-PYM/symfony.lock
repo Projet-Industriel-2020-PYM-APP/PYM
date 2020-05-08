@@ -255,6 +255,9 @@
     "swiftmailer/swiftmailer": {
         "version": "v6.1.3"
     },
+    "symfony-bundles/json-request-bundle": {
+        "version": "v3.0.0"
+    },
     "symfony/apache-pack": {
         "version": "1.0",
         "recipe": {

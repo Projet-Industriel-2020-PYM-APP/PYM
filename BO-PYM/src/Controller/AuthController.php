@@ -8,6 +8,7 @@ use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,14 +26,15 @@ class AuthController extends AbstractController
 
     /**
      * @Route("/utilisateurs/ajout", name="user_add", methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
      * @param Swift_Mailer $mailer
      * @param Request $request
-     * @param EntityManagerInterface $manager
      * @param UserPasswordEncoderInterface $encoder
      * @return RedirectResponse|Response
      */
-    public function registration(Swift_Mailer $mailer, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
+    public function registration(Swift_Mailer $mailer, Request $request, UserPasswordEncoderInterface $encoder)
     {
+        $manager = $this->getDoctrine()->getManager();
         $user = new Utilisateur();
 
         $form = $this->createForm(RegistrationType::class, $user);
@@ -80,6 +82,7 @@ class AuthController extends AbstractController
 
     /**
      * @Route("/login",name="auth_connexion", methods={"GET","POST"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param AuthenticationUtils $authUtils
      * @return Response
      */
@@ -104,13 +107,14 @@ class AuthController extends AbstractController
 
     /**
      * @Route("/reinitialisation_mot_de_passe",name="auth_resetpassword", methods={"GET","POST"})
-     * @param EntityManagerInterface $manager
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param Request $request
      * @param Swift_Mailer $mailer
      * @return RedirectResponse|Response
      */
-    public function reset_password(EntityManagerInterface $manager, Request $request, Swift_Mailer $mailer)
+    public function reset_password(Request $request, Swift_Mailer $mailer)
     {
+        $manager = $this->getDoctrine()->getManager();
         $form = $this->createFormBuilder()
             ->add('email', EmailType::class, [
                 'attr' => [

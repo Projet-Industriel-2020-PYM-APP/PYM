@@ -59,6 +59,42 @@ class Service implements JsonSerializable
         $this->actions = new ArrayCollection();
     }
 
+    public function addAction(Action $action): self
+    {
+        if (!$this->actions->contains($action)) {
+            $this->actions[] = $action;
+        }
+
+        return $this;
+    }
+
+    public function removeAction(Action $action): self
+    {
+        if ($this->actions->contains($action)) {
+            $this->actions->removeElement($action);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'categorie_id' => $this->getCategorie()->getId(),
+            'subtitle' => $this->getSubtitle(),
+            'address' => $this->getAddress(),
+            'img_url' => $this->getImgUrl(),
+            'actions' => $this->getActions(),
+            'telephone' => $this->getTelephone(),
+            'website' => $this->getWebsite(),
+        ];
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -129,24 +165,6 @@ class Service implements JsonSerializable
         return $this->actions;
     }
 
-    public function addAction(Action $action): self
-    {
-        if (!$this->actions->contains($action)) {
-            $this->actions[] = $action;
-        }
-
-        return $this;
-    }
-
-    public function removeAction(Action $action): self
-    {
-        if ($this->actions->contains($action)) {
-            $this->actions->removeElement($action);
-        }
-
-        return $this;
-    }
-
     public function getTelephone(): ?string
     {
         return $this->telephone;
@@ -169,23 +187,5 @@ class Service implements JsonSerializable
         $this->website = $website;
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->getId(),
-            'title' => $this->getTitle(),
-            'categorie_id' => $this->getCategorie()->getId(),
-            'subtitle' => $this->getSubtitle(),
-            'address' => $this->getAddress(),
-            'img_url' => $this->getImgUrl(),
-            'actions' => $this->getActions(),
-            'telephone' => $this->getTelephone(),
-            'website' => $this->getWebsite(),
-        ];
     }
 }

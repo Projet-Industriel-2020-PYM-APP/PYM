@@ -6,38 +6,48 @@ use App\Entity\Poste;
 use App\Form\PosteType;
 use App\Entity\Activite;
 use App\Form\ActiviteType;
+use App\Repository\ActiviteRepository;
+use App\Repository\PosteRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ReferenceTableController extends AbstractController
 {
+    private $activiteRepository;
+    private $posteRepository;
+
+    public function __construct(ActiviteRepository $activiteRepository, PosteRepository $posteRepository)
+    {
+        $this->posteRepository = $posteRepository;
+        $this->activiteRepository = $activiteRepository;
+    }
+
     /**
      * @Route("/tables_reference", name="reference_tables", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function index()
     {
-        $repository = $this->getDoctrine()->getRepository(Activite::class);
-        $activites = $repository->findAll();
-
-        $repo = $this->getDoctrine()->getRepository(Poste::class);
-        $postes = $repo->findAll();
-
         return $this->render('reference_table/index.html.twig', [
-            'activites' => $activites,
-            'postes' => $postes
+            'activites' => $this->activiteRepository->findAll(),
+            'postes' => $this->posteRepository->findAll()
         ]);
     }
 
     /**
      * @Route("tables_reference/activite/add",name="reference_table_add_activite", methods={"GET", "POST"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
-    public function add_activite(Request $request, EntityManagerInterface $manager)
+    public function add_activite(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $activite = new Activite;
         $form = $this->createForm(ActiviteType::class, $activite);
         $form->handleRequest($request);
@@ -52,21 +62,19 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/activite/{id}/edit",name="reference_table_edit_activite", methods={"GET", "POST"})
-     * @param $id
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param Activite $activite
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
-    public function edit_activite($id, Request $request, EntityManagerInterface $manager)
+    public function edit_activite(Activite $activite, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Activite::class);
-        $activite = $repository->findOneBy(['id' => $id]);
+        $manager = $this->getDoctrine()->getManager();
 
         $form = $this->createForm(ActiviteType::class, $activite);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$manager->persist($activite);
             $manager->flush();
             return $this->redirectToRoute('reference_tables');
         }
@@ -76,12 +84,13 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/poste/add",name="reference_table_add_poste", methods={"GET", "POST"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
-    public function add_poste(Request $request, EntityManagerInterface $manager)
+    public function add_poste(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $poste = new Poste;
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
@@ -97,16 +106,14 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("/tables_reference/activite/{id}/delete",name="reference_table_delete_activite", methods={"GET", "POST"})
-     * @param EntityManagerInterface $manager
-     * @param $id
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param Activite $activite
+     * @return RedirectResponse
      */
-    public function delete_activite(EntityManagerInterface $manager, $id)
+    public function delete_activite(Activite $activite)
     {
-        $repository = $this->getDoctrine()->getRepository(Activite::class);
-        $activite_to_delete = $repository->findOneBy(['id' => $id]);
-
-        $manager->remove($activite_to_delete);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->remove($activite);
         $manager->flush();
 
         return $this->redirectToRoute('reference_tables');
@@ -115,21 +122,18 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("tables_reference/poste/{id}/edit",name="reference_table_edit_poste", methods={"GET", "POST"})
-     * @param $id
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param Poste $poste
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
-    public function edit_poste($id, Request $request, EntityManagerInterface $manager)
+    public function edit_poste(Poste $poste, Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Poste::class);
-        $poste = $repository->findOneBy(['id' => $id]);
-
+        $manager = $this->getDoctrine()->getManager();
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //$manager->persist($activite);
             $manager->flush();
             return $this->redirectToRoute('reference_tables');
         }
@@ -138,16 +142,14 @@ class ReferenceTableController extends AbstractController
 
     /**
      * @Route("/tables_reference/poste/{id}/delete",name="reference_table_delete_poste", methods={"GET", "POST"})
-     * @param EntityManagerInterface $manager
-     * @param $id
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param Poste $poste
+     * @return RedirectResponse
      */
-    public function delete_poste(EntityManagerInterface $manager, $id)
+    public function delete_poste(Poste $poste)
     {
-        $repository = $this->getDoctrine()->getRepository(Poste::class);
-        $poste_to_delete = $repository->findOneBy(['id' => $id]);
-
-        $manager->remove($poste_to_delete);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->remove($poste);
         $manager->flush();
 
         return $this->redirectToRoute('reference_tables');

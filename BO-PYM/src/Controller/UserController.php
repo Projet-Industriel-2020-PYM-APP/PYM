@@ -2,75 +2,94 @@
 
 namespace App\Controller;
 
-use App\Form\UserEditType;
-
 use App\Entity\Utilisateur;
+use App\Form\UserEditType;
+use App\Repository\UtilisateurRepository;
 use DateInterval;
 use DateTime;
 use Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
 use Swift_Message;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
+    private $utilsateurRepository;
+    private $mailer;
+    private $encoder;
 
+    public function __construct(
+        UtilisateurRepository $utilsateurRepository,
+        UserPasswordEncoderInterface $userPasswordEncoder,
+        Swift_Mailer $mailer
+    )
+    {
+        $this->utilsateurRepository = $utilsateurRepository;
+        $this->encoder = $userPasswordEncoder;
+        $this->mailer = $mailer;
+    }
 
     /**
      * @Route("/users", name="users", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function index()
     {
-        $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
-        $users = $repository->findAll();
-
-
-        return $this->render("user/index.html.twig", ['users' => $users]);
+        return $this->render("user/index.html.twig", [
+            'users' => $this->utilsateurRepository->findAll()
+        ]);
     }
 
 
     /**
      * @Route("/users/me/edit",name="user_edit", methods={"GET", "POST"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param UserPasswordEncoderInterface $encoder
      * @return RedirectResponse|Response
      */
-    public function edit(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder)
+    public function edit(Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $user = $this->getUser();
 
         $form = $this->createFormBuilder($user)
             ->add('email', EmailType::class, [
                 'attr' => [
                     'placeholder' => "Adresse e-mail",
-                    'class' => 'reg-email rounded form-control'],
-                'label' => ' '])
+                    'class' => 'reg-email rounded form-control'
+                ],
+                'label' => ' '
+            ])
             ->add('password', PasswordType::class, [
                 'attr' => [
                     'placeholder' => "Mot de passe",
-                    'class' => 'reg-email rounded form-control'],
-                'label' => ' '])
+                    'class' => 'reg-email rounded form-control'
+                ],
+                'label' => ' '
+            ])
             ->add('confirm_password', PasswordType::class, [
                 'attr' => [
                     'placeholder' => "Confirmation du mot de passe",
-                    'class' => 'reg-username rounded form-control'],
-                'label' => ' '])
+                    'class' => 'reg-username rounded form-control'
+                ],
+                'label' => ' '
+            ])
             ->getForm();
 
         $form->handleRequest($request);
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $hash = $encoder->encodePassWord($user, $user->getPassword());
+            $hash = $this->encoder->encodePassWord($user, $user->getPassword());
             $user->setPassword($hash);
 
 
@@ -86,38 +105,30 @@ class UserController extends AbstractController
 
     /**
      * @Route("/users/{id}/edit",name="user_edit_other", methods={"GET", "POST"})
-     * @param $id
+     * @IsGranted("ROLE_ADMIN")
+     * @param Utilisateur $utilisateur
      * @param Request $request
-     * @param EntityManagerInterface $manager
-     * @param UserPasswordEncoderInterface $encoder
-     * @param Swift_Mailer $mailer
      * @return RedirectResponse|Response
      */
-    public function edit_other($id, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder, Swift_Mailer $mailer)
+    public function edit_other(Utilisateur $utilisateur, Request $request)
     {
+        $manager = $this->getDoctrine()->getManager();
         $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
-        /** @var Utilisateur $user_to_edit */
-        $user_to_edit = $repository->find($id);
-        if (!$user_to_edit) {
-            throw $this->createNotFoundException(
-                'No user found for id' / $id
-            );
-        }
 
         $user = $this->getUser();
 
-        $form = $this->createForm(UserEditType::class, $user_to_edit);
+        $form = $this->createForm(UserEditType::class, $utilisateur);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $password = $user_to_edit->getPassword();
-            $hash = $encoder->encodePassWord($user_to_edit, $user_to_edit->getPassword());
-            $user_to_edit->setPassword($hash);
+            $password = $utilisateur->getPassword();
+            $hash = $this->encoder->encodePassWord($utilisateur, $utilisateur->getPassword());
+            $utilisateur->setPassword($hash);
 
 
             $message = (new Swift_Message('Modification de votre compte'))
                 ->setFrom('projetindu6@gmail.com')
-                ->setTo($user_to_edit->getEmail())
+                ->setTo($utilisateur->getEmail())
                 ->setBody(
                     $this->renderView(
                         "auth/email/resetpassword_admin.html.twig",
@@ -127,27 +138,29 @@ class UserController extends AbstractController
 
             $manager->flush();
 
-            $mailer->send($message);
+            $this->mailer->send($message);
 
 
             return $this->redirectToRoute('users');
         }
 
-        return $this->render('user/edit.html.twig', ['user' => $user_to_edit, 'user_connected' => $user, 'form' => $form->createView()]);
+        return $this->render('user/edit.html.twig', [
+            'user' => $utilisateur,
+            'user_connected' => $user,
+            'form' => $form->createView()
+        ]);
     }
 
     /**
      * @Route("/users/{id}/delete",name="user_delete", methods={"GET", "POST"})
-     * @param $id
-     * @param EntityManagerInterface $manager
+     * @IsGranted("ROLE_ADMIN")
+     * @param Utilisateur $utilisateur
      * @return RedirectResponse
      */
-    public function delete($id, EntityManagerInterface $manager)
+    public function delete(Utilisateur $utilisateur)
     {
-        $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
-        $user_to_delete = $repository->find($id);
-
-        $manager->remove($user_to_delete);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->remove($utilisateur);
         $manager->flush();
 
         return $this->redirectToRoute('users');
@@ -161,12 +174,10 @@ class UserController extends AbstractController
      * It generate an url and send it to the owner of the email address.
      *
      * @Route("/users/me/email_verification", name="auth_email_verification", methods={"POST"})
-     * @param Swift_Mailer $mailer
-     * @return Response
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * Response
      */
-    public function emailVerification(
-        Swift_Mailer $mailer
-    )
+    public function emailVerification()
     {
         $em = $this->getDoctrine()->getManager();
         /** @var Utilisateur $user */
@@ -193,8 +204,29 @@ class UserController extends AbstractController
                 )
             );
 
-        $mailer->send($message);
+        $this->mailer->send($message);
 
         return $this->redirectToRoute('users');
+    }
+
+
+    /**
+     * @Route("/api/users/me", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     */
+    public function get_user_me()
+    {
+        /** @var Utilisateur $user */
+        $user = $this->getUser();
+        $data = [
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'token' => $user->getToken(),
+            'token_expires_at' => $user->getTokenExpiresAt()->format(DateTime::ISO8601),
+            'role' => $user->getRole(),
+            'is_email_verified' => $user->getIsEmailVerified(),
+        ];
+        return new JsonResponse($data);
     }
 }

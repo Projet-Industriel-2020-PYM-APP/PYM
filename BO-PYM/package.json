@@ -19,5 +19,13 @@
   },
   "dependencies": {
     "ckeditor": "^4.12.1"
-  }
+  },
+  "contributors": [
+    "Marc Nguyen <nguyen_marc@live.fr> (https://github.com/Darkness4/)",
+    "Frank Sebelon",
+    "Axel Ouari",
+    "Paul Grandamme",
+    "Loïc Deleforterie",
+    "Axel Ouari"
+  ]
 }

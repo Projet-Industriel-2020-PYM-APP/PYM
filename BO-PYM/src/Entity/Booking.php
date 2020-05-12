@@ -5,6 +5,8 @@ namespace App\Entity;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,9 +23,10 @@ class Booking implements JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ManyToOne(targetEntity="Service")
+     * @JoinColumn(name="$service_id", referencedColumnName="id")
      */
-    private $serviceId;
+    private $service;
 
     /**
      * @ORM\Column(type="datetime")
@@ -50,7 +53,7 @@ class Booking implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'service_id' => $this->getServiceId(),
+            'service_id' => $this->getService()->getId(),
             'title' => $this->getTitle(),
             'start_date' => $this->getStartDate()->format(DateTime::ISO8601),
             'end_date' => $this->getEndDate()->format(DateTime::ISO8601)
@@ -62,14 +65,14 @@ class Booking implements JsonSerializable
         return $this->id;
     }
 
-    public function getServiceId(): ?int
+    public function getService(): ?Service
     {
-        return $this->serviceId;
+        return $this->service;
     }
 
-    public function setServiceId(int $serviceId): self
+    public function setService(Service $service): self
     {
-        $this->serviceId = $serviceId;
+        $this->service = $service;
 
         return $this;
     }

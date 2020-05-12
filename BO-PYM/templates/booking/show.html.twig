@@ -37,7 +37,7 @@
             </div>
             <div class="btn-group" role="group" aria-label="Safe Group">
                 <a class="btn btn-outline-primary"
-                   href="{{ path('booking_of_service_index', { 'id': booking.serviceId }) }}">Revenir
+                   href="{{ path('booking_of_service_index', { 'id': booking.service.id }) }}">Revenir
                     au calendrier</a>
 
                 <a class="btn btn-primary" href="{{ path('booking_edit', { 'id': booking.id }) }}">Modifier</a>

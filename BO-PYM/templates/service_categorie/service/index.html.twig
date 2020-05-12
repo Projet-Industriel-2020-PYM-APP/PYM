@@ -29,7 +29,7 @@
             {% endif %}
         </td>
         <td>{{ service.actions|length }}</td>
-        <td>{{ bookings|filter(e => e.serviceId == service.id)|length }}</td>
+        <td>{{ bookings|filter(e => e.service.id == service.id)|length }}</td>
         <td>
             <div class="btn-group action">
                 <button aria-expanded="false" aria-haspopup="true"

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Booking;
 use App\Entity\Service;
+use App\Form\BookingAPIType;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Repository\ServiceRepository;
@@ -52,7 +53,8 @@ class BookingController extends AbstractController
     public function add(int $id_srv, Request $request): Response
     {
         $booking = new Booking();
-        $booking->setServiceId($id_srv);
+        $service = $this->serviceRepository->find($id_srv);
+        $booking->setService($service);
         $booking->setStartDate(new DateTime());
         $booking->setEndDate(new DateTime());
         $form = $this->createForm(BookingType::class, $booking);
@@ -64,7 +66,7 @@ class BookingController extends AbstractController
             $entityManager->flush();
 
             return $this->redirectToRoute('booking_of_service_index', [
-                'id' => $booking->getServiceId()
+                'id' => $booking->getService()->getId()
             ]);
         }
 
@@ -82,7 +84,7 @@ class BookingController extends AbstractController
      */
     public function show(Booking $booking): Response
     {
-        $service = $this->serviceRepository->find($booking->getServiceId());
+        $service = $booking->getService();
         return $this->render('booking/show.html.twig', [
             'booking' => $booking,
             'service' => $service
@@ -105,7 +107,7 @@ class BookingController extends AbstractController
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('booking_of_service_index', [
-                'id' => $booking->getServiceId(),
+                'id' => $booking->getService()->getId(),
             ]);
         }
 
@@ -118,13 +120,12 @@ class BookingController extends AbstractController
     /**
      * @Route("/bookings/{id}/delete", name="booking_delete", methods={"GET"})
      * @IsGranted("ROLE_ADMIN")
-     * @param Request $request
      * @param Booking $booking
      * @return Response
      */
-    public function delete(Request $request, Booking $booking): Response
+    public function delete(Booking $booking): Response
     {
-        $id_srv = $booking->getServiceId();
+        $id_srv = $booking->getService()->getId();
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($booking);
         $entityManager->flush();
@@ -139,7 +140,7 @@ class BookingController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @return Response
      */
-    public function get_bookings(): Response
+    public function fetchAllAction(): Response
     {
         $bookingsOfService = $this->bookingRepository->findAll();
         return new JsonResponse($bookingsOfService);
@@ -151,7 +152,7 @@ class BookingController extends AbstractController
      * @param Booking $booking
      * @return Response
      */
-    public function get_booking(Booking $booking): Response
+    public function fetchAction(Booking $booking): Response
     {
         return new JsonResponse($booking);
     }
@@ -162,69 +163,57 @@ class BookingController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    public function post_booking(Request $request): Response
+    public function newAction(Request $request): Response
     {
+        $data = $request->request->all();
         $booking = new Booking();
-        $serviceId = $request->request->get('service_id');
-        $startDate = $request->request->get('start_date');
-        $endDate = $request->request->get('end_date');
-        $title = $request->request->get('title');
+        $form = $this->createForm(BookingAPIType::class, $booking);
+        $form->submit($data);
 
-        if (
-            is_null($serviceId)
-            || is_null($startDate)
-            || is_null($endDate)
-            || is_null($title)
-        ) {
-            return Response::create('400 Bad request', Response::HTTP_BAD_REQUEST);
+        if ($form->isSubmitted() and $form->isValid()) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($booking);
+            $entityManager->flush();
+            return new JsonResponse(
+                $booking,
+                Response::HTTP_CREATED,
+                ['Location' => '/api/bookings/' . $booking->getId()]
+            );
         }
 
-        $booking->setServiceId($serviceId);
-        $booking->setStartDate(DateTime::createFromFormat(DateTime::ISO8601, $startDate));
-        $booking->setEndDate(DateTime::createFromFormat(DateTime::ISO8601, $endDate));
-        $booking->setTitle($title);
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($booking);
-        $entityManager->flush();
-
-        return new JsonResponse(
-            $booking,
-            Response::HTTP_CREATED,
-            ['Location' => '/api/bookings/' . $booking->getId()]
+        return new Response(
+            $form->getErrors(true),
+            Response::HTTP_BAD_REQUEST
         );
     }
 
     /**
-     * @Route("/api/bookings/{id}", methods={"PATCH"})
+     * @Route("/api/bookings/{id}", methods={"PATCH", "PUT"})
      * @IsGranted("ROLE_ADMIN")
      * @param Request $request
      * @param Booking $booking
      * @return Response
      */
-    public function patch_booking(Request $request, Booking $booking): Response
+    public function updateAction(Request $request, Booking $booking): Response
     {
-        $serviceId = $request->request->get('service_id');
-        $startDate = $request->request->get('start_date');
-        $endDate = $request->request->get('end_date');
-        $title = $request->request->get('title');
-        if (!is_null($serviceId)) {
-            $booking->setServiceId($serviceId);
-        }
-        if (!is_null($startDate)) {
-            $booking->setStartDate(DateTime::createFromFormat(DateTime::ISO8601, $startDate));
-        }
-        if (!is_null($endDate)) {
-            $booking->setEndDate(DateTime::createFromFormat(DateTime::ISO8601, $endDate));
-        }
-        if (!is_null($title)) {
-            $booking->setTitle($title);
+        $data = $request->request->all();
+        $form = $this->createForm(BookingAPIType::class, $booking);
+        $clearMissing = $request->getMethod() != 'PATCH';
+        $form->submit($data, $clearMissing);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->flush();
+
+        if ($form->isSubmitted() and $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            return new JsonResponse($booking);
         }
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->flush();
-
-        return new JsonResponse($booking);
+        return new Response(
+            $form->getErrors(true),
+            Response::HTTP_BAD_REQUEST
+        );
     }
 
 
@@ -234,7 +223,7 @@ class BookingController extends AbstractController
      * @param Booking $booking
      * @return Response
      */
-    public function delete_booking(Booking $booking): Response
+    public function deleteAction(Booking $booking): Response
     {
         $em = $this->getDoctrine()->getManager();
         $em->remove($booking);

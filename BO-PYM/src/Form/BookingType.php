@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Booking;
-use DateTime;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,10 +13,9 @@ class BookingType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('title', TextType::class, [
+        $builder->add('title', TextType::class, [
                 'label' => 'Titre',
-                'attr' => ['placeholder' =>'Titre'],
+                'attr' => ['placeholder' => 'Titre'],
             ])
             ->add('startDate', DateTimeType::class, [
                 'label' => 'Date de début',

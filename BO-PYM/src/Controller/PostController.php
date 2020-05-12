@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Repository\PostRepository;
+use App\Service\DeviceNotifier\DeviceNotifierInterface;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,10 +17,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class PostController extends AbstractController
 {
     private $postRepository;
+    private $notifier;
 
-    public function __construct(PostRepository $postRepository)
+    public function __construct(
+        PostRepository $postRepository,
+        DeviceNotifierInterface $notifier
+    )
     {
         $this->postRepository = $postRepository;
+        $this->notifier = $notifier;
     }
 
     /**
@@ -52,6 +58,8 @@ class PostController extends AbstractController
             $post->setUrl(null);  // TODO: Add here Front-End url
             $entityManager->persist($post);
             $entityManager->flush();
+
+            $this->notifier->notifyLatestPost($post, 'actualite');
 
             return $this->redirectToRoute('post_index');
         }

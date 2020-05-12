@@ -3,7 +3,7 @@
 <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
     <div class="btn-group" role="group" aria-label="Button Toolbar">
         <a class="btn btn-light"
-           href="{{ path('booking_of_service_index', { 'id': booking.serviceId }) }}">Annuler</a>
+           href="{{ path('booking_of_service_index', { 'id': booking.service.id }) }}">Annuler</a>
 
         <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
     </div>

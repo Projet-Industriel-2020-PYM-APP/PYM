@@ -3,15 +3,16 @@
 namespace App\Entity;
 
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ContactRepository")
  */
-class Contact
+class Contact implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -57,33 +58,50 @@ class Contact
         $this->poste = new ArrayCollection();
     }
 
+    /**
+     * @return Collection|Poste[]
+     */
+    public function getPoste(): Collection
+    {
+        return $this->poste;
+    }
+
+    public function addPoste(Poste $poste): self
+    {
+        if (!$this->poste->contains($poste)) {
+            $this->poste[] = $poste;
+        }
+
+        return $this;
+    }
+
+    public function removePoste(Poste $poste): self
+    {
+        if ($this->poste->contains($poste)) {
+            $this->poste->removeElement($poste);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'nom' => $this->getNom(),
+            'prenom' => $this->getPrenom(),
+            'telephone' => $this->getTelephone(),
+            'mail' => $this->getMail(),
+            'idEntreprise' => $this->getEntreprise()->getId(),
+        ];
+    }
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getMail(): ?string
-    {
-        return $this->Mail;
-    }
-
-    public function setMail(string $Mail): self
-    {
-        $this->Mail = $Mail;
-
-        return $this;
-    }
-
-    public function getTelephone(): ?string
-    {
-        return $this->Telephone;
-    }
-
-    public function setTelephone(string $Telephone): self
-    {
-        $this->Telephone = $Telephone;
-
-        return $this;
     }
 
     public function getNom(): ?string
@@ -110,6 +128,30 @@ class Contact
         return $this;
     }
 
+    public function getTelephone(): ?string
+    {
+        return $this->Telephone;
+    }
+
+    public function setTelephone(string $Telephone): self
+    {
+        $this->Telephone = $Telephone;
+
+        return $this;
+    }
+
+    public function getMail(): ?string
+    {
+        return $this->Mail;
+    }
+
+    public function setMail(string $Mail): self
+    {
+        $this->Mail = $Mail;
+
+        return $this;
+    }
+
     public function getEntreprise(): ?Entreprise
     {
         return $this->entreprise;
@@ -118,32 +160,6 @@ class Contact
     public function setEntreprise(?Entreprise $entreprise): self
     {
         $this->entreprise = $entreprise;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Poste[]
-     */
-    public function getPoste(): Collection
-    {
-        return $this->poste;
-    }
-
-    public function addPoste(Poste $poste): self
-    {
-        if (!$this->poste->contains($poste)) {
-            $this->poste[] = $poste;
-        }
-
-        return $this;
-    }
-
-    public function removePoste(Poste $poste): self
-    {
-        if ($this->poste->contains($poste)) {
-            $this->poste->removeElement($poste);
-        }
 
         return $this;
     }

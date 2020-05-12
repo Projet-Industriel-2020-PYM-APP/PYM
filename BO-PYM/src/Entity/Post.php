@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
@@ -43,29 +44,44 @@ class Post implements JsonSerializable
      */
     private $content;
 
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'published' => $this->getPublished()->format(DateTime::ISO8601),
+            'updated' => $this->getUpdated()->format(DateTime::ISO8601),
+            'url' => $this->getUrl(),
+            'title' => $this->getTitle(),
+            'content' => $this->getContent(),
+        ];
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPublished(): ?\DateTimeInterface
+    public function getPublished(): ?DateTimeInterface
     {
         return $this->published;
     }
 
-    public function setPublished(\DateTimeInterface $published): self
+    public function setPublished(DateTimeInterface $published): self
     {
         $this->published = $published;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(?\DateTimeInterface $updated): self
+    public function setUpdated(?DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 
@@ -106,20 +122,5 @@ class Post implements JsonSerializable
         $this->content = $content;
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'id'=> $this->getId(),
-            'published' => $this->getPublished()->format(DateTime::ISO8601),
-            'updated' => $this->getUpdated()->format(DateTime::ISO8601),
-            'url'=> $this->getUrl(),
-            'title' => $this->getTitle(),
-            'content' => $this->getContent(),
-        ];
     }
 }

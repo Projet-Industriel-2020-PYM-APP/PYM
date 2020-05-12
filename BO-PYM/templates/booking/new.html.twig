@@ -1,0 +1,18 @@
+{% extends 'layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('bookingForm') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('bookingForm') }}
+{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="container">
+            <h1 class="mt-3">Créer une réservation</h1>
+
+            {{ include('booking/_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

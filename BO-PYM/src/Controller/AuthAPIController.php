@@ -10,6 +10,7 @@ use DateTime;
 use Exception;
 use LogicException;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,8 +30,7 @@ class AuthAPIController extends AbstractController
         LoggerInterface $logger,
         Swift_Mailer $mailer,
         UtilisateurRepository $repository
-    )
-    {
+    ) {
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->repository = $repository;
@@ -40,6 +40,7 @@ class AuthAPIController extends AbstractController
      * Returns a token by triggering the LoginApiAuthenticator.
      *
      * @Route("/api/auth/login", name="auth_api_login", methods={"GET", "POST"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param AuthenticationUtils $authenticationUtils
      * @return Response
      */
@@ -62,6 +63,7 @@ class AuthAPIController extends AbstractController
      * It also send an email.
      *
      * @Route("/api/auth/register", methods={"POST"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param Request $request
      * @param UserPasswordEncoderInterface $encoder
      * @return Response
@@ -69,16 +71,15 @@ class AuthAPIController extends AbstractController
     public function register(
         Request $request,
         UserPasswordEncoderInterface $encoder
-    )
-    {
+    ) {
         $em = $this->getDoctrine()->getManager();
         // Fill data
         $user = new Utilisateur();
-        $user->setEmail($request->query->get('email'));
+        $user->setEmail($request->request->get('email'));
         $user->setUsername($user->getEmail());
         $user->setPassword($encoder->encodePassword(
             $user,
-            $request->query->get('password')
+            $request->request->get('password')
         ));
         $user->setIsEmailVerified(false);
         $user->setRole('User');
@@ -131,6 +132,7 @@ class AuthAPIController extends AbstractController
      * It generate an url and send it to the owner of the email address.
      *
      * @Route("/api/auth/email_verification", methods={"POST"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @return Response
      */
     public function emailVerification()
@@ -172,13 +174,14 @@ class AuthAPIController extends AbstractController
 
     /**
      * @Route("/auth/forgot_password", name="auth_forgot_password", methods={"POST"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param Request $request
      * @return Response
      */
     public function forgotPassword(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-        $email = $request->query->get('email');
+        $email = $request->request->get('email');
         $user = $this->repository->findOneBy(["email" => $email]);
         if (is_null($user)) {
             throw $this->createNotFoundException(
@@ -218,6 +221,7 @@ class AuthAPIController extends AbstractController
 
     /**
      * @Route("/auth/confirm_email/{token}", name="auth_confirm_email", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param string $token
      * @return Response
      */
@@ -240,6 +244,7 @@ class AuthAPIController extends AbstractController
 
     /**
      * @Route("/auth/reset_password/{token}", name="auth_reset_password", methods={"GET", "POST"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @param string $token
      * @param Request $request
      * @param UserPasswordEncoderInterface $encoder
@@ -249,8 +254,7 @@ class AuthAPIController extends AbstractController
         string $token,
         Request $request,
         UserPasswordEncoderInterface $encoder
-    )
-    {
+    ) {
         $em = $this->getDoctrine()->getManager();
         $user = $this->repository->findOneBy(["refreshToken" => $token]);
         if (is_null($user)) {

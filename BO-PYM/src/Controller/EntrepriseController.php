@@ -320,7 +320,7 @@ class EntrepriseController extends AbstractController
                 'No entreprise found for id' / $id_ent
             );
         }
-        $contactCategorie = $this->contactCategorieRepository->find($contact->getId());
+        $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact'=> $contact]);
         if ($contactCategorie) {
             $manager->remove($contactCategorie);
         }

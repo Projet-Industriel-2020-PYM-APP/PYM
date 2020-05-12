@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ContactCategorieRepository")
@@ -45,6 +46,7 @@ class ContactCategorie implements JsonSerializable
     private $actions;
 
     /**
+     * @Assert\NotNull()
      * @ORM\OneToOne(targetEntity=Contact::class, cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
@@ -53,6 +55,51 @@ class ContactCategorie implements JsonSerializable
     public function __construct()
     {
         $this->actions = new ArrayCollection();
+    }
+
+    public function getImgUrl()
+    {
+        return $this->imgUrl;
+    }
+
+    public function setImgUrl($imgUrl): self
+    {
+        $this->imgUrl = $imgUrl;
+
+        return $this;
+    }
+
+    public function addAction(Action $action): self
+    {
+        if (!$this->actions->contains($action)) {
+            $this->actions[] = $action;
+        }
+
+        return $this;
+    }
+
+    public function removeAction(Action $action): self
+    {
+        if ($this->actions->contains($action)) {
+            $this->actions->removeElement($action);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'subtitle' => $this->getSubtitle(),
+            'address' => $this->getAddress(),
+            'actions' => $this->getActions()->toArray(),
+            'contact_id' => $this->getContact()->getId(),
+        ];
     }
 
     public function getId(): ?int
@@ -96,39 +143,9 @@ class ContactCategorie implements JsonSerializable
         return $this;
     }
 
-    public function getImgUrl()
-    {
-        return $this->imgUrl;
-    }
-
-    public function setImgUrl($imgUrl): self
-    {
-        $this->imgUrl = $imgUrl;
-
-        return $this;
-    }
-
     public function getActions(): ?Collection
     {
         return $this->actions;
-    }
-
-    public function addAction(Action $action): self
-    {
-        if (!$this->actions->contains($action)) {
-            $this->actions[] = $action;
-        }
-
-        return $this;
-    }
-
-    public function removeAction(Action $action): self
-    {
-        if ($this->actions->contains($action)) {
-            $this->actions->removeElement($action);
-        }
-
-        return $this;
     }
 
     public function getContact(): ?Contact
@@ -141,20 +158,5 @@ class ContactCategorie implements JsonSerializable
         $this->contact = $contact;
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->getId(),
-            'title' => $this->getTitle(),
-            'subtitle' => $this->getSubtitle(),
-            'address' => $this->getAddress(),
-            'actions' => $this->getActions()->toArray(),
-            'contact_id' => $this->getContact()->getId(),
-        ];
     }
 }

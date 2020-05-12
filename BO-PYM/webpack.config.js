@@ -51,6 +51,8 @@ Encore
     .addEntry('postShow', './assets/js/postShow.js')
     .addEntry('bookingForm', './assets/js/bookingForm.js')
     .addEntry('bookingCalendar', './assets/js/bookingCalendar.js')
+    .addEntry('contactCategorieForm', './assets/js/contactCategorieForm.js')
+    .addEntry('contactCategorieIndex', './assets/js/contactCategorieIndex.js')
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
 

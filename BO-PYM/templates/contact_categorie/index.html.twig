@@ -1,0 +1,90 @@
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('contactCategorieIndex') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('contactCategorieIndex') }}
+{% endblock %}
+{% block body %}
+    {% if app.user %}
+        <div class="categories container m-4">
+            <div class="row justify-content-center">
+                <nav class="navbar navbar-dark bg-dark justify-content-between rounded">
+                    {% if app.user.role =="Admin" %}
+                        <a class="btn btn-outline-light add" href="{{ path('contact_categorie_add') }}">Ajouter</a>
+                    {% endif %}
+                    <div class="mr-sm-2"></div>
+                </nav>
+            </div>
+            <div class="row justify-content-center">
+                <table class="table rounded" id="categorieTable">
+                    <thead class="thead-dark">
+                    <tr class="searchHide">
+                        <th scope="col">Titre</th>
+                        <th scope="col">Sous-titre</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Arrière-Plan</th>
+                        <th scope="col">Nombre d'actions</th>
+                        <th scope="col">Contact lié</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="categorieBody">
+                    {% for category in categories %}
+                    <tr class="searchHide">
+                        <td>{{ category.title }}</td>
+                        <td>{{ category.subtitle }}</td>
+                        <td>{{ category.address }}</td>
+                        <td>
+                            {% if category.imgUrl is not null and category.imgUrl is defined %}
+                                <img class="img-fluid imgUrl"
+                                     src="{{ asset('uploads/contact_categories/' ~ category.imgUrl) }}"
+                                     alt="{{ asset('uploads/contact_categories/' ~ category.imgUrl) }}"/>
+                            {% else %}
+                                Pas d'image.
+                            {% endif %}
+                        </td>
+                        <td>{{ category.actions|length }}</td>
+                        <td>{{ category.contact.prenom ~' '~ category.contact.nom }}</td>
+                        <td>
+                            <div class="btn-group action">
+                                <button type="button" class="btn btn-secondary dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Action
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    {% if app.user.role =="Admin" %}
+                                        <a class="dropdown-item btn rounded"
+                                           href="{{ path('contact_categorie_edit',{'id':category.id}) }}">Modifier</a>
+                                        <a class="dropdown-item btn rounded"
+                                           href="{{ path('contact_categorie_delete', {'id':category.id}) }}">Supprimer</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="alert alert-warning" role="alert">
+                                <p>Pas de catégorie</p>
+                                <div class="btn-group action" role="group" aria-label="Ajouter une catégorie">
+                                    <a class="btn rounded"
+                                       href="{{ path('contact_categorie_add') }}">
+                                        <button class="btn btn-primary rounded" aria-expanded="false"
+                                                aria-haspopup="true" type="button">
+                                            Ajouter une catégorie
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    <tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+    {% endif %}
+{% endblock %}

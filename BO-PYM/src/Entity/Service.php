@@ -89,7 +89,7 @@ class Service implements JsonSerializable
             'subtitle' => $this->getSubtitle(),
             'address' => $this->getAddress(),
             'img_url' => $this->getImgUrl(),
-            'actions' => $this->getActions(),
+            'actions' => $this->getActions()->toArray(),
             'telephone' => $this->getTelephone(),
             'website' => $this->getWebsite(),
         ];

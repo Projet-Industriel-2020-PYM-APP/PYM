@@ -53,8 +53,8 @@ class Action implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'name' => $this->name,
-            'html_url' => $this->htmlUrl,
+            'name' => $this->getName(),
+            'html_url' => $this->getHtmlUrl(),
         ];
     }
 }

@@ -6,7 +6,6 @@ use App\Entity\Utilisateur;
 use App\Form\RegistrationType;
 use DateInterval;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
@@ -102,7 +101,6 @@ class AuthController extends AbstractController
      */
     public function deconnexion()
     {
-
     }
 
     /**

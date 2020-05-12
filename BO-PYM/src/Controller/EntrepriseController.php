@@ -12,6 +12,7 @@ use App\Form\EntrepriseType;
 use App\Form\PosteType;
 use App\Repository\ActiviteRepository;
 use App\Repository\BureauRepository;
+use App\Repository\ContactCategorieRepository;
 use App\Repository\ContactRepository;
 use App\Repository\EntrepriseRepository;
 use App\Repository\PosteRepository;
@@ -35,6 +36,7 @@ class EntrepriseController extends AbstractController
     private $activiteRepository;
     private $contactRepository;
     private $bureauRepository;
+    private $contactCategorieRepository;
 
     public function __construct(
         EntrepriseRepository $entrepriseRepository,
@@ -42,6 +44,7 @@ class EntrepriseController extends AbstractController
         PosteRepository $posteRepository,
         ContactRepository $contactRepository,
         BureauRepository $bureauRepository,
+        ContactCategorieRepository $contactCategorieRepository,
         FileUploader $fileUploader
     )
     {
@@ -51,6 +54,7 @@ class EntrepriseController extends AbstractController
         $this->bureauRepository = $bureauRepository;
         $this->fileUploader = $fileUploader;
         $this->contactRepository = $contactRepository;
+        $this->contactCategorieRepository = $contactCategorieRepository;
     }
 
     /**
@@ -315,6 +319,10 @@ class EntrepriseController extends AbstractController
             throw $this->createNotFoundException(
                 'No entreprise found for id' / $id_ent
             );
+        }
+        $contactCategorie = $this->contactCategorieRepository->find($contact->getId());
+        if ($contactCategorie) {
+            $manager->remove($contactCategorie);
         }
 
         $manager->remove($contact);

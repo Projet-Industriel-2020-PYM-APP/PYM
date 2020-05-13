@@ -20,6 +20,7 @@
     "symfony/form": "5.0.*",
     "symfony/framework-bundle": "5.0.*",
     "symfony/http-foundation": "5.0.*",
+    "symfony/maker-bundle": "^1.17",
     "symfony/monolog-bundle": "^3.1",
     "symfony/orm-pack": "*",
     "symfony/process": "5.0.*",
@@ -40,7 +41,6 @@
   "require-dev": {
     "doctrine/doctrine-fixtures-bundle": "^3.3",
     "symfony/debug-pack": "*",
-    "symfony/maker-bundle": "^1.15",
     "symfony/profiler-pack": "^1.0",
     "symfony/test-pack": "*"
   },

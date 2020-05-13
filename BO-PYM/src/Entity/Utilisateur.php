@@ -37,7 +37,7 @@ class Utilisateur implements UserInterface
     private $role;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @ORM\Column(type="string", length=191, unique=true, nullable=true)
      */
     private $token;
 
@@ -47,7 +47,7 @@ class Utilisateur implements UserInterface
     private $tokenExpiresAt;
 
     /**
-     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @ORM\Column(type="string", length=191, unique=true, nullable=true)
      */
     private $refreshToken;
 

@@ -13,10 +13,8 @@
                 <h1>Modifier une publication</h1>
             </div>
             <div class="col-lg-9">
-                {{ include('post/_form.html.twig') }}
+                {{ include('post/_form.html.twig', {'button_label': 'Modifier'}) }}
             </div>
         </div>
-
-        {{ include('post/_delete_form.html.twig') }}
     </div>
 {% endblock %}

@@ -3,22 +3,31 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Form\RegistrationAPIType;
 use App\Form\ResetPasswordType;
 use App\Repository\UtilisateurRepository;
 use DateInterval;
 use DateTime;
 use Exception;
+use Laminas\Code\Scanner\Util;
 use LogicException;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class AuthAPIController extends AbstractController
 {
@@ -75,52 +84,60 @@ class AuthAPIController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         // Fill data
         $user = new Utilisateur();
-        $user->setEmail($request->request->get('email'));
-        $user->setUsername($user->getEmail());
-        $user->setPassword($encoder->encodePassword(
-            $user,
-            $request->request->get('password')
-        ));
-        $user->setIsEmailVerified(false);
-        $user->setRole('User');
-        try {
-            $user->setToken(bin2hex(random_bytes(64)));
-        } catch (Exception $e) {
-            $this->logger->warning($e);
-            $user->setToken(uniqid("", true));
-        }
-        $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('P1D'));
-        $user->setTokenExpiresAt($expirationDate);
-        try {
-            $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (Exception $e) {
-            $this->logger->warning($e);
-            $user->setRefreshToken(uniqid("", true));
-        }
-        $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('PT1H'));
-        $user->setRefreshTokenExpiresAt($expirationDate);
+        $form = $this->createForm(RegistrationAPIType::class, $user);
+        $form->handleRequest($request);
 
-        $em->persist($user);
-        $em->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setUsername($user->getEmail());
+            $user->setPassword($encoder->encodePassword(
+                $user,
+                $user->getPassword()
+            ));
+            $user->setIsEmailVerified(false);
+            $user->setRole('User');
+            try {
+                $user->setToken(bin2hex(random_bytes(64)));
+            } catch (Exception $e) {
+                $this->logger->warning($e);
+                $user->setToken(uniqid("", true));
+            }
+            $expirationDate = new DateTime();
+            $expirationDate->add(new DateInterval('P1D'));
+            $user->setTokenExpiresAt($expirationDate);
+            try {
+                $user->setRefreshToken(bin2hex(random_bytes(64)));
+            } catch (Exception $e) {
+                $this->logger->warning($e);
+                $user->setRefreshToken(uniqid("", true));
+            }
+            $expirationDate = new DateTime();
+            $expirationDate->add(new DateInterval('P1D'));
+            $user->setRefreshTokenExpiresAt($expirationDate);
 
-        $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
-            ->setFrom('account-security-noreply@map-pym.com')
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->renderView(
-                    "auth/email/confirm_email.html.twig",
-                    ['token' => $user->getRefreshToken()]
-                )
+            $em->persist($user);
+            $em->flush();
+
+            $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
+                ->setFrom('account-security-noreply@map-pym.com')
+                ->setTo($user->getEmail())
+                ->setContentType("text/html")
+                ->setBody(
+                    $this->renderView(
+                        "auth/email/confirm_email.html.twig",
+                        ['token' => $user->getRefreshToken()]
+                    )
+                );
+
+            $this->mailer->send($message);
+
+            return Response::create(
+                $user->getToken(),
+                Response::HTTP_OK
             );
-
-        $this->mailer->send($message);
-
+        }
         return Response::create(
-            $user->getToken(),
-            Response::HTTP_OK,
-            ['content-type' => 'text/html']
+            $form->getErrors(true),
+            Response::HTTP_BAD_REQUEST
         );
     }
 
@@ -148,7 +165,7 @@ class AuthAPIController extends AbstractController
             $user->setRefreshToken(uniqid("", true));
         }
         $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('PT1H'));
+        $expirationDate->add(new DateInterval('P1D'));
         $user->setRefreshTokenExpiresAt($expirationDate);
         $em->flush();
 
@@ -195,7 +212,7 @@ class AuthAPIController extends AbstractController
             $user->setRefreshToken(uniqid("", true));
         }
         $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('PT1H'));
+        $expirationDate->add(new DateInterval('P1D'));
         $user->setRefreshTokenExpiresAt($expirationDate);
         $em->flush();
 
@@ -255,7 +272,6 @@ class AuthAPIController extends AbstractController
         Request $request,
         UserPasswordEncoderInterface $encoder
     ) {
-        $em = $this->getDoctrine()->getManager();
         $user = $this->repository->findOneBy(["refreshToken" => $token]);
         if (is_null($user)) {
             throw $this->createNotFoundException('User not found.');
@@ -263,16 +279,15 @@ class AuthAPIController extends AbstractController
         if ($user->isRefreshTokenExpired()) {
             throw $this->createAccessDeniedException('Link has expired.');
         }
-
         $form = $this->createForm(ResetPasswordType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $hash = $encoder->encodePassword($user, $user->getPassword());
             $user->setPassword($hash);
             $user->setRefreshTokenExpiresAt(new DateTime());
             $user->setRefreshToken(null);
+            $em = $this->getDoctrine()->getManager();
             $em->flush();
 
             $message = (new Swift_Message("Mot de passe modifié."))

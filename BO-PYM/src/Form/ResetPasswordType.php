@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,16 +17,31 @@ class ResetPasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('password', PasswordType::class, [
-                'row_attr' => [
-                    'class' => 'form-group'
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'invalid_message' => 'Les mots de passes doivent correspondre.',
+                'required' => true,
+                'options' => [
+                    'label_attr' => [
+                        'class' => 'h5'
+                    ],
+                    'row_attr' => [
+                        'class' => 'form-group'
+                    ],
                 ],
-                'label_attr' => [
-                    'class' => 'h5'
+                'first_options'  => [
+                    'label' => 'Mot de passe',
+                    'attr' => [
+                        'placeholder' => 'Mot de passe',
+                        'class' => 'password-field',
+                    ],
                 ],
-                'attr' => [
-                    'placeholder' => "Mot de passe",
-                    'class' => 'form-control',
+                'second_options' => [
+                    'label' => 'Confirmer le mot de passe',
+                    'attr' => [
+                        'placeholder' => 'Confirmer le mot de passe',
+                        'class' => 'password-field',
+                    ]
                 ],
                 'constraints' => [
                     new Length(['min' => 8]),
@@ -34,20 +50,6 @@ class ResetPasswordType extends AbstractType
                         'message' => "Il faut 1 chiffre et 1 lettre au minimum",
                     ])
                 ],
-                'label' => "Mot de passe",
-            ])
-            ->add('confirm_password', PasswordType::class, [
-                'row_attr' => [
-                    'class' => 'form-group'
-                ],
-                'label_attr' => [
-                    'class' => 'h5'
-                ],
-                'attr' => [
-                    'placeholder' => "Confirmer le mot de passe",
-                    'class' => 'form-control'
-                ],
-                'label' => "Confirmer le mot de passe",
             ])
             ->add('_submit', SubmitType::class, [
                 'attr' => [

@@ -17,6 +17,7 @@ use App\Repository\ContactRepository;
 use App\Repository\EntrepriseRepository;
 use App\Repository\PosteRepository;
 use App\Service\FileUploader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
@@ -267,22 +268,15 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/contact/{id}/edit",name="entreprise_edit_contact", methods={"GET", "POST"})
      * @IsGranted("ROLE_ADMIN")
-     * @param int $id_ent
+     * @Entity("entreprise", expr="repository.find(id_ent)")
+     * @param Entreprise $entreprise
      * @param Contact $contact
      * @param Request $request
      * @return RedirectResponse|Response
      */
-    public function edit_contact(int $id_ent, Contact $contact, Request $request)
+    public function edit_contact(Entreprise $entreprise, Contact $contact, Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
-        $entreprise = $this->entrepriseRepository->find($id_ent);
-
-        if (!$entreprise) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id_ent
-            );
-        }
-
         $form = $this->createForm(ContactType::class, $contact);
         $form->handleRequest($request);
 
@@ -307,19 +301,14 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/contact/{id}/delete",name="entreprise_delete_contact", methods={"GET", "POST"})
      * @IsGranted("ROLE_ADMIN")
-     * @param int $id_ent
+     * @Entity("entreprise", expr="repository.find(id_ent)")
+     * @param Entreprise $entreprise
      * @param Contact $contact
      * @return RedirectResponse
      */
-    public function delete_contact(int $id_ent, Contact $contact)
+    public function delete_contact(Entreprise $entreprise, Contact $contact)
     {
         $manager = $this->getDoctrine()->getManager();
-        $entreprise = $this->entrepriseRepository->find($id_ent);
-        if (!$entreprise) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id_ent
-            );
-        }
         $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact'=> $contact]);
         if ($contactCategorie) {
             $manager->remove($contactCategorie);
@@ -334,28 +323,16 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/contact/{id_cont}/poste/{id}/delete",name="entreprise_delete_poste", methods={"GET", "POST"})
      * @IsGranted("ROLE_ADMIN")
-     * @param $id_ent
-     * @param $id_cont
+     * @Entity("entreprise", expr="repository.find(id_ent)")
+     * @Entity("contact", expr="repository.find(id_cont)")
+     * @param Entreprise $entreprise
+     * @param Contact $contact
      * @param Poste $poste
      * @return RedirectResponse
      */
-    public function delete_poste(int $id_ent, int $id_cont, Poste $poste)
+    public function delete_poste(Entreprise $entreprise, Contact $contact, Poste $poste)
     {
         $manager = $this->getDoctrine()->getManager();
-        $entreprise = $this->entrepriseRepository->find($id_ent);
-        if (!$entreprise) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id_ent
-            );
-        }
-
-        $contact = $this->contactRepository->find($id_cont);
-        if (!$contact) {
-            throw $this->createNotFoundException(
-                'No contact found for id' / $id_cont
-            );
-        }
-
         $contact->removePoste($poste);
         $manager->flush();
         return $this->redirectToRoute('entreprises');
@@ -364,19 +341,14 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprises/{id_ent}/activite/{id}/delete",name="entreprise_delete_activite", methods={"GET", "POST"})
      * @IsGranted("ROLE_ADMIN")
-     * @param $id_ent
+     * @Entity("entreprise", expr="repository.find(id_ent)")
+     * @param Entreprise $entreprise
      * @param Activite $activite
      * @return RedirectResponse
      */
-    public function delete_activite($id_ent, Activite $activite)
+    public function delete_activite(Entreprise $entreprise, Activite $activite)
     {
         $manager = $this->getDoctrine()->getManager();
-        $entreprise = $this->entrepriseRepository->find($id_ent);
-        if (!$entreprise) {
-            throw $this->createNotFoundException(
-                'No entreprise found for id' / $id_ent
-            );
-        }
         $entreprise->removeActivite($activite);
         $manager->flush();
         return $this->redirectToRoute('entreprises');

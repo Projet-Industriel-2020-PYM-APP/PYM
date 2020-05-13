@@ -10,6 +10,7 @@ use App\Repository\BookingRepository;
 use App\Repository\ServiceCategorieRepository;
 use App\Repository\ServiceRepository;
 use App\Service\FileUploader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
@@ -192,12 +193,15 @@ class ServiceCategorieController extends AbstractController
 
     /**
      * @Route("/service_categorie/{id_cat}/services/{id}/edit",name="service_edit", methods={"GET","POST"})
+     * @Entity("serviceCategorie", expr="repository.find(id_cat)")
      * @IsGranted("ROLE_ADMIN")
+     * @param ServiceCategorie $serviceCategorie
      * @param Request $request
      * @param Service $service
      * @return Response
      */
     public function edit_service(
+        ServiceCategorie $serviceCategorie,
         Request $request,
         Service $service
     )
@@ -231,11 +235,13 @@ class ServiceCategorieController extends AbstractController
 
     /**
      * @Route("/service_categorie/{id_cat}/services/{id}/delete",name="service_delete", methods={"GET"})
+     * @Entity("serviceCategorie", expr="repository.find(id_cat)")
      * @IsGranted("ROLE_ADMIN")
+     * @param ServiceCategorie $serviceCategorie
      * @param Service $service
      * @return Response
      */
-    public function delete_service(Service $service)
+    public function delete_service(ServiceCategorie $serviceCategorie, Service $service)
     {
         $manager = $this->getDoctrine()->getManager();
         $this->_clearService($service);
@@ -249,7 +255,7 @@ class ServiceCategorieController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @return JsonResponse
      */
-    public function get_service_categories()
+    public function fetchAllServiceCategoriesAction()
     {
         $serviceCategories = $this->serviceCategorieRepository->findAll();
         return new JsonResponse($serviceCategories);
@@ -260,7 +266,7 @@ class ServiceCategorieController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @return JsonResponse
      */
-    public function fetchServicesAction()
+    public function fetchAllServicesAction()
     {
         $services = $this->serviceRepository->findAll();
         return new JsonResponse($services);

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Domaine;
 use App\Form\DomaineType;
+use App\Repository\DomaineRepository;
 use App\Service\FileUploader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -16,14 +17,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DomaineController extends AbstractController
 {
+    private $fileUploader;
+    private $domaineRepository;
+    public function __construct(
+        FileUploader $fileUploader,
+        DomaineRepository $domaineRepository
+    )
+    {
+        $this->fileUploader = $fileUploader;
+        $this->domaineRepository = $domaineRepository;
+    }
+
     /**
      * @Route("/domaine", name="domaine", methods={"GET"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function index()
     {
-        $repository = $this->getDoctrine()->getRepository(Domaine::class);
-        $domaine = $repository->findAll();
+        $domaine = $this->domaineRepository->findAll();
         $file = '';
         if ($domaine !== null) {
             $file = $domaine[0]->getFichier();
@@ -37,16 +48,15 @@ class DomaineController extends AbstractController
     /**
      * @Route("/domaine/{id}/edit",name="domaine_edit", methods={"GET", "POST"})
      * @IsGranted("ROLE_ADMIN")
-     * @param $id
+     * @param int $id
      * @param Request $request
      * @param FileUploader $fileUploader
      * @return RedirectResponse|Response
      */
-    public function edit($id, Request $request, FileUploader $fileUploader)
+    public function edit(int $id, Request $request, FileUploader $fileUploader)
     {
         $manager = $this->getDoctrine()->getManager();
-        $repository = $this->getDoctrine()->getRepository(Domaine::class);
-        $domaine = $repository->find($id);
+        $domaine = $this->domaineRepository->find($id);
         if (is_null($domaine)) {
             $domaine = new Domaine();
         }

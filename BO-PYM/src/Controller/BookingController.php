@@ -9,7 +9,9 @@ use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Repository\ServiceRepository;
 use DateTime;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,15 +47,15 @@ class BookingController extends AbstractController
 
     /**
      * @Route("/services/{id_srv}/bookings/add", name="booking_of_service_add", methods={"GET","POST"})
+     * @Entity("service", expr="repository.find(id_srv)")
      * @IsGranted("ROLE_ADMIN")
-     * @param int $id_srv
+     * @param Service $service
      * @param Request $request
      * @return Response
      */
-    public function add(int $id_srv, Request $request): Response
+    public function add(Service $service, Request $request): Response
     {
         $booking = new Booking();
-        $service = $this->serviceRepository->find($id_srv);
         $booking->setService($service);
         $booking->setStartDate(new DateTime());
         $booking->setEndDate(new DateTime());
@@ -78,17 +80,13 @@ class BookingController extends AbstractController
 
     /**
      * @Route("/bookings/{id}", name="booking_of_service_show", methods={"GET","POST"})
+     * @Template("booking/show.html.twig", vars={"booking"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Booking $booking
-     * @return Response
+     * @return void
      */
-    public function show(Booking $booking): Response
+    public function show(Booking $booking)
     {
-        $service = $booking->getService();
-        return $this->render('booking/show.html.twig', [
-            'booking' => $booking,
-            'service' => $service
-        ]);
     }
 
     /**
@@ -170,7 +168,7 @@ class BookingController extends AbstractController
         $form = $this->createForm(BookingAPIType::class, $booking);
         $form->submit($data);
 
-        if ($form->isSubmitted() and $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($booking);
             $entityManager->flush();
@@ -204,7 +202,7 @@ class BookingController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->flush();
 
-        if ($form->isSubmitted() and $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->flush();
             return new JsonResponse($booking);

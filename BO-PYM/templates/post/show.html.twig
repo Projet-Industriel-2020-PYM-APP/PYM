@@ -1,0 +1,38 @@
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('postShow') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('postShow') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Article n°{{ post.id }}</h1>
+                <p class="card-subtitle">Publié
+                    le {{ post.published ? (post.published|date('Y-m-d H:i:s')|format_datetime('long', 'short', locale='fr')) : '' }} UTC</p>
+                <p class="card-subtitle">Mis à jour
+                    le {{ post.updated ? (post.updated|date('Y-m-d H:i:s')|format_datetime('long', 'short', locale='fr')) : '' }} UTC</p>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">{{ post.title }}</h4>
+                <div class="container border">
+                    {{ post.content|raw }}
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="btn-toolbar my-4 justify-content-end" role="toolbar"
+                     aria-label="Toolbar with button groups">
+                    <div class="btn-group mr-2" role="group" aria-label="Cancel Group">
+                        <a class="btn btn-outline-danger" href="{{ path('post_delete', {'id':post.id}) }}">Supprimer</a>
+                    </div>
+                    <div class="btn-group mr-2" role="group" aria-label="Publish Group">
+                        <a class="btn btn-primary" href="{{ path('post_edit', {'id':post.id}) }}">Modifier</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

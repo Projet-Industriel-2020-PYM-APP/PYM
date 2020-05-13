@@ -10,6 +10,7 @@ use App\Repository\BatimentRepository;
 use App\Repository\BureauRepository;
 use App\Repository\EntrepriseRepository;
 use App\Service\FileUploader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -198,23 +199,16 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("/batiments/{id_bat}/bureau/{id}/edit",name="batiment_edit_bureau", methods={"GET","POST"})
+     * @Entity("batiment", expr="repository.find(id_bat)")
      * @IsGranted("ROLE_ADMIN")
-     * @param $id_bat
+     * @param Batiment $batiment
      * @param Bureau $bureau
      * @param Request $request
      * @return RedirectResponse|Response
      */
-    public function edit_bureau(int $id_bat, Bureau $bureau, Request $request)
+    public function edit_bureau(Batiment $batiment, Bureau $bureau, Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
-        $batiment = $this->batimentRepository->find($id_bat);
-
-        if (!$batiment) {
-            throw $this->createNotFoundException(
-                'No batiment found for id' / $id_bat
-            );
-        }
-
         $form = $this->createForm(BureauType::class, $bureau);
         $form->handleRequest($request);
 
@@ -230,11 +224,13 @@ class BatimentController extends AbstractController
 
     /**
      * @Route("batiments/{id_bat}/bureau/{id}/delete",name="batiment_delete_bureau", methods={"GET","POST"})
+     * @Entity("batiment", expr="repository.find(id_bat)")
      * @IsGranted("ROLE_ADMIN")
+     * @param Batiment $batiment
      * @param Bureau $bureau
      * @return RedirectResponse
      */
-    public function delete_bureau(Bureau $bureau)
+    public function delete_bureau(Batiment $batiment, Bureau $bureau)
     {
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($bureau);

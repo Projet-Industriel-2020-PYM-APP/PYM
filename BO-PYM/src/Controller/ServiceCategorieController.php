@@ -210,7 +210,7 @@ class ServiceCategorieController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
         $file = $service->getImgUrl();
-        if (!$file) {
+        if ($file) {
             $service->setImgUrl(new File($this->getParameter('shared_directory') . 'services/' . $file));
         }
         $form = $this->createForm(ServiceType::class, $service);

@@ -82,9 +82,9 @@ class ContactCategorieController extends AbstractController
      */
     public function edit(Request $request, ContactCategorie $contactCategorie): Response
     {
-        $file = $contactCategorie->getImgUrl();
-        if ($file) {
-            $contactCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'contact_categories/' . $file));
+        $oldFile = $contactCategorie->getImgUrl();
+        if ($oldFile) {
+            $contactCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'contact_categories/' . $oldFile));
         }
         $form = $this->createForm(ContactCategorieType::class, $contactCategorie);
         $form->handleRequest($request);
@@ -94,8 +94,8 @@ class ContactCategorieController extends AbstractController
             $imgFile = $form->get('imgUrl')->getData();
 
             if ($imgFile) {
-                $path = $this->getParameter('shared_directory') . 'contact_categories/' . $imgFile;
-                if (file_exists($path)) {
+                $path = $this->getParameter('shared_directory') . 'contact_categories/' . $oldFile;
+                if ($oldFile && file_exists($path)) {
                     unlink($path);
                 }
                 $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);

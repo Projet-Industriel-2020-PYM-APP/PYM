@@ -5,14 +5,13 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\JoinColumn;
-use Doctrine\ORM\Mapping\ManyToOne;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\ServiceRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\ContactCategorieRepository")
  */
-class Service implements JsonSerializable
+class ContactCategorie implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -20,43 +19,54 @@ class Service implements JsonSerializable
      * @ORM\Column(type="integer")
      */
     private $id;
+
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $title;
-    /**
-     * @ManyToOne(targetEntity="ServiceCategorie")
-     * @JoinColumn(name="$categorie_id", referencedColumnName="id")
-     */
-    private $categorie;
+
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $subtitle;
+
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $address;
+
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $imgUrl;
+
     /**
      * @ORM\Column(type="array", nullable=true)
      */
     private $actions;
+
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotNull()
+     * @ORM\OneToOne(targetEntity=Contact::class, cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $telephone;
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $website;
+    private $contact;
 
     public function __construct()
     {
         $this->actions = new ArrayCollection();
+    }
+
+    public function getImgUrl()
+    {
+        return $this->imgUrl;
+    }
+
+    public function setImgUrl($imgUrl): self
+    {
+        $this->imgUrl = $imgUrl;
+
+        return $this;
     }
 
     public function addAction(Action $action): self
@@ -85,13 +95,10 @@ class Service implements JsonSerializable
         return [
             'id' => $this->getId(),
             'title' => $this->getTitle(),
-            'categorie_id' => $this->getCategorie()->getId(),
             'subtitle' => $this->getSubtitle(),
             'address' => $this->getAddress(),
-            'img_url' => $this->getImgUrl(),
             'actions' => $this->getActions()->toArray(),
-            'telephone' => $this->getTelephone(),
-            'website' => $this->getWebsite(),
+            'contact_id' => $this->getContact()->getId(),
         ];
     }
 
@@ -105,21 +112,9 @@ class Service implements JsonSerializable
         return $this->title;
     }
 
-    public function setTitle(?string $title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getCategorie(): ?ServiceCategorie
-    {
-        return $this->categorie;
-    }
-
-    public function setCategorie(ServiceCategorie $categorie): self
-    {
-        $this->categorie = $categorie;
 
         return $this;
     }
@@ -148,43 +143,19 @@ class Service implements JsonSerializable
         return $this;
     }
 
-    public function getImgUrl()
-    {
-        return $this->imgUrl;
-    }
-
-    public function setImgUrl($imgUrl): self
-    {
-        $this->imgUrl = $imgUrl;
-
-        return $this;
-    }
-
     public function getActions(): ?Collection
     {
         return $this->actions;
     }
 
-    public function getTelephone(): ?string
+    public function getContact(): ?Contact
     {
-        return $this->telephone;
+        return $this->contact;
     }
 
-    public function setTelephone(?string $telephone): self
+    public function setContact(Contact $contact): self
     {
-        $this->telephone = $telephone;
-
-        return $this;
-    }
-
-    public function getWebsite(): ?string
-    {
-        return $this->website;
-    }
-
-    public function setWebsite(?string $website): self
-    {
-        $this->website = $website;
+        $this->contact = $contact;
 
         return $this;
     }

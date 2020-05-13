@@ -41,7 +41,8 @@
                                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Action
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right">              
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item btn rounded" href="{{path('post_show', {'id':post.id})}}">Voir</a>
                                     {% if app.user.role =="Admin" %}
                                     <a class="dropdown-item btn rounded" href="{{path('post_edit', {'id':post.id})}}">Modifier</a>
                                     <a class="dropdown-item btn rounded" onclick="return confirm('Êtes vous sûr de vouloir supprimer cet élèment?')" href="{{path('post_delete',{'id': post.id})}}">Supprimer</a>

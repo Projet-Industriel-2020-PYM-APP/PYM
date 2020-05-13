@@ -8,36 +8,38 @@
 
 {% block body %}
     {% if app.user %}
-        <div class="card">
-            <div class="card-header bg-dark ">
-                <h4>Modifier un utilisateur</h4>
-            </div>
-            <div class="card-body">
-                <div class="row justify-content-center">
-                    {% if not user.isEmailVerified %}
-                    <form action="{{ path('auth_email_verification') }}" method="post">
-                        <div class="alert alert-warning" role="alert">
-                            E-mail non vérifié 🙁
-                        </div>
-                        <button class="btn btn-primary" type="submit">Envoyer un mail de confirmation</button>
-                    </form>
-                    {% else %}
-                        <div class="alert alert-success" role="alert">
-                           E-mail vérifié 😉 !
-                        </div>
-                    {% endif %}
+        <div class=container>
+            <div class="card">
+                <div class="card-header bg-dark ">
+                    <h4>Modifier un utilisateur</h4>
                 </div>
-                {{ form_start(form) }}
-                <div class="row justify-content-center">
-                    <div class="col-10">
-                        {{ form_widget(form) }}
+                <div class="card-body">
+                    <div class="row justify-content-center">
+                        {% if not user.isEmailVerified %}
+                            <form action="{{ path('auth_email_verification') }}" method="post">
+                                <div class="alert alert-warning" role="alert">
+                                    E-mail non vérifié 🙁
+                                </div>
+                                <button class="btn btn-primary" type="submit">Envoyer un mail de confirmation</button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-success" role="alert">
+                                E-mail vérifié 😉 !
+                            </div>
+                        {% endif %}
                     </div>
+                    {{ form_start(form) }}
+                    <div class="row justify-content-center">
+                        <div class="col-10">
+                            {{ form_widget(form) }}
+                        </div>
+                    </div>
+                    <div class="btns row justify-content-around">
+                        <a href="{{ path('users') }}" class="btn btn-secondary btn-back">Annuler</a>
+                        <button type="submit" class="btn btn-success btn-add">Modifier</button>
+                    </div>
+                    {{ form_end(form) }}
                 </div>
-                <div class="btns row justify-content-around">
-                    <a href="{{ path('users') }}" class="btn btn-secondary btn-back">Annuler</a>
-                    <button type="submit" class="btn btn-success btn-add">Modifier</button>
-                </div>
-                {{ form_end(form) }}
             </div>
         </div>
     {% else %}

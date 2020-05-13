@@ -24,18 +24,27 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         $this->em = $em;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function supports(Request $request)
     {
         return $request->headers->has('Authorization')
             && 0 === strpos($request->headers->get('Authorization'), 'Bearer ');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getCredentials(Request $request)
     {
         $authorizationHeader = $request->headers->get('Authorization');
         return substr($authorizationHeader, 7);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         if (null === $credentials) {
@@ -63,11 +72,17 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         return $user;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function checkCredentials($credentials, UserInterface $user)
     {
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = [
@@ -77,11 +92,17 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         return null;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function start(Request $request, AuthenticationException $authException = null)
     {
         $data = [
@@ -91,6 +112,9 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function supportsRememberMe()
     {
         return false;

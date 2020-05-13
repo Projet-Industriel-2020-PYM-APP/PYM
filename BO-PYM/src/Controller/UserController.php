@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Form\RegistrationType;
 use App\Form\UserEditType;
 use App\Repository\UtilisateurRepository;
 use DateInterval;
@@ -14,12 +15,15 @@ use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class UserController extends AbstractController
 {
@@ -59,48 +63,38 @@ class UserController extends AbstractController
     public function edit(Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
+        /** @var Utilisateur $user */
         $user = $this->getUser();
-
-        $form = $this->createFormBuilder($user)
-            ->add('email', EmailType::class, [
-                'attr' => [
-                    'placeholder' => "Adresse e-mail",
-                    'class' => 'reg-email rounded form-control'
-                ],
-                'label' => ' '
-            ])
-            ->add('password', PasswordType::class, [
-                'attr' => [
-                    'placeholder' => "Mot de passe",
-                    'class' => 'reg-email rounded form-control'
-                ],
-                'label' => ' '
-            ])
-            ->add('confirm_password', PasswordType::class, [
-                'attr' => [
-                    'placeholder' => "Confirmation du mot de passe",
-                    'class' => 'reg-username rounded form-control'
-                ],
-                'label' => ' '
-            ])
-            ->getForm();
-
+        $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $hash = $this->encoder->encodePassWord($user, $user->getPassword());
+            $password = $user->getPassword();
+            $hash = $this->encoder->encodePassword($user, $user->getPassword());
             $user->setPassword($hash);
 
-
+            $message = (new Swift_Message('Modification de votre compte'))
+                ->setFrom('account-security-noreply@map-pym.com')
+                ->setTo($user->getEmail())
+                ->setBody(
+                    $this->renderView(
+                        "auth/email/resetpassword_admin.html.twig",
+                        ['password' => $password]
+                    )
+                );
+            $this->mailer->send($message);
             $manager->persist($user);
             $manager->flush();
 
-            return $this->redirectToRoute('entreprises');
+            return $this->redirectToRoute('root');
         }
 
 
-        return $this->render("user/edit.html.twig", ['user' => $user, 'form' => $form->createView()]);
+        return $this->render("user/edit.html.twig", [
+            'user' => $user,
+            'form' => $form->createView()
+        ]);
     }
 
     /**
@@ -113,21 +107,17 @@ class UserController extends AbstractController
     public function edit_other(Utilisateur $utilisateur, Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
-        $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
-
-        $user = $this->getUser();
 
         $form = $this->createForm(UserEditType::class, $utilisateur);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $password = $utilisateur->getPassword();
             $hash = $this->encoder->encodePassWord($utilisateur, $utilisateur->getPassword());
             $utilisateur->setPassword($hash);
 
-
             $message = (new Swift_Message('Modification de votre compte'))
-                ->setFrom('projetindu6@gmail.com')
+                ->setFrom('account-security-noreply@map-pym.com')
                 ->setTo($utilisateur->getEmail())
                 ->setBody(
                     $this->renderView(
@@ -140,13 +130,11 @@ class UserController extends AbstractController
 
             $this->mailer->send($message);
 
-
             return $this->redirectToRoute('users');
         }
 
         return $this->render('user/edit.html.twig', [
             'user' => $utilisateur,
-            'user_connected' => $user,
             'form' => $form->createView()
         ]);
     }
@@ -189,7 +177,7 @@ class UserController extends AbstractController
             $user->setRefreshToken(uniqid("", true));
         }
         $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('PT1H'));
+        $expirationDate->add(new DateInterval('P1D'));
         $user->setRefreshTokenExpiresAt($expirationDate);
         $em->flush();
 

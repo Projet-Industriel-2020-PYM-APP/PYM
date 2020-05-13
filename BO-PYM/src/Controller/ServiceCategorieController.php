@@ -10,6 +10,7 @@ use App\Repository\BookingRepository;
 use App\Repository\ServiceCategorieRepository;
 use App\Repository\ServiceRepository;
 use App\Service\FileUploader;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
@@ -109,7 +110,7 @@ class ServiceCategorieController extends AbstractController
 
             if ($imgFile) {
                 $path = $this->getParameter('shared_directory') . 'service_categories/' . $imgFile;
-                if(file_exists($path)){
+                if (file_exists($path)) {
                     unlink($path);
                 }
                 $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -139,16 +140,11 @@ class ServiceCategorieController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
         $services = $this->serviceRepository->findBy(['categorie' => $serviceCategorie]);
         foreach ($services as $service) {
-            $imgFile = $service->getImgUrl();
-            $path = $this->getParameter('shared_directory') . 'services/' . $imgFile;
-            if($imgFile && file_exists($path)){
-                unlink($path);
-            }
-            $manager->remove($service);
+            $this->_clearService($service);
         }
         $imgFile = $serviceCategorie->getImgUrl();
         $path = $this->getParameter('shared_directory') . 'service_categories/' . $imgFile;
-        if($imgFile && file_exists($path)){
+        if ($imgFile && file_exists($path)) {
             unlink($path);
         }
         $manager->remove($serviceCategorie);
@@ -197,12 +193,15 @@ class ServiceCategorieController extends AbstractController
 
     /**
      * @Route("/service_categorie/{id_cat}/services/{id}/edit",name="service_edit", methods={"GET","POST"})
+     * @Entity("serviceCategorie", expr="repository.find(id_cat)")
      * @IsGranted("ROLE_ADMIN")
+     * @param ServiceCategorie $serviceCategorie
      * @param Request $request
      * @param Service $service
      * @return Response
      */
     public function edit_service(
+        ServiceCategorie $serviceCategorie,
         Request $request,
         Service $service
     )
@@ -218,7 +217,7 @@ class ServiceCategorieController extends AbstractController
 
             if ($imgFile) {
                 $path = $this->getParameter('shared_directory') . 'services/' . $imgFile;
-                if(file_exists($path)){
+                if (file_exists($path)) {
                     unlink($path);
                 }
                 $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -236,20 +235,16 @@ class ServiceCategorieController extends AbstractController
 
     /**
      * @Route("/service_categorie/{id_cat}/services/{id}/delete",name="service_delete", methods={"GET"})
+     * @Entity("serviceCategorie", expr="repository.find(id_cat)")
      * @IsGranted("ROLE_ADMIN")
+     * @param ServiceCategorie $serviceCategorie
      * @param Service $service
      * @return Response
      */
-    public function delete_service(Service $service)
+    public function delete_service(ServiceCategorie $serviceCategorie, Service $service)
     {
         $manager = $this->getDoctrine()->getManager();
-        $imgFile = $service->getImgUrl();
-        $path = $this->getParameter('shared_directory') . 'services/' . $imgFile;
-        if($imgFile && file_exists($path)){
-            unlink($path);
-        }
-
-        $manager->remove($service);
+        $this->_clearService($service);
         $manager->flush();
 
         return $this->redirectToRoute('service_categorie_index');
@@ -260,7 +255,7 @@ class ServiceCategorieController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @return JsonResponse
      */
-    public function get_service_categories()
+    public function fetchAllServiceCategoriesAction()
     {
         $serviceCategories = $this->serviceCategorieRepository->findAll();
         return new JsonResponse($serviceCategories);
@@ -271,9 +266,24 @@ class ServiceCategorieController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      * @return JsonResponse
      */
-    public function get_services()
+    public function fetchAllServicesAction()
     {
         $services = $this->serviceRepository->findAll();
         return new JsonResponse($services);
+    }
+
+    private function _clearService(Service $service) {
+        $manager = $this->getDoctrine()->getManager();
+        $imgFile = $service->getImgUrl();
+        $path = $this->getParameter('shared_directory') . 'services/' . $imgFile;
+        if ($imgFile && file_exists($path)) {
+            unlink($path);
+        }
+
+        $bookings = $this->bookingRepository->findBy(['service' => $service]);
+        foreach ($bookings as $booking) {
+            $manager->remove($booking);
+        }
+        $manager->remove($service);
     }
 }

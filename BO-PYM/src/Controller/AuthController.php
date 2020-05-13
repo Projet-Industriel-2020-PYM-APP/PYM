@@ -6,7 +6,6 @@ use App\Entity\Utilisateur;
 use App\Form\RegistrationType;
 use DateInterval;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
@@ -41,32 +40,41 @@ class AuthController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $chaine = 'azertyuiopqsdfghjklmwxcvbn123456789';
-            $nb_lettre = strlen($chaine);
-            $nb_car = mt_rand(8, 12);
-            $password = '';
-            for ($i = 0; $i < $nb_car; $i++) {
-                $pos = mt_rand(0, $nb_lettre - 1);
-                $car = $chaine[$pos];
-                $password .= $car;
-            }
-
-            $hash = $encoder->encodePassWord($user, $password);
-            $user->setPassword($hash);
             $user->setUsername($user->getEmail());
-            $user->setRole("Admin");
+            $user->setPassword($encoder->encodePassword(
+                $user,
+                $user->getPassword()
+            ));
             $user->setIsEmailVerified(false);
+            $user->setRole("Admin");
+            try {
+                $user->setToken(bin2hex(random_bytes(64)));
+            } catch (Exception $e) {
+                $user->setToken(uniqid("", true));
+            }
+            $expirationDate = new DateTime();
+            $expirationDate->add(new DateInterval('P1D'));
+            $user->setTokenExpiresAt($expirationDate);
+            try {
+                $user->setRefreshToken(bin2hex(random_bytes(64)));
+            } catch (Exception $e) {
+                $user->setRefreshToken(uniqid("", true));
+            }
+            $expirationDate = new DateTime();
+            $expirationDate->add(new DateInterval('P1D'));
+            $user->setRefreshTokenExpiresAt($expirationDate);
+
             $manager->persist($user);
             $manager->flush();
 
-            $message = (new Swift_Message('Voici votre mot de passe'))
+            $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
                 ->setFrom('account-security-noreply@map-pym.com')
                 ->setTo($user->getEmail())
+                ->setContentType("text/html")
                 ->setBody(
                     $this->renderView(
-                        "auth/email/resetpassword_admin.html.twig",
-                        ['password' => $password, 'role' => $user->getRoles()]
+                        "auth/email/confirm_email.html.twig",
+                        ['token' => $user->getRefreshToken()]
                     )
                 );
 
@@ -102,7 +110,6 @@ class AuthController extends AbstractController
      */
     public function deconnexion()
     {
-
     }
 
     /**
@@ -146,7 +153,7 @@ class AuthController extends AbstractController
                 $user->setRefreshToken(uniqid("", true));
             }
             $expirationDate = new DateTime();
-            $expirationDate->add(new DateInterval('PT1H'));
+            $expirationDate->add(new DateInterval('P1D'));
             $user->setRefreshTokenExpiresAt($expirationDate);
             $manager->flush();
 

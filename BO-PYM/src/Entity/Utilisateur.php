@@ -13,10 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Utilisateur implements UserInterface
 {
     /**
-     * @Assert\EqualTo(propertyPath="password",message="Les mots de passe doivent être identiques." )
-     */
-    public $confirm_password;
-    /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -32,7 +28,6 @@ class Utilisateur implements UserInterface
     private $username;
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\EqualTo(propertyPath="confirm_password",message="Les mots de passe doivent être identiques.")
      */
     private $password;
     /**

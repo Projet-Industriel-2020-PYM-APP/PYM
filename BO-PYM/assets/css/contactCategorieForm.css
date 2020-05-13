@@ -1,6 +1,19 @@
 @import '../../node_modules/bootstrap/dist/css/bootstrap.css';
 @import './layout.css';
 
-.card {
+.card{
+    background: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.card-header{
+    color: white;
+    text-align: center;
+}
+
+.reg{
+    border: 3px solid #343a40;
+}
+.reg-end{
+    margin-bottom: 20px;
 }

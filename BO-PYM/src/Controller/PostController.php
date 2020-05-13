@@ -8,6 +8,7 @@ use App\Repository\PostRepository;
 use App\Service\DeviceNotifier\DeviceNotifierInterface;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,13 +49,13 @@ class PostController extends AbstractController
     public function new(Request $request): Response
     {
         $post = new Post();
+        $post->setPublished(new DateTime());
+        $post->setUpdated(new DateTime());
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $post->setPublished(new DateTime());
-            $post->setUpdated(new DateTime());
             $post->setUrl(null);  // TODO: Add here Front-End url
             $entityManager->persist($post);
             $entityManager->flush();
@@ -68,6 +69,17 @@ class PostController extends AbstractController
             'post' => $post,
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/post/{id}", name="post_show", methods={"GET"})
+     * @Template("post/show.html.twig", vars={"post"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param Post $post
+     * @return void
+     */
+    public function show(Post $post)
+    {
     }
 
     /**
@@ -103,8 +115,6 @@ class PostController extends AbstractController
      */
     public function delete(Post $post): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($post);
         $entityManager->flush();
@@ -113,10 +123,10 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/api/posts", name="get_posts", methods={"GET"})
+     * @Route("/api/posts", methods={"GET"})
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
      */
-    public function get_posts(): Response
+    public function fetchAllAction(): Response
     {
         $posts = $this->postRepository->findAll();
         return new JsonResponse($posts);

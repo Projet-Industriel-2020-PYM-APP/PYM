@@ -128,9 +128,9 @@ class EntrepriseController extends AbstractController
     public function edit(Entreprise $entreprise, Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
-        $file = $entreprise->getLogo();
-        if ($file) {
-            $entreprise->setLogo(new File('uploads/logos/' . $file));
+        $oldFile = $entreprise->getLogo();
+        if ($oldFile) {
+            $entreprise->setLogo(new File('uploads/logos/' . $oldFile));
         }
         $old_value = $entreprise->getLogo();
         $form = $this->createForm(EntrepriseType::class, $entreprise);
@@ -140,8 +140,8 @@ class EntrepriseController extends AbstractController
 
             $new_file = $form->get('Logo')->getData();
             if ($new_file !== null) {
-                $path = "uploads/logos/" . $file;
-                if ($file && file_exists($path)) {
+                $path = "uploads/logos/" . $oldFile;
+                if ($oldFile && file_exists($path)) {
                     unlink($path);
                 }
                 $nom_entreprise = $entreprise->getNom();

@@ -101,7 +101,9 @@ class ServiceCategorieController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
         $file = $serviceCategorie->getImgUrl();
-        $serviceCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'service_categories/' . $file));
+        if ($file) {
+            $serviceCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'service_categories/' . $file));
+        }
         $form = $this->createForm(ServiceCategorieType::class, $serviceCategorie);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -208,7 +210,9 @@ class ServiceCategorieController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
         $file = $service->getImgUrl();
-        $service->setImgUrl(new File($this->getParameter('shared_directory') . 'services/' . $file));
+        if (!$file) {
+            $service->setImgUrl(new File($this->getParameter('shared_directory') . 'services/' . $file));
+        }
         $form = $this->createForm(ServiceType::class, $service);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

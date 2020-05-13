@@ -129,7 +129,9 @@ class EntrepriseController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
         $file = $entreprise->getLogo();
-        $entreprise->setLogo(new File('uploads/logos/' . $file));
+        if ($file) {
+            $entreprise->setLogo(new File('uploads/logos/' . $file));
+        }
         $old_value = $entreprise->getLogo();
         $form = $this->createForm(EntrepriseType::class, $entreprise);
         $form->handleRequest($request);

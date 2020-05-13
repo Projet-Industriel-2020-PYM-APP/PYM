@@ -83,7 +83,9 @@ class ContactCategorieController extends AbstractController
     public function edit(Request $request, ContactCategorie $contactCategorie): Response
     {
         $file = $contactCategorie->getImgUrl();
-        $contactCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'contact_categories/' . $file));
+        if ($file) {
+            $contactCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'contact_categories/' . $file));
+        }
         $form = $this->createForm(ContactCategorieType::class, $contactCategorie);
         $form->handleRequest($request);
 

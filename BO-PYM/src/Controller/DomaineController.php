@@ -10,7 +10,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,8 +21,7 @@ class DomaineController extends AbstractController
     public function __construct(
         FileUploader $fileUploader,
         DomaineRepository $domaineRepository
-    )
-    {
+    ) {
         $this->fileUploader = $fileUploader;
         $this->domaineRepository = $domaineRepository;
     }
@@ -50,10 +48,9 @@ class DomaineController extends AbstractController
      * @IsGranted("ROLE_ADMIN")
      * @param int $id
      * @param Request $request
-     * @param FileUploader $fileUploader
      * @return RedirectResponse|Response
      */
-    public function edit(int $id, Request $request, FileUploader $fileUploader)
+    public function edit(int $id, Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
         $domaine = $this->domaineRepository->find($id);
@@ -66,7 +63,7 @@ class DomaineController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var UploadedFile $file */
             $file = $form->get('Fichier')->getData();
-            $filename = $fileUploader->upload($file, "domaine", 'domaine');
+            $filename = $this->fileUploader->upload($file, "domaine", 'domaine', false);
             $domaine->setFichier($filename);
             $manager->persist($domaine);
             $manager->flush();

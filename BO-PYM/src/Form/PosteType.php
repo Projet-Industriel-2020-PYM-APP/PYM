@@ -13,7 +13,13 @@ class PosteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-        ->add('Nom',TextType::class,['attr' => ['placeholder' => "Nom du nouveau poste", 'class' => 'reg reg-end rounded form-control'] , 'label' => ' '])
+        ->add('Nom',TextType::class,[
+            'attr' => [
+                'placeholder' => "Nom du nouveau poste",
+                'class' => 'reg reg-end rounded form-control'
+            ] ,
+            'label' => ' '
+        ])
         ;
     }
 

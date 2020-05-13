@@ -365,7 +365,13 @@ class EntrepriseController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
 
         $contacts = $this->contactRepository->findBy(['entreprise' => $entreprise]);
-        foreach ($contacts as $contact) $manager->remove($contact);
+        foreach ($contacts as $contact) {
+            $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact'=> $contact]);
+            if ($contactCategorie) {
+                $manager->remove($contactCategorie);
+            }
+            $manager->remove($contact);
+        }
 
         $bureaux = $this->bureauRepository->findBy(['entreprise' => $entreprise]);
         foreach ($bureaux as $bureau) $manager->remove($bureau);

@@ -1,0 +1,16 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+<div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group" role="group" aria-label="Button Toolbar">
+        <a class="btn btn-light"
+           href="{{ path('booking_of_service_index', { 'id': booking.service.id }) }}">Annuler</a>
+
+        <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
+    </div>
+    {% if button_label is defined %}
+        <div class="btn-group" role="group" aria-label="Delete Group">
+            {{ include('booking/_delete_form.html.twig') }}
+        </div>
+    {% endif %}
+</div>
+{{ form_end(form) }}

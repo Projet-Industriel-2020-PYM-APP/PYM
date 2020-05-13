@@ -96,11 +96,11 @@ class ServiceCategorie implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'primary_color' => $this->primaryColor,
-            'img_url' => $this->imgUrl,
-            'action' => $this->action,
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'primary_color' => $this->getPrimaryColor(),
+            'img_url' => $this->getImgUrl(),
+            'action' => $this->getAction(),
         ];
     }
 }

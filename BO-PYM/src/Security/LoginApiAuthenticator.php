@@ -22,6 +22,15 @@ use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticato
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+/**
+ * Class LoginApiAuthenticator is used to login via API. (email+pass)
+ *
+ * A session cookie and a access token is sent.
+ * The access token is temporary.
+ * External users (not using the back-office) should use the access token.
+ * TODO: Implements ability to reset access token from user.
+ * @package App\Security
+ */
 class LoginApiAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;
@@ -30,23 +39,27 @@ class LoginApiAuthenticator extends AbstractFormLoginAuthenticator implements Pa
 
     private $entityManager;
     private $urlGenerator;
-    private $csrfTokenManager;
     private $passwordEncoder;
 
     public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
-        $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function supports(Request $request)
     {
         return self::LOGIN_ROUTE === $request->attributes->get('_route')
             && $request->isMethod('POST');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getCredentials(Request $request)
     {
         $credentials = [
@@ -61,6 +74,9 @@ class LoginApiAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         return $credentials;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $user = $this->entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $credentials['email']]);
@@ -73,21 +89,25 @@ class LoginApiAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         return $user;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function checkCredentials($credentials, UserInterface $user)
     {
         return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
     }
 
     /**
-     * Used to upgrade (rehash) the user's password automatically over time.
-     * @param $credentials
-     * @return string|null
+     * @inheritDoc
      */
     public function getPassword($credentials): ?string
     {
         return $credentials['password'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
@@ -115,6 +135,9 @@ class LoginApiAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function getLoginUrl()
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);

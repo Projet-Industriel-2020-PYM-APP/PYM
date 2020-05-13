@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EntrepriseRepository")
  */
-class Entreprise
+class Entreprise implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -71,6 +72,105 @@ class Entreprise
         $this->Contact = new ArrayCollection();
         $this->activites = new ArrayCollection();
         $this->bureaux = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection|Contact[]
+     */
+    public function getContact(): Collection
+    {
+        return $this->Contact;
+    }
+
+    public function addContact(Contact $contact): self
+    {
+        if (!$this->Contact->contains($contact)) {
+            $this->Contact[] = $contact;
+            $contact->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContact(Contact $contact): self
+    {
+        if ($this->Contact->contains($contact)) {
+            $this->Contact->removeElement($contact);
+            // set the owning side to null (unless already changed)
+            if ($contact->getEntreprise() === $this) {
+                $contact->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Activite[]
+     */
+    public function getActivites(): Collection
+    {
+        return $this->activites;
+    }
+
+    public function addActivite(Activite $activite): self
+    {
+        if (!$this->activites->contains($activite)) {
+            $this->activites[] = $activite;
+            $activite->addEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivite(Activite $activite): self
+    {
+        if ($this->activites->contains($activite)) {
+            $this->activites->removeElement($activite);
+            $activite->removeEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function addBureaux(Bureau $bureaux): self
+    {
+        if (!$this->bureaux->contains($bureaux)) {
+            $this->bureaux[] = $bureaux;
+            $bureaux->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBureaux(Bureau $bureaux): self
+    {
+        if ($this->bureaux->contains($bureaux)) {
+            $this->bureaux->removeElement($bureaux);
+            // set the owning side to null (unless already changed)
+            if ($bureaux->getEntreprise() === $this) {
+                $bureaux->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'nom' => $this->getNom(),
+            'site_internet' => $this->getSiteInternet(),
+            'nb_salaries' => $this->getNbSalaries(),
+            'telephone' => $this->getTelephone(),
+            'mail' => $this->getMail(),
+            'logo' => $this->getLogo(),
+            'idBatiment' => $this->getBureaux()[0] !== null ? $this->getBureaux()[0]->getBatiment()->getId() : 0,
+        ];
     }
 
     public function getId(): ?int
@@ -151,92 +251,10 @@ class Entreprise
     }
 
     /**
-     * @return Collection|Contact[]
-     */
-    public function getContact(): Collection
-    {
-        return $this->Contact;
-    }
-
-    public function addContact(Contact $contact): self
-    {
-        if (!$this->Contact->contains($contact)) {
-            $this->Contact[] = $contact;
-            $contact->setEntreprise($this);
-        }
-
-        return $this;
-    }
-
-    public function removeContact(Contact $contact): self
-    {
-        if ($this->Contact->contains($contact)) {
-            $this->Contact->removeElement($contact);
-            // set the owning side to null (unless already changed)
-            if ($contact->getEntreprise() === $this) {
-                $contact->setEntreprise(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Activite[]
-     */
-    public function getActivites(): Collection
-    {
-        return $this->activites;
-    }
-
-    public function addActivite(Activite $activite): self
-    {
-        if (!$this->activites->contains($activite)) {
-            $this->activites[] = $activite;
-            $activite->addEntreprise($this);
-        }
-
-        return $this;
-    }
-
-    public function removeActivite(Activite $activite): self
-    {
-        if ($this->activites->contains($activite)) {
-            $this->activites->removeElement($activite);
-            $activite->removeEntreprise($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|Bureau[]
      */
     public function getBureaux(): Collection
     {
         return $this->bureaux;
-    }
-
-    public function addBureaux(Bureau $bureaux): self
-    {
-        if (!$this->bureaux->contains($bureaux)) {
-            $this->bureaux[] = $bureaux;
-            $bureaux->setEntreprise($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBureaux(Bureau $bureaux): self
-    {
-        if ($this->bureaux->contains($bureaux)) {
-            $this->bureaux->removeElement($bureaux);
-            // set the owning side to null (unless already changed)
-            if ($bureaux->getEntreprise() === $this) {
-                $bureaux->setEntreprise(null);
-            }
-        }
-
-        return $this;
     }
 }

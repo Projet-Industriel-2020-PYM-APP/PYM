@@ -24,6 +24,7 @@
 {% endblock %}
 {% block body %}
     {% if app.user %}
+        <div class="col-lg-6 col-md-8">
             <div class="card">
                 <div class="card-header bg-dark ">
                     <h4>Modifier un bureau</h4>
@@ -32,28 +33,29 @@
                     <div class="row">
                         <div class="col-1"></div>
                         <div class="col-10">
-                        <div class="form-check">
-                            <input class="form-check-input" id="checkbox" onclick="toggle()" type="checkbox">
-                            <label class="form-check-label" for="checkbox">Seule entreprise dans le bâtiment</label>
-                        </div>
-                        {{ form_start(form) }}
-                        <div id="numero">
-                            {{form_row(form.Numero)}}
-                        </div>
-                        <div id="etage">
-                            {{form_row(form.Etage)}}
-                        </div>
-                        {{form_row(form.Entreprise,{'id':'entreprise'})}}
-                        {{form_row(form._token) }}
+                            <div class="form-check">
+                                <input class="form-check-input" id="checkbox" onclick="toggle()" type="checkbox">
+                                <label class="form-check-label" for="checkbox">Seule entreprise dans le bâtiment</label>
+                            </div>
+                            {{ form_start(form) }}
+                            <div id="numero">
+                                {{ form_row(form.Numero) }}
+                            </div>
+                            <div id="etage">
+                                {{ form_row(form.Etage) }}
+                            </div>
+                            {{ form_row(form.Entreprise,{'id':'entreprise'}) }}
+                            {{ form_row(form._token) }}
                         </div>
                         <div class="col-1"></div>
                     </div>
                     <div class="btns row justify-content-around">
-                        <a href="{{path('batiments')}}" class="btn btn-secondary btn-back">Annuler</a>
+                        <a href="{{ path('batiments') }}" class="btn btn-secondary btn-back">Annuler</a>
                         <button class="btn btn-success btn-add" type="submit">Ajouter</button>
                     </div>
-                    {{form_end(form) }}
+                    {{ form_end(form) }}
                 </div>
+            </div>
         </div>
 
     {% else %}

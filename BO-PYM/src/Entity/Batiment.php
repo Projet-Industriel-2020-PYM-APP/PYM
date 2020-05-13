@@ -5,11 +5,12 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BatimentRepository")
  */
-class Batiment
+class Batiment implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -118,6 +119,88 @@ class Batiment
         $this->Bureaux = new ArrayCollection();
     }
 
+    /**
+     * @return Collection|Bureau[]
+     */
+    public function getBureaux(): Collection
+    {
+        return $this->Bureaux;
+    }
+
+    public function addBureaux(Bureau $bureaux): self
+    {
+        if (!$this->Bureaux->contains($bureaux)) {
+            $this->Bureaux[] = $bureaux;
+            $bureaux->setBatiment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBureaux(Bureau $bureaux): self
+    {
+        if ($this->Bureaux->contains($bureaux)) {
+            $this->Bureaux->removeElement($bureaux);
+            // set the owning side to null (unless already changed)
+            if ($bureaux->getBatiment() === $this) {
+                $bureaux->setBatiment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getNom();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        if ($this->getEtat() === true) {
+            return [
+                'id' => $this->getId(),
+                'nom' => $this->getNom(),
+                'nbEtage' => $this->getNbEtage(),
+                'description' => $this->getDescription(),
+                'accesHandicape' => $this->getAccesHandicape(),
+                'url' => $this->getRepresentation3D(),
+                'x' => $this->getLongitude(),
+                'y' => $this->getLatitude(),
+                'latitude' => $this->getGPS()[0],
+                'longitude' => $this->getGPS()[1],
+                'largeur' => $this->getLargeur(),
+                'longueur' => $this->getLongueur(),
+                'rayon' => $this->getRayon(),
+                'hauteur' => $this->getHauteur(),
+                'angle' => $this->getAngle(),
+                'scale' => $this->getTypeBatiment()->getNom() == "Forme Paramétrique" ? 1 : $this->getEchelle(),
+                'type' => $this->getTypeBatiment()->getNom(),
+                'formeParamétrique' => $this->getTypeBatiment()->getNom() == "Forme Paramétrique" ? $this->getFormeParametrique()->getNom() : null,
+                'adresse' => $this->getAdresse(),
+                'accessoire' => $this->getAccessoire(),
+            ];
+
+        } else {
+            return null;
+        }
+    }
+
+    public function getEtat(): ?bool
+    {
+        return $this->Etat;
+    }
+
+    public function setEtat(bool $Etat): self
+    {
+        $this->Etat = $Etat;
+
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -171,18 +254,6 @@ class Batiment
         return $this;
     }
 
-    public function getEtat(): ?bool
-    {
-        return $this->Etat;
-    }
-
-    public function setEtat(bool $Etat): self
-    {
-        $this->Etat = $Etat;
-
-        return $this;
-    }
-
     public function getRepresentation3D(): ?string
     {
         return $this->Representation3D;
@@ -198,12 +269,6 @@ class Batiment
     public function getLongitude(): ?float
     {
         return $this->Longitude;
-    }
-
-    public function getGPS(): array {
-        $newLatitude = $this->Latitude * 8.8414096916255E-06 + 43.4514367224670;
-        $newLongitude = $this->Longitude * 5.4333333333230E-05 + 5.44877766666667;
-        return [$newLatitude, $newLongitude];
     }
 
     public function setLongitude(float $Longitude): self
@@ -225,99 +290,11 @@ class Batiment
         return $this;
     }
 
-    public function getAngle(): ?float
+    public function getGPS(): array
     {
-        return $this->Angle;
-    }
-
-    public function setAngle(float $Angle): self
-    {
-        $this->Angle = $Angle;
-
-        return $this;
-    }
-
-    public function getEchelle(): ?float
-    {
-        return $this->Echelle;
-    }
-
-    public function setEchelle(float $Echelle): self
-    {
-        $this->Echelle = $Echelle;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Bureau[]
-     */
-    public function getBureaux(): Collection
-    {
-        return $this->Bureaux;
-    }
-
-    public function addBureaux(Bureau $bureaux): self
-    {
-        if (!$this->Bureaux->contains($bureaux)) {
-            $this->Bureaux[] = $bureaux;
-            $bureaux->setBatiment($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBureaux(Bureau $bureaux): self
-    {
-        if ($this->Bureaux->contains($bureaux)) {
-            $this->Bureaux->removeElement($bureaux);
-            // set the owning side to null (unless already changed)
-            if ($bureaux->getBatiment() === $this) {
-                $bureaux->setBatiment(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getTypeBatiment(): ?TypeBatiment
-    {
-        return $this->TypeBatiment;
-    }
-
-    public function setTypeBatiment(?TypeBatiment $TypeBatiment): self
-    {
-        $this->TypeBatiment = $TypeBatiment;
-
-        return $this;
-    }
-
-    public function getFormeParametrique(): ?FormeParametrique
-    {
-        return $this->FormeParametrique;
-    }
-
-    public function setFormeParametrique(?FormeParametrique $FormeParametrique): self
-    {
-        $this->FormeParametrique = $FormeParametrique;
-
-        return $this;
-    }
-
-    public function __toString(){
-        return $this->Nom;
-    }
-
-    public function getLongueur(): ?float
-    {
-        return $this->Longueur;
-    }
-
-    public function setLongueur(?float $Longueur): self
-    {
-        $this->Longueur = $Longueur;
-
-        return $this;
+        $newLatitude = $this->Latitude * 8.8414096916255E-06 + 43.4514367224670;
+        $newLongitude = $this->Longitude * 5.4333333333230E-05 + 5.44877766666667;
+        return [$newLatitude, $newLongitude];
     }
 
     public function getLargeur(): ?float
@@ -328,6 +305,18 @@ class Batiment
     public function setLargeur(?float $Largeur): self
     {
         $this->Largeur = $Largeur;
+
+        return $this;
+    }
+
+    public function getLongueur(): ?float
+    {
+        return $this->Longueur;
+    }
+
+    public function setLongueur(?float $Longueur): self
+    {
+        $this->Longueur = $Longueur;
 
         return $this;
     }
@@ -352,6 +341,54 @@ class Batiment
     public function setHauteur(?float $Hauteur): self
     {
         $this->Hauteur = $Hauteur;
+
+        return $this;
+    }
+
+    public function getAngle(): ?float
+    {
+        return $this->Angle;
+    }
+
+    public function setAngle(float $Angle): self
+    {
+        $this->Angle = $Angle;
+
+        return $this;
+    }
+
+    public function getTypeBatiment(): ?TypeBatiment
+    {
+        return $this->TypeBatiment;
+    }
+
+    public function setTypeBatiment(?TypeBatiment $TypeBatiment): self
+    {
+        $this->TypeBatiment = $TypeBatiment;
+
+        return $this;
+    }
+
+    public function getEchelle(): ?float
+    {
+        return $this->Echelle;
+    }
+
+    public function setEchelle(float $Echelle): self
+    {
+        $this->Echelle = $Echelle;
+
+        return $this;
+    }
+
+    public function getFormeParametrique(): ?FormeParametrique
+    {
+        return $this->FormeParametrique;
+    }
+
+    public function setFormeParametrique(?FormeParametrique $FormeParametrique): self
+    {
+        $this->FormeParametrique = $FormeParametrique;
 
         return $this;
     }

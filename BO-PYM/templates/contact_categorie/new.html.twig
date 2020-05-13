@@ -1,0 +1,28 @@
+{% extends 'layout.html.twig' %}
+{% block stylesheets %}
+    {{ encore_entry_link_tags('contactCategorieForm') }}
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('contactCategorieForm') }}
+{% endblock %}
+
+{% block body %}
+    {% if app.user %}
+        <div class="container">
+            <div class="col-10 mx-auto py-4 overflow-auto">
+                <div class="card">
+                    <div class="card-header bg-dark ">
+                        <h4>Ajouter la catégorie d'un contact</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ include('contact_categorie/_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <h1>Vous n'avez pas accès à cette page.</h1>
+    {% endif %}
+
+{% endblock %}

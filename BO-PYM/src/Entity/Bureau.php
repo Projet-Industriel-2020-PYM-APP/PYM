@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BureauRepository")
  */
-class Bureau
+class Bureau implements JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -36,31 +37,35 @@ class Bureau
      */
     private $Batiment;
 
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'idBatiment' => $this->getBatiment()->getId(),
+            'idEntreprise' => $this->getEntreprise()->getId(),
+            'entreprise' => $this->getEntreprise()->getNom(),
+            'urlEntreprise' => $this->getEntreprise()->getLogo(),
+            'etage' => $this->getEtage(),
+            'numero' => $this->getNumero(),
+        ];
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNumero(): ?int
+    public function getBatiment(): ?Batiment
     {
-        return $this->Numero;
+        return $this->Batiment;
     }
 
-    public function setNumero(int $Numero): self
+    public function setBatiment(?Batiment $Batiment): self
     {
-        $this->Numero = $Numero;
-
-        return $this;
-    }
-
-    public function getEtage(): ?int
-    {
-        return $this->Etage;
-    }
-
-    public function setEtage(int $Etage): self
-    {
-        $this->Etage = $Etage;
+        $this->Batiment = $Batiment;
 
         return $this;
     }
@@ -77,14 +82,26 @@ class Bureau
         return $this;
     }
 
-    public function getBatiment(): ?Batiment
+    public function getEtage(): ?int
     {
-        return $this->Batiment;
+        return $this->Etage;
     }
 
-    public function setBatiment(?Batiment $Batiment): self
+    public function setEtage(int $Etage): self
     {
-        $this->Batiment = $Batiment;
+        $this->Etage = $Etage;
+
+        return $this;
+    }
+
+    public function getNumero(): ?int
+    {
+        return $this->Numero;
+    }
+
+    public function setNumero(int $Numero): self
+    {
+        $this->Numero = $Numero;
 
         return $this;
     }

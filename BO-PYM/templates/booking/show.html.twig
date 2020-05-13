@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+
+        <h1>Réservation</h1>
+
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ booking.id }}</td>
+            </tr>
+            <tr>
+                <th>Titre</th>
+                <td>{{ booking.title }}</td>
+            </tr>
+            <tr>
+                <th>Service</th>
+                <td>{{ booking.service.title }}</td>
+            </tr>
+            <tr>
+                <th>Date de début</th>
+                <td>{{ booking.startDate ? booking.startDate|date('d M Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Date de fin</th>
+                <td>{{ booking.endDate ? booking.endDate|date('d M Y H:i:s') : '' }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group" role="group" aria-label="Delete Group">
+                {{ include('booking/_delete_form.html.twig') }}
+            </div>
+            <div class="btn-group" role="group" aria-label="Safe Group">
+                <a class="btn btn-outline-primary"
+                   href="{{ path('booking_of_service_index', { 'id': booking.service.id }) }}">Revenir
+                    au calendrier</a>
+
+                <a class="btn btn-primary" href="{{ path('booking_edit', { 'id': booking.id }) }}">Modifier</a>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

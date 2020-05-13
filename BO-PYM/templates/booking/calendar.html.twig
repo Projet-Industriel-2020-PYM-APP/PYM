@@ -1,0 +1,21 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-between">
+            <h1>Réservations de {{ service.title }}</h1>
+            <div>
+                <a class="btn btn-primary" href="{{ path('booking_of_service_add', { 'id_srv': service.id }) }}">Créer une réservation</a>
+
+            </div>
+        </div>
+        <div id="calendar-holder" data-service-id="{{ service.id }}" data-events-url="{{ path('fc_load_events') }}"></div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('bookingCalendar') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('bookingCalendar') }}
+{% endblock %}

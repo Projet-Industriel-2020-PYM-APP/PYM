@@ -1,7 +1,7 @@
 <table class="table rounded">
     <thead class="serviceHead">
     <tr>
-        <th colspan="6">Services</th>
+        <th colspan="7">Services</th>
     </tr>
     <tr>
         <th scope="col">Titre</th>
@@ -9,6 +9,7 @@
         <th scope="col">Adresse</th>
         <th scope="col">Arrière-Plan</th>
         <th scope="col">Nombre d'actions</th>
+        <th scope="col">Nombre de réservations</th>
         <th scope="col">Action</th>
     </tr>
     </thead>
@@ -28,6 +29,7 @@
             {% endif %}
         </td>
         <td>{{ service.actions|length }}</td>
+        <td>{{ bookings|filter(e => e.service.id == service.id)|length }}</td>
         <td>
             <div class="btn-group action">
                 <button aria-expanded="false" aria-haspopup="true"
@@ -36,6 +38,8 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     {% if app.user.role =="Admin" %}
+                        <a class="dropdown-item btn rounded"
+                           href="{{ path('booking_of_service_index',{'id': service.id}) }}">Voir les réservations</a>
                         <a class="dropdown-item btn rounded"
                            href="{{ path('service_edit',{'id_cat': category.id, 'id':service.id}) }}">Modifer</a>
                         <a class="dropdown-item btn rounded"

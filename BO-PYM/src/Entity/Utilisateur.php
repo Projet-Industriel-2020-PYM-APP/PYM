@@ -13,10 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Utilisateur implements UserInterface
 {
     /**
-     * @Assert\EqualTo(propertyPath="password",message="Les mots de passe doivent être identiques." )
-     */
-    public $confirm_password;
-    /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -32,7 +28,6 @@ class Utilisateur implements UserInterface
     private $username;
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\EqualTo(propertyPath="confirm_password",message="Les mots de passe doivent être identiques.")
      */
     private $password;
     /**
@@ -97,17 +92,6 @@ class Utilisateur implements UserInterface
     public function setRefreshToken(?string $refreshToken): self
     {
         $this->refreshToken = $refreshToken;
-        return $this;
-    }
-
-    public function getRefreshTokenExpiresAt(): ?DateTime
-    {
-        return $this->refreshTokenExpiresAt;
-    }
-
-    public function setRefreshTokenExpiresAt(?DateTime $refreshTokenExpiresAt): self
-    {
-        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
         return $this;
     }
 
@@ -186,11 +170,6 @@ class Utilisateur implements UserInterface
         return $this->getTokenExpiresAt() <= new DateTime();
     }
 
-    public function isRefreshTokenExpired(): bool
-    {
-        return $this->getRefreshTokenExpiresAt() <= new DateTime();
-    }
-
     /**
      * @return DateTime
      */
@@ -207,6 +186,22 @@ class Utilisateur implements UserInterface
     {
         $this->tokenExpiresAt = $tokenExpiresAt;
 
+        return $this;
+    }
+
+    public function isRefreshTokenExpired(): bool
+    {
+        return $this->getRefreshTokenExpiresAt() <= new DateTime();
+    }
+
+    public function getRefreshTokenExpiresAt(): ?DateTime
+    {
+        return $this->refreshTokenExpiresAt;
+    }
+
+    public function setRefreshTokenExpiresAt(?DateTime $refreshTokenExpiresAt): self
+    {
+        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
         return $this;
     }
 

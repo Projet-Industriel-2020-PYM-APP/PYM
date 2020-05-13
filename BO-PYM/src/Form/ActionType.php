@@ -18,14 +18,14 @@ class ActionType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'attr' => [
-                    'placeholder' => "Nom de l'action [ex. : Réserver]",
+                    'placeholder' => "Nom de l'action (Réserver, SMS, Telephone, Email)",
                     'class' => 'reg form-control'
                 ],
                 'label' => false,
             ])
             ->add('htmlUrl', UrlType::class, [
                 'attr' => [
-                    'placeholder' => "(optionnel) Redirection [ex. : https://reservation.fr]",
+                    'placeholder' => "(optionnel) Redirection (https://reservation.fr)",
                     'class' => 'reg form-control'
                 ],
                 'label' => false,

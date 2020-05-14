@@ -2,6 +2,8 @@ fm_elfinder:
     assets_path: /assets # chemin des fichiers JS
     instances:
         default:
+            relative_path: false
+            # path_prefix: "https://admin.map-pym.com/"
             locale: fr # Langue
             editor: ckeditor # Editeur utilisé
             fullscreen: true # Taille d'affichage

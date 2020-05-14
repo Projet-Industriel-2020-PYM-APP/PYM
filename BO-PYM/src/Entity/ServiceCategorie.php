@@ -99,7 +99,7 @@ class ServiceCategorie implements JsonSerializable
             'id' => $this->getId(),
             'name' => $this->getName(),
             'primary_color' => $this->getPrimaryColor(),
-            'img_url' => $this->getImgUrl(),
+            'img_url' => "https://map-pym.com/sharedfolder/service_categories/" . $this->getImgUrl(),
             'action' => $this->getAction(),
         ];
     }

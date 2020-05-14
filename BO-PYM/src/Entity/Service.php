@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -44,7 +42,7 @@ class Service implements JsonSerializable
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private $actions;
+    private $actions = [];
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -54,25 +52,9 @@ class Service implements JsonSerializable
      */
     private $website;
 
-    public function __construct()
+    public function setActions(array $actions): self
     {
-        $this->actions = new ArrayCollection();
-    }
-
-    public function addAction(Action $action): self
-    {
-        if (!$this->actions->contains($action)) {
-            $this->actions[] = $action;
-        }
-
-        return $this;
-    }
-
-    public function removeAction(Action $action): self
-    {
-        if ($this->actions->contains($action)) {
-            $this->actions->removeElement($action);
-        }
+        $this->actions = $actions;
 
         return $this;
     }
@@ -89,7 +71,7 @@ class Service implements JsonSerializable
             'subtitle' => $this->getSubtitle(),
             'address' => $this->getAddress(),
             'img_url' => "https://map-pym.com/sharedfolder/services/" . $this->getImgUrl(),
-            'actions' => $this->getActions()->toArray(),
+            'actions' => $this->getActions(),
             'telephone' => $this->getTelephone(),
             'website' => $this->getWebsite(),
         ];
@@ -160,7 +142,7 @@ class Service implements JsonSerializable
         return $this;
     }
 
-    public function getActions(): ?Collection
+    public function getActions(): ?array
     {
         return $this->actions;
     }

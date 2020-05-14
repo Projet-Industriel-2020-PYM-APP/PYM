@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,19 +41,14 @@ class ContactCategorie implements JsonSerializable
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private $actions;
+    private $actions = [];
 
     /**
      * @Assert\NotNull()
-     * @ORM\OneToOne(targetEntity=Contact::class, cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Contact::class, cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $contact;
-
-    public function __construct()
-    {
-        $this->actions = new ArrayCollection();
-    }
 
     public function getImgUrl()
     {
@@ -69,20 +62,9 @@ class ContactCategorie implements JsonSerializable
         return $this;
     }
 
-    public function addAction(Action $action): self
+    public function setActions(array $actions): self
     {
-        if (!$this->actions->contains($action)) {
-            $this->actions[] = $action;
-        }
-
-        return $this;
-    }
-
-    public function removeAction(Action $action): self
-    {
-        if ($this->actions->contains($action)) {
-            $this->actions->removeElement($action);
-        }
+        $this->actions = $actions;
 
         return $this;
     }
@@ -98,7 +80,7 @@ class ContactCategorie implements JsonSerializable
             'subtitle' => $this->getSubtitle(),
             'img_url' => "https://map-pym.com/sharedfolder/contact_categories/" . $this->getImgUrl(),
             'address' => $this->getAddress(),
-            'actions' => $this->getActions()->toArray(),
+            'actions' => $this->getActions(),
             'contact_id' => $this->getContact()->getId(),
         ];
     }
@@ -144,7 +126,7 @@ class ContactCategorie implements JsonSerializable
         return $this;
     }
 
-    public function getActions(): ?Collection
+    public function getActions(): ?array
     {
         return $this->actions;
     }

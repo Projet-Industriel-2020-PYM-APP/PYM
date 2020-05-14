@@ -1,19 +1,20 @@
-import 'bootstrap';
-import '../css/bookingCalendar.css';
-import $ from 'jquery';
-import { Calendar } from '@fullcalendar/core';
-import frLocale from '@fullcalendar/core/locales/fr';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import "bootstrap";
+import "../css/bookingCalendar.css";
+import $ from "jquery";
+import { Calendar } from "@fullcalendar/core";
+import frLocale from "@fullcalendar/core/locales/fr";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 
 $(document).ready(function () {
-    const calendarEl = document.getElementById('calendar-holder');
+    const calendarEl = document.getElementById("calendar-holder");
     const serviceId = calendarEl.dataset.serviceId;
     const eventsUrl = calendarEl.dataset.eventsUrl;
 
     const calendar = new Calendar(calendarEl, {
-        defaultView: 'dayGridMonth',
+        defaultView: "dayGridMonth",
+        timeZone: "Europe/Paris",
         editable: true,
         locale: frLocale,
         eventSources: [
@@ -21,7 +22,7 @@ $(document).ready(function () {
                 url: eventsUrl,
                 method: "POST",
                 extraParams: {
-                    filters: JSON.stringify({"service_id": serviceId})
+                    filters: JSON.stringify({ service_id: serviceId }),
                 },
                 failure: () => {
                     // alert("There was an error while fetching FullCalendar!");
@@ -29,12 +30,12 @@ $(document).ready(function () {
             },
         ],
         header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay',
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
         },
         plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin], // https://fullcalendar.io/docs/plugin-index
-        timeZone: 'UTC',
+        timeZone: "UTC",
     });
     calendar.render();
-})
+});

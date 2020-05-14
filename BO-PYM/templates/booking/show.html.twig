@@ -21,11 +21,11 @@
             </tr>
             <tr>
                 <th>Date de début</th>
-                <td>{{ booking.startDate ? booking.startDate|date('d M Y H:i:s') : '' }}</td>
+                <td>{{ booking.startDate ? booking.startDate|date('d M Y H:i:sP', "Europe/Paris") : '' }}</td>
             </tr>
             <tr>
                 <th>Date de fin</th>
-                <td>{{ booking.endDate ? booking.endDate|date('d M Y H:i:s') : '' }}</td>
+                <td>{{ booking.endDate ? booking.endDate|date('d M Y H:i:sP', "Europe/Paris") : '' }}</td>
             </tr>
             </tbody>
         </table>

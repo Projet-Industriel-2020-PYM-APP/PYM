@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class EntrepriseType extends AbstractType
 {
@@ -33,7 +34,17 @@ class EntrepriseType extends AbstractType
                 'placeholder' => 'Choisir une activite',
                 'attr' => ['class' => 'reg reg-end rounded form-control']
             ))
-            ->add('Logo', FileType::class, ['label' => 'Importer un logo: (JPEG ou PNG)', 'required' => false, 'attr' => ['class' => 'import btn']]);
+            ->add('Logo', FileType::class, [
+                'label' => 'Importer un logo: (JPEG ou PNG)',
+                'required' => false,
+                'attr' => ['class' => 'import btn'],
+                'constraints' => [
+                    new Image([
+                        'mimeTypesMessage' => "Ce fichier n'est pas une image.",
+                    ])
+                ],
+                'mapped' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

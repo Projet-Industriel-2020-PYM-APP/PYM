@@ -32,8 +32,7 @@ class ServiceCategorieController extends AbstractController
         ServiceRepository $serviceRepository,
         BookingRepository $bookingRepository,
         FileUploader $fileUploader
-    )
-    {
+    ) {
         $this->serviceCategorieRepository = $serviceCategorieRepository;
         $this->serviceRepository = $serviceRepository;
         $this->fileUploader = $fileUploader;
@@ -84,7 +83,6 @@ class ServiceCategorieController extends AbstractController
         }
 
         return $this->render("service_categorie/new.html.twig", ['form' => $form->createView()]);
-
     }
 
     /**
@@ -97,8 +95,7 @@ class ServiceCategorieController extends AbstractController
     public function edit(
         ServiceCategorie $serviceCategorie,
         Request $request
-    )
-    {
+    ) {
         $manager = $this->getDoctrine()->getManager();
         $file = $serviceCategorie->getImgUrl();
         if ($file) {
@@ -165,8 +162,7 @@ class ServiceCategorieController extends AbstractController
     public function add_service(
         ServiceCategorie $categorie,
         Request $request
-    )
-    {
+    ) {
         $manager = $this->getDoctrine()->getManager();
         $service = new Service();
         $service->setCategorie($categorie);
@@ -206,13 +202,9 @@ class ServiceCategorieController extends AbstractController
         ServiceCategorie $serviceCategorie,
         Request $request,
         Service $service
-    )
-    {
+    ) {
         $manager = $this->getDoctrine()->getManager();
         $oldFile = $service->getImgUrl();
-        if ($oldFile) {
-            $service->setImgUrl(new File($this->getParameter('shared_directory') . 'services/' . $oldFile));
-        }
         $form = $this->createForm(ServiceType::class, $service);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -276,7 +268,8 @@ class ServiceCategorieController extends AbstractController
         return new JsonResponse($services);
     }
 
-    private function _clearService(Service $service) {
+    private function _clearService(Service $service)
+    {
         $manager = $this->getDoctrine()->getManager();
         $imgFile = $service->getImgUrl();
         $path = $this->getParameter('shared_directory') . 'services/' . $imgFile;

@@ -36,12 +36,9 @@ security:
                 path: auth_deconnexion
                 target: auth_connexion
 
-
             # activate different ways to authenticate
-
             # http_basic: true
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
 
@@ -49,5 +46,5 @@ security:
     # Note: Only the *first* access control that matches will be used
     # Please use php bin/console debug:router
     access_control:
-        # User
-        # - { path: ^/users$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/efconnect, role: ROLE_ADMIN }
+        - { path: ^/elfinder, role: ROLE_ADMIN }

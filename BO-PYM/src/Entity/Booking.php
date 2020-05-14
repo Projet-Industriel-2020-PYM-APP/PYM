@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use DateTime;
-use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -55,8 +54,8 @@ class Booking implements JsonSerializable
             'id' => $this->getId(),
             'service_id' => $this->getService()->getId(),
             'title' => $this->getTitle(),
-            'start_date' => $this->getStartDate()->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
-            'end_date' => $this->getEndDate()->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601)
+            'start_date' => $this->getStartDate()->format(DateTime::ISO8601),
+            'end_date' => $this->getEndDate()->format(DateTime::ISO8601)
         ];
     }
 

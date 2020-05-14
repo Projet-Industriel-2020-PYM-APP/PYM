@@ -220,7 +220,6 @@ class ServiceCategorieController extends AbstractController
                 $newFilename = $this->fileUploader->upload($imgFile, $originalFilename, 'services');
                 $service->setImgUrl($newFilename);
             }
-
             $manager->flush();
 
             return $this->redirectToRoute('service_categorie_index');

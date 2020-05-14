@@ -47,8 +47,7 @@ class EntrepriseController extends AbstractController
         BureauRepository $bureauRepository,
         ContactCategorieRepository $contactCategorieRepository,
         FileUploader $fileUploader
-    )
-    {
+    ) {
         $this->entrepriseRepository = $entrepriseRepository;
         $this->activiteRepository = $activiteRepository;
         $this->posteRepository = $posteRepository;
@@ -94,14 +93,14 @@ class EntrepriseController extends AbstractController
                 $entreprise->addActivite($activite);
             }
 
-            $file = $entreprise->getLogo();
+            $new_file = $form->get('Logo')->getData();
             $nom_entreprise = $entreprise->getNom();
             for ($i = 0, $size = strlen($nom_entreprise); $i < $size; $i++) {
                 if ($nom_entreprise[$i] == " ") {
                     $nom_entreprise[$i] = "_";
                 }
             }
-            $filename = $this->fileUploader->upload($file, $nom_entreprise, 'logos');
+            $filename = $this->fileUploader->upload($new_file, $nom_entreprise, 'logos');
             //$img=Image::make('uploads/logos/'.$filename);
             //$img->resize(500,500);
             //$img->save('uploads/logos/'.$filename);
@@ -129,16 +128,13 @@ class EntrepriseController extends AbstractController
     {
         $manager = $this->getDoctrine()->getManager();
         $oldFile = $entreprise->getLogo();
-        if ($oldFile) {
-            $entreprise->setLogo(new File('uploads/logos/' . $oldFile));
-        }
-        $old_value = $entreprise->getLogo();
         $form = $this->createForm(EntrepriseType::class, $entreprise);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
 
             $new_file = $form->get('Logo')->getData();
+
             if ($new_file !== null) {
                 $path = "uploads/logos/" . $oldFile;
                 if ($oldFile && file_exists($path)) {
@@ -147,8 +143,6 @@ class EntrepriseController extends AbstractController
                 $nom_entreprise = $entreprise->getNom();
                 $filename = $this->fileUploader->upload($new_file, $nom_entreprise, 'logos');
                 $entreprise->setLogo($filename);
-            } else {
-                $entreprise->setLogo($old_value);
             }
 
             if ($form->get('activites')->getData() !== null) {
@@ -311,7 +305,7 @@ class EntrepriseController extends AbstractController
     public function delete_contact(Entreprise $entreprise, Contact $contact)
     {
         $manager = $this->getDoctrine()->getManager();
-        $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact'=> $contact]);
+        $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact' => $contact]);
         if ($contactCategorie) {
             $manager->remove($contactCategorie);
         }
@@ -368,7 +362,7 @@ class EntrepriseController extends AbstractController
 
         $contacts = $this->contactRepository->findBy(['entreprise' => $entreprise]);
         foreach ($contacts as $contact) {
-            $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact'=> $contact]);
+            $contactCategorie = $this->contactCategorieRepository->findOneBy(['contact' => $contact]);
             if ($contactCategorie) {
                 $manager->remove($contactCategorie);
             }

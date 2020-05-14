@@ -47,7 +47,6 @@ class Entreprise implements JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=40)
-     * @Assert\NotBlank(message="Joindre un fichier jpg")
      * @Assert\File(mimeTypes={"image/jpeg","image/png"})
      */
     private $Logo;

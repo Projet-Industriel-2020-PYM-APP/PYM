@@ -88,7 +88,7 @@ class Service implements JsonSerializable
             'categorie_id' => $this->getCategorie()->getId(),
             'subtitle' => $this->getSubtitle(),
             'address' => $this->getAddress(),
-            'img_url' => $this->getImgUrl(),
+            'img_url' => "https://map-pym.com/sharedfolder/services/" . $this->getImgUrl(),
             'actions' => $this->getActions()->toArray(),
             'telephone' => $this->getTelephone(),
             'website' => $this->getWebsite(),

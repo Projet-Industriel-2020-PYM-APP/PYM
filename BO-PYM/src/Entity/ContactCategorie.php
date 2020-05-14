@@ -96,6 +96,7 @@ class ContactCategorie implements JsonSerializable
             'id' => $this->getId(),
             'title' => $this->getTitle(),
             'subtitle' => $this->getSubtitle(),
+            'img_url' => "https://map-pym.com/sharedfolder/contact_categories/" . $this->getImgUrl(),
             'address' => $this->getAddress(),
             'actions' => $this->getActions()->toArray(),
             'contact_id' => $this->getContact()->getId(),

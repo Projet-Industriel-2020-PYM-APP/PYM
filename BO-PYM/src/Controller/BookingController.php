@@ -21,15 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class BookingController extends AbstractController
 {
     private $bookingRepository;
-    private $serviceRepository;
 
     public function __construct(
-        BookingRepository $bookingRepository,
-        ServiceRepository $serviceRepository
-    )
-    {
+        BookingRepository $bookingRepository
+    ) {
         $this->bookingRepository = $bookingRepository;
-        $this->serviceRepository = $serviceRepository;
     }
 
     /**
@@ -140,7 +136,18 @@ class BookingController extends AbstractController
      */
     public function fetchAllAction(): Response
     {
-        $bookingsOfService = $this->bookingRepository->findAll();
+        $booking = $this->bookingRepository->findAll();
+        return new JsonResponse($booking);
+    }
+
+    /**
+     * @Route("/api/services/{id}/bookings", methods={"GET"})
+     * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
+     * @return Response
+     */
+    public function fetchAllByServiceAction(Service $service): Response
+    {
+        $bookingsOfService = $this->bookingRepository->findBy(['service' => $service]);
         return new JsonResponse($bookingsOfService);
     }
 

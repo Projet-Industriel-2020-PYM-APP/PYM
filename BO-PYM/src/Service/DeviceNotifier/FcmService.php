@@ -4,7 +4,6 @@ namespace App\Service\DeviceNotifier;
 
 use App\Entity\Post;
 use DateTime;
-use DateTimeZone;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Messaging;
@@ -37,8 +36,8 @@ class FcmService implements DeviceNotifierInterface
         );
         $data = [
             'id' => $post->getId(),
-            'published' => is_null($published) ? null : $published->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
-            'updated' => is_null($updated) ? null : $updated->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
+            'published' => is_null($published) ? null : $published->format(DateTime::ISO8601),
+            'updated' => is_null($updated) ? null : $updated->format(DateTime::ISO8601),
             'url' => $post->getUrl(),
             'title' => $post->getTitle(),
             'content' => $post->getContent(),

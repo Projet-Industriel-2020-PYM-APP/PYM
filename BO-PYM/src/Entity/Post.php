@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use DateTime;
-use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
@@ -51,8 +50,8 @@ class Post implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'published' => $this->getPublished()->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
-            'updated' => $this->getUpdated()->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
+            'published' => $this->getPublished()->format(DateTime::ISO8601),
+            'updated' => $this->getUpdated()->format(DateTime::ISO8601),
             'url' => $this->getUrl(),
             'title' => $this->getTitle(),
             'content' => $this->getContent(),

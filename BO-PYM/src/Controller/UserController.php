@@ -8,7 +8,6 @@ use App\Form\UserEditType;
 use App\Repository\UtilisateurRepository;
 use DateInterval;
 use DateTime;
-use DateTimeZone;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
@@ -206,7 +205,7 @@ class UserController extends AbstractController
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'token' => $user->getToken(),
-            'token_expires_at' => $user->getTokenExpiresAt()->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
+            'token_expires_at' => $user->getTokenExpiresAt()->format(DateTime::ISO8601),
             'role' => $user->getRole(),
             'is_email_verified' => $user->getIsEmailVerified(),
         ];

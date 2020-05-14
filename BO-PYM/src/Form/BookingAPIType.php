@@ -18,7 +18,7 @@ class BookingAPIType extends AbstractType
     public function __construct(ServiceToIDTransformer $serviceToIDTransformer)
     {
         $this->serviceTransformer = $serviceToIDTransformer;
-        $this->dateTimeTransformer =  new DateTimeToStringTransformer('UTC', "UTC", "Y-m-d\TH:i:s.u\Z");
+        $this->dateTimeTransformer =  new DateTimeToStringTransformer('Europe/Paris', "UTC", "Y-m-d\TH:i:s.u\Z");
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

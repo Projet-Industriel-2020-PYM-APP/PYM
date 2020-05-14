@@ -12,9 +12,9 @@
             <div class="card-header">
                 <h1 class="card-title">Article n°{{ post.id }}</h1>
                 <p class="card-subtitle">Publié
-                    le {{ post.published ? (post.published|date('Y-m-d H:i:s')|format_datetime('long', 'short', locale='fr')) : '' }} UTC</p>
+                    le {{ post.published ? (post.published|date('Y-m-d H:i:sP', "Europe/Paris")|format_datetime('long', 'short', locale='fr')) : '' }} UTC</p>
                 <p class="card-subtitle">Mis à jour
-                    le {{ post.updated ? (post.updated|date('Y-m-d H:i:s')|format_datetime('long', 'short', locale='fr')) : '' }} UTC</p>
+                    le {{ post.updated ? (post.updated|date('Y-m-d H:i:sP', "Europe/Paris")|format_datetime('long', 'short', locale='fr')) : '' }} UTC</p>
             </div>
             <div class="card-body">
                 <h4 class="card-title">{{ post.title }}</h4>

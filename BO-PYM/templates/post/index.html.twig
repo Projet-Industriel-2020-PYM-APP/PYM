@@ -32,8 +32,8 @@
                 {% for post in posts %}
                     <tr class="searchHide">
                         <td>{{ post.id }}</td>
-                        <td>{{ post.published ? post.published|date('Y-m-d H:i:s') : '' }}</td>
-                        <td>{{ post.updated ? post.updated|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ post.published ? post.published|date('Y-m-d H:i:sP', "Europe/Paris") : '' }}</td>
+                        <td>{{ post.updated ? post.updated|date('Y-m-d H:i:sP', "Europe/Paris") : '' }}</td>
                         <td>{{ post.title }}</td>
                         <td>{{ post.content|length }}</td>
                         <td>

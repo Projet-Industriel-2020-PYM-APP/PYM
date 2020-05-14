@@ -8,22 +8,18 @@ use App\Form\UserEditType;
 use App\Repository\UtilisateurRepository;
 use DateInterval;
 use DateTime;
+use DateTimeZone;
 use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\Regex;
 
 class UserController extends AbstractController
 {
@@ -35,8 +31,7 @@ class UserController extends AbstractController
         UtilisateurRepository $utilsateurRepository,
         UserPasswordEncoderInterface $userPasswordEncoder,
         Swift_Mailer $mailer
-    )
-    {
+    ) {
         $this->utilsateurRepository = $utilsateurRepository;
         $this->encoder = $userPasswordEncoder;
         $this->mailer = $mailer;
@@ -211,7 +206,7 @@ class UserController extends AbstractController
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'token' => $user->getToken(),
-            'token_expires_at' => $user->getTokenExpiresAt()->format(DateTime::ISO8601),
+            'token_expires_at' => $user->getTokenExpiresAt()->setTimezone(new DateTimeZone("UTC"))->format(DateTime::ISO8601),
             'role' => $user->getRole(),
             'is_email_verified' => $user->getIsEmailVerified(),
         ];

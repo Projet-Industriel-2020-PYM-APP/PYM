@@ -2,9 +2,13 @@
 
 twig:
     form_themes:
-        - '@FOSCKEditor/Form/ckeditor_widget.html.twig'
+        - "@FOSCKEditor/Form/ckeditor_widget.html.twig"
 
 fos_ck_editor:
-    # ...
-    base_path: "build/ckeditor"
-    js_path:   "build/ckeditor/ckeditor.js"
+    base_path: "ckeditor"
+    js_path: "ckeditor/ckeditor.js"
+    configs:
+        my_config:
+            language: fr
+            filebrowserBrowseRoute: elfinder
+            filebrowserBrowseRouteParameters: []

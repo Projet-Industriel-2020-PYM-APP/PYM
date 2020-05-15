@@ -7,7 +7,6 @@ use App\Entity\Service;
 use App\Form\BookingAPIType;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
-use App\Repository\ServiceRepository;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -143,6 +142,7 @@ class BookingController extends AbstractController
     /**
      * @Route("/api/services/{id}/bookings", methods={"GET"})
      * @IsGranted("IS_AUTHENTICATED_ANONYMOUSLY")
+     * @param Service $service
      * @return Response
      */
     public function fetchAllByServiceAction(Service $service): Response

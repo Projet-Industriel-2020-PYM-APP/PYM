@@ -20,7 +20,6 @@ use App\Service\FileUploader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -157,7 +156,6 @@ class EntrepriseController extends AbstractController
         return $this->render('entreprise/edit.html.twig', [
             'entreprise' => $entreprise,
             'form' => $form->createView(),
-            'file' => $file
         ]);
     }
 

@@ -33,8 +33,7 @@ class BatimentController extends AbstractController
         EntrepriseRepository $entrepriseRepository,
         BureauRepository $bureauRepository,
         FileUploader $fileUploader
-    )
-    {
+    ) {
         $this->batimentRepository = $batimentRepository;
         $this->entrepriseRepository = $entrepriseRepository;
         $this->bureauRepository = $bureauRepository;
@@ -145,16 +144,14 @@ class BatimentController extends AbstractController
                 }
                 if ($model !== null) {
                     $path = "uploads/modeles" . $old_value;
-                    if(file_exists($path)){
+                    if (file_exists($path)) {
                         unlink($path);
                     }
                     $filename = $this->fileUploader->upload($model, $nom_batiment, 'modeles');
                     $batiment->setRepresentation3D($filename);
-
                 } else {
                     $batiment->setRepresentation3D($old_value);
                 }
-
             }
             $manager->flush();
             return $this->redirectToRoute('batiments');
@@ -217,9 +214,10 @@ class BatimentController extends AbstractController
             return $this->redirectToRoute('batiments');
         }
 
-        return $this->render('batiment/bureau/edit.html.twig',
-            ['form' => $form->createView(), 'bureau' => $bureau]);
-
+        return $this->render(
+            'batiment/bureau/edit.html.twig',
+            ['form' => $form->createView(), 'bureau' => $bureau]
+        );
     }
 
     /**
@@ -255,7 +253,7 @@ class BatimentController extends AbstractController
         }
         if ($batiment->getTypeBatiment() == "Batiment") {
             $path = "uploads/modeles/" . $batiment->getRepresentation3D();
-            if(file_exists($path)){
+            if (file_exists($path)) {
                 unlink($path);
             }
         }

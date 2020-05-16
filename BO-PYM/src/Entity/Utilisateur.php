@@ -19,11 +19,11 @@ class Utilisateur implements UserInterface
      */
     private $id;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $email;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $username;
     /**
@@ -231,12 +231,10 @@ class Utilisateur implements UserInterface
 
     public function eraseCredentials()
     {
-
     }
 
     public function getSalt()
     {
-
     }
 
     public function getRoles()

@@ -74,10 +74,12 @@ class AuthAPIController extends AbstractController
         UserPasswordEncoderInterface $encoder
     ) {
         $em = $this->getDoctrine()->getManager();
+
         // Fill data
+        $data = $request->request->all();
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationAPIType::class, $user);
-        $form->handleRequest($request);
+        $form->submit($data);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setUsername($user->getEmail());

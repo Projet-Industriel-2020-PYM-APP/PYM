@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UtilisateurRepository")
- * @UniqueEntity("email")
+ * @UniqueEntity("email", message="L'adresse e-mail existe déjà")
  * @UniqueEntity("username")
  */
 class Utilisateur implements UserInterface

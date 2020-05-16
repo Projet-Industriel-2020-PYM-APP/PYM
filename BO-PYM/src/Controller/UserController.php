@@ -211,6 +211,8 @@ class UserController extends AbstractController
             'role' => $user->getRole(),
             'is_email_verified' => $user->getIsEmailVerified(),
         ];
-        return new JsonResponse($data);
+        return new JsonResponse($data, Response::HTTP_OK, [
+            "Access-Control-Allow-Origin" => "*"
+        ]);
     }
 }

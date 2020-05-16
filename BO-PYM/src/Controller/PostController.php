@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+header("Access-Control-Allow-Origin: *");
+
 class PostController extends AbstractController
 {
     private $postRepository;

@@ -21,6 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
+header("Access-Control-Allow-Origin: *");
+
 class AuthAPIController extends AbstractController
 {
     private $logger;

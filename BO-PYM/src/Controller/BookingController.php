@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+header("Access-Control-Allow-Origin: *");
+
 class BookingController extends AbstractController
 {
     private $bookingRepository;

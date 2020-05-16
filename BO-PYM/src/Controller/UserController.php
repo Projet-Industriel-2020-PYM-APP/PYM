@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+header("Access-Control-Allow-Origin: *");
+
 class UserController extends AbstractController
 {
     private $utilsateurRepository;

@@ -22,6 +22,8 @@ use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticato
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+header("Access-Control-Allow-Origin: *");
+
 /**
  * Class LoginApiAuthenticator is used to login via API. (email+pass)
  *

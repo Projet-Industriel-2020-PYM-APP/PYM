@@ -17,7 +17,7 @@ class RegistrationAPIType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email',EmailType::class)
+            ->add('email', EmailType::class)
             ->add('password', PasswordType::class, [
                 'constraints' => [
                     new Length(['min' => 8]),
@@ -26,14 +26,14 @@ class RegistrationAPIType extends AbstractType
                         'message' => "Il faut 1 chiffre et 1 lettre au minimum",
                     ])
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
+            'csrf_protection' => false,
         ]);
     }
 }

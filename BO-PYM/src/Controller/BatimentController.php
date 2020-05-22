@@ -33,7 +33,8 @@ class BatimentController extends AbstractController
         EntrepriseRepository $entrepriseRepository,
         BureauRepository $bureauRepository,
         FileUploader $fileUploader
-    ) {
+    )
+    {
         $this->batimentRepository = $batimentRepository;
         $this->entrepriseRepository = $entrepriseRepository;
         $this->bureauRepository = $bureauRepository;
@@ -62,7 +63,6 @@ class BatimentController extends AbstractController
      */
     public function add(Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $batiment = new Batiment;
 
         $form = $this->createForm(Batiment2Type::class, $batiment);
@@ -99,6 +99,7 @@ class BatimentController extends AbstractController
                     break;
             }
 
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($batiment);
             $manager->flush();
             return $this->redirectToRoute('batiments');
@@ -117,7 +118,6 @@ class BatimentController extends AbstractController
      */
     public function edit(Batiment $batiment, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $old_value = $batiment->getRepresentation3D();
 
         $form = $this->createForm(Batiment2Type::class, $batiment);
@@ -153,7 +153,9 @@ class BatimentController extends AbstractController
                     $batiment->setRepresentation3D($old_value);
                 }
             }
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
+
             return $this->redirectToRoute('batiments');
         }
 
@@ -171,9 +173,6 @@ class BatimentController extends AbstractController
      */
     public function add_bureau(Batiment $batiment, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
-        $entreprises = $this->entrepriseRepository->findAll();
-
         $bureau = new Bureau;
 
         $form = $this->createForm(BureauType::class, $bureau);
@@ -184,6 +183,8 @@ class BatimentController extends AbstractController
             $entreprise = $bureau->getEntreprise();
             $entreprise->addBureaux($bureau);
             $batiment->addBureaux($bureau);
+
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($bureau);
             $manager->persist($entreprise);
             $manager->persist($batiment);
@@ -191,7 +192,10 @@ class BatimentController extends AbstractController
             return $this->redirectToRoute('batiments');
         }
 
-        return $this->render('batiment/bureau/add.html.twig', ['form' => $form->createView(), 'entreprises' => $entreprises]);
+        return $this->render('batiment/bureau/add.html.twig', [
+            'form' => $form->createView(),
+            'entreprises' => $this->entrepriseRepository->findAll()
+        ]);
     }
 
     /**
@@ -205,18 +209,20 @@ class BatimentController extends AbstractController
      */
     public function edit_bureau(Batiment $batiment, Bureau $bureau, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $form = $this->createForm(BureauType::class, $bureau);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
             return $this->redirectToRoute('batiments');
         }
 
         return $this->render(
-            'batiment/bureau/edit.html.twig',
-            ['form' => $form->createView(), 'bureau' => $bureau]
+            'batiment/bureau/edit.html.twig', [
+                'form' => $form->createView(),
+                'bureau' => $bureau
+            ]
         );
     }
 
@@ -270,7 +276,7 @@ class BatimentController extends AbstractController
      *
      * @return JsonResponse
      */
-    public function SendAllBatimentAction()
+    public function sendAllBatimentAction()
     {
         $batiments = $this->batimentRepository->findAll();
         return new JsonResponse($batiments);
@@ -283,7 +289,7 @@ class BatimentController extends AbstractController
      *
      * @return JsonResponse
      */
-    public function SendAllBureauAction()
+    public function sendAllBureauAction()
     {
         $bureaux = $this->bureauRepository->findAll();
         return new JsonResponse($bureaux);

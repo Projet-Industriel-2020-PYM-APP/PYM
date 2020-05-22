@@ -12,5 +12,5 @@ interface DeviceNotifierInterface
      * @param Post $post
      * @param string $topic
      */
-    public function notifyLatestPost(Post $post, string $topic): void;
+    public function notifyPost(Post $post, string $topic): void;
 }

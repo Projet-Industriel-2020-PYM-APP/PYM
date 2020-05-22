@@ -46,7 +46,8 @@ class EntrepriseController extends AbstractController
         BureauRepository $bureauRepository,
         ContactCategorieRepository $contactCategorieRepository,
         FileUploader $fileUploader
-    ) {
+    )
+    {
         $this->entrepriseRepository = $entrepriseRepository;
         $this->activiteRepository = $activiteRepository;
         $this->posteRepository = $posteRepository;
@@ -76,7 +77,6 @@ class EntrepriseController extends AbstractController
      */
     public function add(Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $entreprise = new Entreprise();
 
         $form = $this->createForm(EntrepriseType::class, $entreprise);
@@ -105,7 +105,7 @@ class EntrepriseController extends AbstractController
             //$img->save('uploads/logos/'.$filename);
             $entreprise->setLogo($filename);
 
-
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($entreprise);
             $manager->flush();
 
@@ -125,7 +125,6 @@ class EntrepriseController extends AbstractController
      */
     public function edit(Entreprise $entreprise, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $oldFile = $entreprise->getLogo();
         $form = $this->createForm(EntrepriseType::class, $entreprise);
         $form->handleRequest($request);
@@ -148,6 +147,7 @@ class EntrepriseController extends AbstractController
                 $entreprise->addActivite($form->get('activites')->getData());
             }
 
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
 
             return $this->redirectToRoute('entreprises');
@@ -188,13 +188,14 @@ class EntrepriseController extends AbstractController
      */
     public function add_contact(Entreprise $entreprise, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $contact = new Contact;
 
         $form = $this->createForm(ContactType::class, $contact);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
+
             if ($form->get('poste')->getData() !== null) {
                 $poste = $this->posteRepository->findOneBy(['Nom' => $form->get('poste')->getData()->getNom()]);
                 if (!$poste) {
@@ -208,13 +209,15 @@ class EntrepriseController extends AbstractController
             $manager->persist($contact);
             $manager->persist($entreprise);
 
-
             $manager->flush();
 
             return $this->redirectToRoute('entreprises');
         }
 
-        return $this->render('entreprise/contact/add.html.twig', ['form' => $form->createView(), 'entreprise' => $entreprise]);
+        return $this->render('entreprise/contact/add.html.twig', [
+            'form' => $form->createView(),
+            'entreprise' => $entreprise
+        ]);
     }
 
     /**
@@ -225,12 +228,12 @@ class EntrepriseController extends AbstractController
      */
     public function add_poste(Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $poste = new Poste;
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($poste);
             $manager->flush();
             return $this->redirectToRoute('entreprises');
@@ -246,12 +249,12 @@ class EntrepriseController extends AbstractController
      */
     public function add_activite(Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $activite = new Activite;
         $form = $this->createForm(ActiviteType::class, $activite);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($activite);
             $manager->flush();
             return $this->redirectToRoute('entreprises');
@@ -270,7 +273,6 @@ class EntrepriseController extends AbstractController
      */
     public function edit_contact(Entreprise $entreprise, Contact $contact, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $form = $this->createForm(ContactType::class, $contact);
         $form->handleRequest($request);
 
@@ -285,6 +287,7 @@ class EntrepriseController extends AbstractController
                 $contact->addPoste($form->get('poste')->getData());
             }
 
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
             return $this->redirectToRoute('entreprises');
         }

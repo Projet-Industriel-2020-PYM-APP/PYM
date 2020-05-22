@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use DateInterval;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -191,6 +193,46 @@ class Utilisateur implements UserInterface
         $this->tokenExpiresAt = $tokenExpiresAt;
 
         return $this;
+    }
+
+    /**
+     *  Generate and instanciate the "token" and the "tokenExpiresAt" properties.
+     *
+     *  Settings :
+     *
+     *  -  Token of 64 bytes (128 hexadical characters), or a token of 23 characters if entropy gathering fails
+     *  -  ExpiresAt 24 hours
+     */
+    public function generateToken()
+    {
+        try {
+            $this->setToken(bin2hex(random_bytes(64)));
+        } catch (Exception $e) {
+            $this->setToken(uniqid("", true));
+        }
+        $expirationDate = new DateTime();
+        $expirationDate->add(new DateInterval('P1D'));
+        $this->setTokenExpiresAt($expirationDate);
+    }
+
+    /**
+     *  Generate and instanciate the "refreshToken" and the "refreshTokenExpiresAt" properties.
+     *
+     *  Settings :
+     *
+     *  -  Token of 64 bytes (128 hexadical characters), or a token of 23 characters if entropy gathering fails
+     *  -  ExpiresAt 24 hours
+     */
+    public function generateRefreshToken()
+    {
+        try {
+            $this->setRefreshToken(bin2hex(random_bytes(64)));
+        } catch (Exception $e) {
+            $this->setRefreshToken(uniqid("", true));
+        }
+        $expirationDate = new DateTime();
+        $expirationDate->add(new DateInterval('P1D'));
+        $this->setRefreshTokenExpiresAt($expirationDate);
     }
 
     public function isRefreshTokenExpired(): bool

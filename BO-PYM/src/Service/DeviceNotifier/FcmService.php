@@ -25,7 +25,7 @@ class FcmService implements DeviceNotifierInterface
     /**
      * @inheritDoc
      */
-    public function notifyLatestPost(Post $post, string $topic = "actualite"): void
+    public function notifyPost(Post $post, string $topic = "actualite"): void
     {
         $this->logger->info('"START NOTIFICATION"');
         $published = $post->getPublished();

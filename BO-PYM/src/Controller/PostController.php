@@ -8,7 +8,6 @@ use App\Repository\PostRepository;
 use App\Service\DeviceNotifier\DeviceNotifierInterface;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,11 +57,11 @@ class PostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $post->setUrl(null);  // TODO: Add here Front-End url
+            $post->setUrl($request->getScheme() . '://' . $request->getHttpHost() . "/post/" . $post->getId());  // TODO: Add here Front-End url
             $entityManager->persist($post);
             $entityManager->flush();
 
-            $this->notifier->notifyLatestPost($post, 'actualite');
+            $this->notifier->notifyPost($post, 'actualite');
 
             return $this->redirectToRoute('post_index');
         }
@@ -75,13 +74,15 @@ class PostController extends AbstractController
 
     /**
      * @Route("/post/{id}", name="post_show", methods={"GET"})
-     * @Template("post/show.html.twig", vars={"post"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Post $post
-     * @return void
+     * @return Response
      */
     public function show(Post $post)
     {
+        return $this->render('post/show.html.twig', [
+            'post' => $post,
+        ]);
     }
 
     /**

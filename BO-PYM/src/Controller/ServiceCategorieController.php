@@ -63,7 +63,6 @@ class ServiceCategorieController extends AbstractController
      */
     public function new(Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $serviceCategorie = new ServiceCategorie();
         $serviceCategorie->setPrimaryColor("#2196f3");
         $form = $this->createForm(ServiceCategorieType::class, $serviceCategorie);
@@ -78,6 +77,8 @@ class ServiceCategorieController extends AbstractController
                 $newFilename = $this->fileUploader->upload($imgFile, $originalFilename, 'service_categories');
                 $serviceCategorie->setImgUrl($newFilename);
             }
+
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($serviceCategorie);
             $manager->flush();
 
@@ -98,11 +99,7 @@ class ServiceCategorieController extends AbstractController
         ServiceCategorie $serviceCategorie,
         Request $request
     ) {
-        $manager = $this->getDoctrine()->getManager();
-        $file = $serviceCategorie->getImgUrl();
-        if ($file) {
-            $serviceCategorie->setImgUrl(new File($this->getParameter('shared_directory') . 'service_categories/' . $file));
-        }
+        $oldFile = $serviceCategorie->getImgUrl();
         $form = $this->createForm(ServiceCategorieType::class, $serviceCategorie);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -110,8 +107,8 @@ class ServiceCategorieController extends AbstractController
             $imgFile = $form->get('imgUrl')->getData();
 
             if ($imgFile) {
-                $path = $this->getParameter('shared_directory') . 'service_categories/' . $imgFile;
-                if (file_exists($path)) {
+                $path = $this->getParameter('shared_directory') . 'service_categories/' . $oldFile;
+                if ($oldFile && file_exists($path)) {
                     unlink($path);
                 }
                 $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -119,6 +116,7 @@ class ServiceCategorieController extends AbstractController
                 $serviceCategorie->setImgUrl($newFilename);
             }
 
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
 
             return $this->redirectToRoute('service_categorie_index');
@@ -165,7 +163,6 @@ class ServiceCategorieController extends AbstractController
         ServiceCategorie $categorie,
         Request $request
     ) {
-        $manager = $this->getDoctrine()->getManager();
         $service = new Service();
         $service->setCategorie($categorie);
 
@@ -182,6 +179,7 @@ class ServiceCategorieController extends AbstractController
                 $service->setImgUrl($newFilename);
             }
 
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($service);
             $manager->flush();
 
@@ -205,7 +203,6 @@ class ServiceCategorieController extends AbstractController
         Request $request,
         Service $service
     ) {
-        $manager = $this->getDoctrine()->getManager();
         $oldFile = $service->getImgUrl();
         $form = $this->createForm(ServiceType::class, $service);
         $form->handleRequest($request);
@@ -222,6 +219,7 @@ class ServiceCategorieController extends AbstractController
                 $newFilename = $this->fileUploader->upload($imgFile, $originalFilename, 'services');
                 $service->setImgUrl($newFilename);
             }
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
 
             return $this->redirectToRoute('service_categorie_index');

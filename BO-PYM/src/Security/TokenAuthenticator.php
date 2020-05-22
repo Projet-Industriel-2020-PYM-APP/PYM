@@ -16,6 +16,14 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 header("Access-Control-Allow-Origin: *");
 
+/**
+ * Class TokenAuthenticator
+ *
+ * Authenticate a user with a token in the Authorization field in the header.
+ * If using an Apache2 reverse proxy, do not forget to allow Authorization header.
+ *
+ * @package App\Security
+ */
 class TokenAuthenticator extends AbstractGuardAuthenticator
 {
     public const API_ROUTE = 'api';

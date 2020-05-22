@@ -68,12 +68,11 @@ class ReferenceTableController extends AbstractController
      */
     public function edit_activite(Activite $activite, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
-
         $form = $this->createForm(ActiviteType::class, $activite);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
             return $this->redirectToRoute('reference_tables');
         }
@@ -89,12 +88,12 @@ class ReferenceTableController extends AbstractController
      */
     public function add_poste(Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $poste = new Poste;
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($poste);
             $manager->flush();
             return $this->redirectToRoute('reference_tables');
@@ -128,11 +127,11 @@ class ReferenceTableController extends AbstractController
      */
     public function edit_poste(Poste $poste, Request $request)
     {
-        $manager = $this->getDoctrine()->getManager();
         $form = $this->createForm(PosteType::class, $poste);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
             return $this->redirectToRoute('reference_tables');
         }

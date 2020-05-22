@@ -77,13 +77,15 @@ class BookingController extends AbstractController
 
     /**
      * @Route("/bookings/{id}", name="booking_of_service_show", methods={"GET","POST"})
-     * @Template("booking/show.html.twig", vars={"booking"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Booking $booking
-     * @return void
+     * @return Response
      */
     public function show(Booking $booking)
     {
+        return $this->render("booking/show.html.twig", [
+            'booking' => $booking,
+        ]);
     }
 
     /**
@@ -207,9 +209,6 @@ class BookingController extends AbstractController
         $form = $this->createForm(BookingAPIType::class, $booking);
         $clearMissing = $request->getMethod() != 'PATCH';
         $form->submit($data, $clearMissing);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();

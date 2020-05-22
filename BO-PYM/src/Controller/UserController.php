@@ -159,7 +159,7 @@ class UserController extends AbstractController
      *
      * @Route("/users/me/email_verification", name="auth_email_verification", methods={"POST"})
      * @IsGranted("IS_AUTHENTICATED_FULLY")
-     * Response
+     * @return Response
      */
     public function emailVerification()
     {
@@ -167,14 +167,7 @@ class UserController extends AbstractController
         /** @var Utilisateur $user */
         $user = $this->getUser();
         $user->setIsEmailVerified(false);
-        try {
-            $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (Exception $e) {
-            $user->setRefreshToken(uniqid("", true));
-        }
-        $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('P1D'));
-        $user->setRefreshTokenExpiresAt($expirationDate);
+        $user->generateRefreshToken();
         $em->flush();
 
         $message = (new Swift_Message('Confirmez votre adresse e-mail.'))

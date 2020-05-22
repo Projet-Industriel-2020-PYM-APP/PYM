@@ -75,15 +75,14 @@ class AuthAPIController extends AbstractController
         Request $request,
         UserPasswordEncoderInterface $encoder
     ) {
-        $em = $this->getDoctrine()->getManager();
-
-        // Fill data
         $data = $request->request->all();
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationAPIType::class, $user);
         $form->submit($data);
 
+        // Validate
         if ($form->isSubmitted() && $form->isValid()) {
+            // Hydrate
             $user->setUsername($user->getEmail());
             $user->setPassword($encoder->encodePassword(
                 $user,
@@ -91,25 +90,11 @@ class AuthAPIController extends AbstractController
             ));
             $user->setIsEmailVerified(false);
             $user->setRole('User');
-            try {
-                $user->setToken(bin2hex(random_bytes(64)));
-            } catch (Exception $e) {
-                $this->logger->warning($e);
-                $user->setToken(uniqid("", true));
-            }
-            $expirationDate = new DateTime();
-            $expirationDate->add(new DateInterval('P1D'));
-            $user->setTokenExpiresAt($expirationDate);
-            try {
-                $user->setRefreshToken(bin2hex(random_bytes(64)));
-            } catch (Exception $e) {
-                $this->logger->warning($e);
-                $user->setRefreshToken(uniqid("", true));
-            }
-            $expirationDate = new DateTime();
-            $expirationDate->add(new DateInterval('P1D'));
-            $user->setRefreshTokenExpiresAt($expirationDate);
+            $user->generateToken();
+            $user->generateRefreshToken();
 
+            // Persist
+            $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
@@ -154,15 +139,7 @@ class AuthAPIController extends AbstractController
         /** @var Utilisateur $user */
         $user = $this->getUser();
         $user->setIsEmailVerified(false);
-        try {
-            $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (Exception $e) {
-            $this->logger->warning($e);
-            $user->setRefreshToken(uniqid("", true));
-        }
-        $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('P1D'));
-        $user->setRefreshTokenExpiresAt($expirationDate);
+        $user->generateRefreshToken();
         $em->flush();
 
         $message = (new Swift_Message('Confirmez votre adresse e-mail.'))
@@ -201,15 +178,7 @@ class AuthAPIController extends AbstractController
                 'Email not found : ' . $email
             );
         }
-        try {
-            $user->setRefreshToken(bin2hex(random_bytes(64)));
-        } catch (Exception $e) {
-            $this->logger->warning($e);
-            $user->setRefreshToken(uniqid("", true));
-        }
-        $expirationDate = new DateTime();
-        $expirationDate->add(new DateInterval('P1D'));
-        $user->setRefreshTokenExpiresAt($expirationDate);
+        $user->generateRefreshToken();
         $em->flush();
 
         $message = (new Swift_Message("Confirmer le changement de mot de passe."))

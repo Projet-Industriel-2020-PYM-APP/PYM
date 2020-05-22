@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Form\RegistrationType;
-use DateInterval;
-use DateTime;
-use Exception;
+use App\Repository\UtilisateurRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Swift_Mailer;
 use Swift_Message;
@@ -22,6 +20,12 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthController extends AbstractController
 {
+    private $repository;
+
+    public function __construct(UtilisateurRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
     /**
      * @Route("/utilisateurs/ajout", name="user_add", methods={"GET","POST"})
@@ -47,22 +51,8 @@ class AuthController extends AbstractController
             ));
             $user->setIsEmailVerified(false);
             $user->setRole("Admin");
-            try {
-                $user->setToken(bin2hex(random_bytes(64)));
-            } catch (Exception $e) {
-                $user->setToken(uniqid("", true));
-            }
-            $expirationDate = new DateTime();
-            $expirationDate->add(new DateInterval('P1D'));
-            $user->setTokenExpiresAt($expirationDate);
-            try {
-                $user->setRefreshToken(bin2hex(random_bytes(64)));
-            } catch (Exception $e) {
-                $user->setRefreshToken(uniqid("", true));
-            }
-            $expirationDate = new DateTime();
-            $expirationDate->add(new DateInterval('P1D'));
-            $user->setRefreshTokenExpiresAt($expirationDate);
+            $user->generateToken();
+            $user->generateRefreshToken();
 
             $manager->persist($user);
             $manager->flush();
@@ -121,7 +111,7 @@ class AuthController extends AbstractController
      */
     public function reset_password(Request $request, Swift_Mailer $mailer)
     {
-        $manager = $this->getDoctrine()->getManager();
+        // Mail only form
         $form = $this->createFormBuilder()
             ->add('email', EmailType::class, [
                 'attr' => [
@@ -135,9 +125,7 @@ class AuthController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $email = $data['email'];
-            $repository = $this->getDoctrine()->getRepository(Utilisateur::class);
-            $user = $repository->findOneBy(['email' => $email]);
+            $user = $this->repository->findOneBy(['email' => $data['email']]);
 
             if (!$user) {
                 $error = "Email non existant";
@@ -146,15 +134,9 @@ class AuthController extends AbstractController
                     'error' => $error
                 ]);
             }
-            try {
-                $user->setRefreshToken(bin2hex(random_bytes(64)));
-            } catch (Exception $e) {
-                # if it was not possible to gather sufficient entropy.
-                $user->setRefreshToken(uniqid("", true));
-            }
-            $expirationDate = new DateTime();
-            $expirationDate->add(new DateInterval('P1D'));
-            $user->setRefreshTokenExpiresAt($expirationDate);
+            $user->generateRefreshToken();
+
+            $manager = $this->getDoctrine()->getManager();
             $manager->flush();
 
             $message = (new Swift_Message("Confirmer le changement de mot de passe."))

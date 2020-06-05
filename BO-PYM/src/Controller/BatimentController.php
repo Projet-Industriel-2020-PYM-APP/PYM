@@ -279,7 +279,10 @@ class BatimentController extends AbstractController
     public function sendAllBatimentAction()
     {
         $batiments = $this->batimentRepository->findAll();
-        return new JsonResponse(array_filter($batiments));
+        $filteredBatiments = array_filter($batiments, function ($v) {
+            return !is_null($v);
+        });
+        return new JsonResponse($filteredBatiments);
     }
 
     /**

@@ -33,8 +33,7 @@ class BatimentController extends AbstractController
         EntrepriseRepository $entrepriseRepository,
         BureauRepository $bureauRepository,
         FileUploader $fileUploader
-    )
-    {
+    ) {
         $this->batimentRepository = $batimentRepository;
         $this->entrepriseRepository = $entrepriseRepository;
         $this->bureauRepository = $bureauRepository;
@@ -219,7 +218,8 @@ class BatimentController extends AbstractController
         }
 
         return $this->render(
-            'batiment/bureau/edit.html.twig', [
+            'batiment/bureau/edit.html.twig',
+            [
                 'form' => $form->createView(),
                 'bureau' => $bureau
             ]
@@ -279,7 +279,7 @@ class BatimentController extends AbstractController
     public function sendAllBatimentAction()
     {
         $batiments = $this->batimentRepository->findAll();
-        return new JsonResponse($batiments);
+        return new JsonResponse(array_filter($batiments));
     }
 
     /**

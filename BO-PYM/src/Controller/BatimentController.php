@@ -280,7 +280,7 @@ class BatimentController extends AbstractController
     {
         $batiments = $this->batimentRepository->findAll();
         $filteredBatiments = array_filter($batiments, function ($v) {
-            return !is_null($v);
+            return $v->getEtat() === true;
         });
         return new JsonResponse($filteredBatiments);
     }

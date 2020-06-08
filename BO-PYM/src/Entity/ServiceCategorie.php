@@ -95,11 +95,16 @@ class ServiceCategorie implements JsonSerializable
      */
     public function jsonSerialize()
     {
+        $imgUrl = null;
+        if (!$this->getImgUrl()) {
+            $imgUrl = "https://map-pym.com/sharedfolder/service_categories/" . $this->getImgUrl();
+        }
+
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
             'primary_color' => $this->getPrimaryColor(),
-            'img_url' => "https://map-pym.com/sharedfolder/service_categories/" . $this->getImgUrl(),
+            'img_url' => $imgUrl,
             'action' => $this->getAction(),
         ];
     }

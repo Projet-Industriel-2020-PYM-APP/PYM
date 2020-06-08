@@ -75,7 +75,7 @@ class ContactCategorie implements JsonSerializable
     public function jsonSerialize()
     {
         $imgUrl = null;
-        if (!$this->getImgUrl()) {
+        if ($this->getImgUrl()) {
             $imgUrl = "https://map-pym.com/sharedfolder/contact_categories/" . $this->getImgUrl();
         }
 

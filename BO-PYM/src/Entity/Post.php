@@ -39,9 +39,35 @@ class Post implements JsonSerializable
     private $title;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $subtitle;
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $tags = [];
+    /**
      * @ORM\Column(type="text", length=65535, nullable=true)
      */
     private $content;
+
+    /**
+     * @return string|null
+     */
+    public function getSubtitle(): ?string
+    {
+        return $this->subtitle;
+    }
+
+    /**
+     * @param string $subtitle
+     * @return Post
+     */
+    public function setSubtitle(?string $subtitle): self
+    {
+        $this->subtitle = $subtitle;
+        return $this;
+    }
 
     /**
      * @inheritDoc
@@ -54,7 +80,9 @@ class Post implements JsonSerializable
             'updated' => $this->getUpdated()->format(DateTime::ISO8601),
             'url' => $this->getUrl(),
             'title' => $this->getTitle(),
+            'subtitle' => $this->getSubtitle(),
             'content' => $this->getContent(),
+            'tags' => $this->getTags(),
         ];
     }
 
@@ -119,6 +147,18 @@ class Post implements JsonSerializable
     public function setContent(?string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getTags(): ?array
+    {
+        return $this->tags;
+    }
+
+    public function setTags(?array $tags): self
+    {
+        $this->tags = $tags;
 
         return $this;
     }

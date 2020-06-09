@@ -29,7 +29,7 @@
                     </tr>
                 </thead>
                 <tbody id="postsBody">
-                {% for post in posts|reverse %}
+                {% for post in posts|sort((a, b) => -(a.published <=> b.published)) %}
                     <tr class="searchHide">
                         <td>{{ post.id }}</td>
                         <td>{{ post.published ? post.published|date('Y-m-d H:i:sP', "Europe/Paris") : '' }}</td>

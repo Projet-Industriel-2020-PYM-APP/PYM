@@ -1,17 +1,62 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-
-    <div class="btn-toolbar my-4 justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
-        {% if button_label is defined %}
-            <div class="btn-group mr-auto" role="group" aria-label="Cancel Group">
-                <a class="btn btn-outline-danger" href="{{path('post_delete',{'id': post.id})}}">Supprimer</a>
-            </div>
-        {% endif %}
-        <div class="btn-group mr-2" role="group" aria-label="Cancel Group">
-            <a class="btn btn-outline-dark" href="{{ path('post_index') }}">Annuler</a>
-        </div>
-        <div class="btn-group mr-2" role="group" aria-label="Publish Group">
-            <button class="btn btn-primary">{{ button_label|default('Publier') }}</button>
+{% macro printTag(tag) %}
+    {# Template for Action Tile #}
+    <div class="input-group">
+        {{ form_errors(tag) }}
+        {{ form_widget(tag.name) }}
+        <div class="input-group-append" id="button-addon4">
+            <button class="btn btn-secondary delete-action-widget" type="button"
+                    aria-label="Enlever">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     </div>
+{% endmacro %}
+{% import _self as formMacros %}
+
+    {{ form_start(form) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.subtitle) }}
+    {{ form_row(form.content) }}
+<div class="row mt-2 justify-content-between align-items-center">
+    <div class="col-10">
+        {{ form_label(form.tags) }}
+    </div>
+    <div class="col-1">
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button"
+                        class="btn add-action-widget"
+                        data-list-selector="#tags-list">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="tags-list" class="container"
+     data-prototype="{{ formMacros.printTag(form.tags.vars.prototype)|e('html_attr') }}"
+     data-widget-tags="{{ '<div class="data-tag"></div>'|e }}"
+     data-widget-counter="{{ form.tags|length }}">
+    {% for tag in form.tags %}
+        <div class="data-tag">
+            {{ formMacros.printTag(tag) }}
+        </div>
+    {% else %}
+        {% do form.tags.setRendered %}
+    {% endfor %}
+</div>
+
+<div class="btn-toolbar my-4 justify-content-end" role="toolbar" aria-label="Toolbar with button groups">
+    {% if button_label is defined %}
+        <div class="btn-group mr-auto" role="group" aria-label="Cancel Group">
+            <a class="btn btn-outline-danger" href="{{ path('post_delete',{'id': post.id}) }}">Supprimer</a>
+        </div>
+    {% endif %}
+    <div class="btn-group mr-2" role="group" aria-label="Cancel Group">
+        <a class="btn btn-outline-dark" href="{{ path('post_index') }}">Annuler</a>
+    </div>
+    <div class="btn-group mr-2" role="group" aria-label="Publish Group">
+        <button class="btn btn-primary">{{ button_label|default('Publier') }}</button>
+    </div>
+</div>
 {{ form_end(form) }}

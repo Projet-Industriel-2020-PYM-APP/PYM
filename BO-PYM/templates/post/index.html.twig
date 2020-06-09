@@ -23,7 +23,8 @@
                         <th>N°</th>
                         <th>Publication</th>
                         <th>Mise à jour</th>
-                        <th>Titre</th>
+                        <th>Titre principal</th>
+                        <th>Titre secondaire</th>
                         <th>Longueur du texte</th>
                         <th>Actions</th>
                     </tr>
@@ -35,6 +36,7 @@
                         <td>{{ post.published ? post.published|date('Y-m-d H:i:sP', "Europe/Paris") : '' }}</td>
                         <td>{{ post.updated ? post.updated|date('Y-m-d H:i:sP', "Europe/Paris") : '' }}</td>
                         <td>{{ post.title }}</td>
+                        <td>{{ post.subtitle }}</td>
                         <td>{{ post.content|length }}</td>
                         <td>
                             <div class="btn-group action">

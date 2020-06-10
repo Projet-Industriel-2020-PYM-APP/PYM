@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+{% block body %}
+    {% if app.user %}
+        <div class="container">
+            {{ include('notification/_form.html.twig') }}
+            {% if success is defined %}
+                <div class="alert alert-success" role="alert">
+                    Notification envoyé !
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        Besoin d'être authentifié.
+    {% endif %}
+{% endblock %}

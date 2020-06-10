@@ -32,7 +32,7 @@ class FcmService implements DeviceNotifierInterface
         $updated = $post->getUpdated();
         $notification = Notification::create(
             "Un nouvel article est disponible !",
-            $post->getTitle() ?? ""
+            $post->getSubtitle() ?? ""
         );
         $data = [
             'id' => $post->getId(),
@@ -40,12 +40,37 @@ class FcmService implements DeviceNotifierInterface
             'updated' => is_null($updated) ? null : $updated->format(DateTime::ISO8601),
             'url' => $post->getUrl(),
             'title' => $post->getTitle(),
-            'content' => $post->getContent(),
+            'subtitle' => $post->getSubtitle(),
         ];
 
         $message = CloudMessage::withTarget('topic', $topic)
             ->withNotification($notification)
             ->withData($data);
+
+        try {
+            $this->messaging->send($message);
+            $this->logger->info('"NOTIFICATION SENT"');
+        } catch (MessagingException $e) {
+            $this->logger->error($e);
+        } catch (FirebaseException $e) {
+            $this->logger->error($e);
+        }
+    }
+
+    public function notify(string $title, string $body, array $data = [], string $topic = "actualite"): void
+    {
+        $this->logger->info('"START NOTIFICATION"');
+        $notification = Notification::create(
+            $title,
+            $body ?? ""
+        );
+
+        $message = CloudMessage::withTarget('topic', $topic)
+            ->withNotification($notification);
+
+        if ($data) {
+            $message = $message->withData($data);
+        }
 
         try {
             $this->messaging->send($message);

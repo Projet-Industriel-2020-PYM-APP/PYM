@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Booking;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,6 +23,11 @@ class BookingType extends AbstractType
             ])
             ->add('endDate', DateTimeType::class, [
                 'label' => 'Date de fin',
+            ])
+            ->add('superpose', CheckboxType::class, [
+                'data' => true,
+                'label' => "Peut se superposer à d'autres événements",
+                'required' => false,
             ]);
     }
 

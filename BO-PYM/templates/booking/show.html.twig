@@ -27,6 +27,10 @@
                 <th>Date de fin</th>
                 <td>{{ booking.endDate ? booking.endDate|date('d M Y H:i:sP', "Europe/Paris") : '' }}</td>
             </tr>
+            <tr>
+                <th>Superposable à d'autres événements</th>
+                <td>{{ booking.superpose ? 'Oui' : 'Non' }}</td>
+            </tr>
             </tbody>
         </table>
 

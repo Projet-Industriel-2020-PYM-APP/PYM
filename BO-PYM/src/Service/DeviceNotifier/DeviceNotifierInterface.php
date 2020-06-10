@@ -13,4 +13,6 @@ interface DeviceNotifierInterface
      * @param string $topic
      */
     public function notifyPost(Post $post, string $topic): void;
+
+    public function notify(string $title, string $body, array $data = []): void;
 }

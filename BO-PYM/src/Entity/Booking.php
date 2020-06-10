@@ -8,8 +8,10 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as CustomAssert;
 
 /**
+ * @CustomAssert\BookingSuperpose
  * @ORM\Entity(repositoryClass="App\Repository\BookingRepository")
  */
 class Booking implements JsonSerializable
@@ -46,6 +48,11 @@ class Booking implements JsonSerializable
     private $title;
 
     /**
+     * @ORM\Column(type="boolean", options={"default" : true})
+     */
+    private $superpose;
+
+    /**
      * @inheritDoc
      */
     public function jsonSerialize()
@@ -55,7 +62,8 @@ class Booking implements JsonSerializable
             'service_id' => $this->getService()->getId(),
             'title' => $this->getTitle(),
             'start_date' => $this->getStartDate()->format(DateTime::ISO8601),
-            'end_date' => $this->getEndDate()->format(DateTime::ISO8601)
+            'end_date' => $this->getEndDate()->format(DateTime::ISO8601),
+            'superpose' => $this->getSuperpose(),
         ];
     }
 
@@ -109,6 +117,24 @@ class Booking implements JsonSerializable
     {
         $this->endDate = $endDate;
 
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getSuperpose(): ?bool
+    {
+        return $this->superpose;
+    }
+
+    /**
+     * @param bool $superpose
+     * @return $this
+     */
+    public function setSuperpose(bool $superpose): self
+    {
+        $this->superpose = $superpose;
         return $this;
     }
 }

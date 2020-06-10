@@ -66,7 +66,7 @@ class Service implements JsonSerializable
     {
         $imgUrl = null;
         if ($this->getImgUrl()) {
-            $imgUrl = "https://map-pym.com/sharedfolder/contact_categories/" . $this->getImgUrl();
+            $imgUrl = "https://map-pym.com/sharedfolder/services/" . $this->getImgUrl();
         }
 
         return [

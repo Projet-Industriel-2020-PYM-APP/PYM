@@ -190,7 +190,7 @@ class BookingController extends AbstractController
             );
         }
 
-        return new Response(
+        return Response::create(
             $form->getErrors(true),
             Response::HTTP_BAD_REQUEST
         );

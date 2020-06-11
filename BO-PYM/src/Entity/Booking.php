@@ -24,6 +24,7 @@ class Booking implements JsonSerializable
     private $id;
 
     /**
+     * @Assert\Valid
      * @ManyToOne(targetEntity="Service")
      * @JoinColumn(name="$service_id", referencedColumnName="id")
      */
@@ -59,7 +60,7 @@ class Booking implements JsonSerializable
     {
         return [
             'id' => $this->getId(),
-            'service_id' => $this->getService()->getId(),
+            'service_id' => $this->getService() ? $this->getService()->getId() : null,
             'title' => $this->getTitle(),
             'start_date' => $this->getStartDate()->format(DateTime::ISO8601),
             'end_date' => $this->getEndDate()->format(DateTime::ISO8601),

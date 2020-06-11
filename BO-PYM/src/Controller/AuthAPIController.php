@@ -6,9 +6,7 @@ use App\Entity\Utilisateur;
 use App\Form\RegistrationAPIType;
 use App\Form\ResetPasswordType;
 use App\Repository\UtilisateurRepository;
-use DateInterval;
 use DateTime;
-use Exception;
 use LogicException;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -33,7 +31,8 @@ class AuthAPIController extends AbstractController
         LoggerInterface $logger,
         Swift_Mailer $mailer,
         UtilisateurRepository $repository
-    ) {
+    )
+    {
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->repository = $repository;
@@ -74,7 +73,8 @@ class AuthAPIController extends AbstractController
     public function register(
         Request $request,
         UserPasswordEncoderInterface $encoder
-    ) {
+    )
+    {
         $data = $request->request->all();
         $user = new Utilisateur();
         $form = $this->createForm(RegistrationAPIType::class, $user);
@@ -116,8 +116,10 @@ class AuthAPIController extends AbstractController
                 Response::HTTP_OK
             );
         }
+
+        $errors = $form->getErrors(true);
         return Response::create(
-            $form->getErrors(true),
+            implode('\n', array($errors)),
             Response::HTTP_BAD_REQUEST
         );
     }
@@ -236,7 +238,8 @@ class AuthAPIController extends AbstractController
         string $token,
         Request $request,
         UserPasswordEncoderInterface $encoder
-    ) {
+    )
+    {
         $user = $this->repository->findOneBy(["refreshToken" => $token]);
         if (is_null($user)) {
             throw $this->createNotFoundException('User not found.');

@@ -10,7 +10,6 @@ use App\Repository\BookingRepository;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +24,8 @@ class BookingController extends AbstractController
 
     public function __construct(
         BookingRepository $bookingRepository
-    ) {
+    )
+    {
         $this->bookingRepository = $bookingRepository;
     }
 
@@ -190,8 +190,9 @@ class BookingController extends AbstractController
             );
         }
 
+        $errors = $form->getErrors(true);
         return Response::create(
-            $form->getErrors(true),
+            implode('\n', array($errors)),
             Response::HTTP_BAD_REQUEST
         );
     }
@@ -216,8 +217,9 @@ class BookingController extends AbstractController
             return new JsonResponse($booking);
         }
 
-        return new Response(
-            $form->getErrors(true),
+        $errors = $form->getErrors(true);
+        return Response::create(
+            implode('\n', array($errors)),
             Response::HTTP_BAD_REQUEST
         );
     }

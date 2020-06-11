@@ -168,7 +168,7 @@ class BookingController extends AbstractController
 
     /**
      * @Route("/api/bookings", methods={"POST"})
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Request $request
      * @return Response
      */
@@ -199,7 +199,7 @@ class BookingController extends AbstractController
 
     /**
      * @Route("/api/bookings/{id}", methods={"PATCH", "PUT"})
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Request $request
      * @param Booking $booking
      * @return Response
@@ -227,7 +227,7 @@ class BookingController extends AbstractController
 
     /**
      * @Route("/api/bookings/{id}", methods={"DELETE"})
-     * @IsGranted("ROLE_ADMIN")
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param Booking $booking
      * @return Response
      */

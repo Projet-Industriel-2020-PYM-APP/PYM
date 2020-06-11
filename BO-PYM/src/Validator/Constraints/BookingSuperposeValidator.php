@@ -8,15 +8,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-function Even($array)
-{
-    // returns if the input integer is even
-    if($array%2==0)
-        return TRUE;
-    else
-        return FALSE;
-}
-
 class BookingSuperposeValidator extends ConstraintValidator
 {
     private $bookingRepository;

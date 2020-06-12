@@ -112,6 +112,7 @@
                         <th scope="col">Nbr d'étages</th>
                         <th scope="col">Type</th>
                         <th scope="col">Etat</th>
+                        <th scope="col">AR</th>
                         <th scope="col">Accès handicapé</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -127,6 +128,7 @@
                             {% else %}
                                 <td class="clickabletd" onclick="toggleCollapse({{ key }})">Non Publié</td>
                             {% endif %}
+                            <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.isVisibleAR ? "Oui" : "Non" }}</td>
                             {% if batiment.acceshandicape %}
                                 <td class="clickabletd" onclick="toggleCollapse({{ key }})">Oui</td>
                             {% else %}

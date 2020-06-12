@@ -114,9 +114,32 @@ class Batiment implements JsonSerializable
      */
     private $Accessoire;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false})
+     */
+    private $IsVisibleAR;
+
     public function __construct()
     {
         $this->Bureaux = new ArrayCollection();
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getIsVisibleAR(): ?bool
+    {
+        return $this->IsVisibleAR;
+    }
+
+    /**
+     * @param bool $IsVisibleAR
+     * @return Batiment
+     */
+    public function setIsVisibleAR(bool $IsVisibleAR): self
+    {
+        $this->IsVisibleAR = $IsVisibleAR;
+        return $this;
     }
 
     /**
@@ -155,6 +178,18 @@ class Batiment implements JsonSerializable
         return $this->getNom();
     }
 
+    public function getNom(): ?string
+    {
+        return $this->Nom;
+    }
+
+    public function setNom(string $Nom): self
+    {
+        $this->Nom = $Nom;
+
+        return $this;
+    }
+
     /**
      * @inheritDoc
      */
@@ -182,6 +217,7 @@ class Batiment implements JsonSerializable
                 'formeParamétrique' => $this->getTypeBatiment()->getNom() == "Forme Paramétrique" ? $this->getFormeParametrique()->getNom() : null,
                 'adresse' => $this->getAdresse(),
                 'accessoire' => $this->getAccessoire(),
+                'isVisibleAR' => $this->getIsVisibleAR()
             ];
 
         } else {
@@ -204,18 +240,6 @@ class Batiment implements JsonSerializable
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getNom(): ?string
-    {
-        return $this->Nom;
-    }
-
-    public function setNom(string $Nom): self
-    {
-        $this->Nom = $Nom;
-
-        return $this;
     }
 
     public function getNbEtage(): ?int

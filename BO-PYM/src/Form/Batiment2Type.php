@@ -29,16 +29,18 @@ class Batiment2Type extends AbstractType
             ])
             ->add('Description', TextareaType::class, [
                 'attr' => ['class' => 'form-control reg rounded'],
-                'required' => false
+                'required' => false,
+                'empty_data' => ''
             ])
             ->add('Adresse', TextareaType::class, [
                 'attr' => ['class' => 'form-control reg rounded'],
-                'required' => false
+                'required' => false,
+                'empty_data' => ''
             ])
             ->add('Acces_handicape', CheckboxType::class, [
                 'required' => false,
                 'attr' => ['class' => 'form-check-input reg'],
-                'label' => 'Accés handicapé'
+                'label' => 'Accès handicapé',
             ])
             ->add('Etat', ChoiceType::class, [
                 'choices' => [
@@ -51,7 +53,6 @@ class Batiment2Type extends AbstractType
             ])
             ->add('IsVisibleAR', CheckboxType::class, [
                 'required' => false,
-                'data' => false,
                 'attr' => ['class' => 'form-check-input reg'],
                 'label' => 'Est visible en réalité augmentée'
             ])
@@ -68,11 +69,11 @@ class Batiment2Type extends AbstractType
             ])
             ->add('Longitude', RangeType::class, [
                 'attr' => ['min' => -250, 'max' => 250, 'step' => 1, 'class' => "reg form-control-range"],
-                'label' => 'Longitude',
+                'label' => 'X',
                 'empty_data' => '0'])
             ->add('Latitude', RangeType::class, [
                 'attr' => ['min' => -250, 'max' => 250, 'step' => 1, 'class' => "reg form-control-range"],
-                'label' => 'Latitude',
+                'label' => 'Y',
                 'empty_data' => '0'
             ])
             ->add('Angle', RangeType::class, [

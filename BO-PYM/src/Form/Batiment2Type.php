@@ -73,6 +73,16 @@ class Batiment2Type extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'custom-file-input']
             ])
+            ->add('LatitudeGPS', NumberType::class, [
+                'label' => 'Latitude GPS (en °)',
+                'required' => false,
+                'attr' => ['class' => 'form-control reg rounded']
+            ])
+            ->add('LongitudeGPS', NumberType::class, [
+                'label' => 'Longitude GPS (en °)',
+                'required' => false,
+                'attr' => ['class' => 'form-control reg rounded']
+            ])
             ->add('Representation3D', FileType::class, [
                 'required' => false,
                 'data_class' => null,

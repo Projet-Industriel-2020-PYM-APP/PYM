@@ -123,6 +123,16 @@ class Batiment implements JsonSerializable
      */
     private $imgUrl;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $LongitudeGPS;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $LatitudeGPS;
+
     public function __construct()
     {
         $this->Bureaux = new ArrayCollection();
@@ -196,8 +206,8 @@ class Batiment implements JsonSerializable
                 'url' => $this->getRepresentation3D(),
                 'x' => $this->getLongitude(),
                 'y' => $this->getLatitude(),
-                'latitude' => $this->getGPS()[0],
-                'longitude' => $this->getGPS()[1],
+                'latitude' => $this->getLatitudeGPS(),
+                'longitude' => $this->getLongitudeGPS(),
                 'largeur' => $this->getLargeur(),
                 'longueur' => $this->getLongueur(),
                 'rayon' => $this->getRayon(),
@@ -318,11 +328,28 @@ class Batiment implements JsonSerializable
         return $this;
     }
 
-    public function getGPS(): array
+    public function getLongitudeGPS(): ?float
     {
-        $newLatitude = $this->Latitude * 8.8414096916255E-06 + 43.4514367224670;
-        $newLongitude = $this->Longitude * 5.4333333333230E-05 + 5.44877766666667;
-        return [$newLatitude, $newLongitude];
+        return $this->LongitudeGPS;
+    }
+
+    public function setLongitudeGPS(?float $LongitudeGPS): self
+    {
+        $this->LongitudeGPS = $LongitudeGPS;
+
+        return $this;
+    }
+
+    public function getLatitudeGPS(): ?float
+    {
+        return $this->LatitudeGPS;
+    }
+
+    public function setLatitudeGPS(?float $LatitudeGPS): self
+    {
+        $this->LatitudeGPS = $LatitudeGPS;
+
+        return $this;
     }
 
     public function getLargeur(): ?float

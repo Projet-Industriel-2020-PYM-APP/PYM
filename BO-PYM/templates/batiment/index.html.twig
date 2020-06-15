@@ -111,6 +111,7 @@
                         <th scope="col">Image</th>
                         <th scope="col">Nom</th>
                         <th scope="col">Nbr d'étages</th>
+                        <th scope="col">GPS</th>
                         <th scope="col">Type</th>
                         <th scope="col">Etat</th>
                         <th scope="col">AR</th>
@@ -125,12 +126,11 @@
                                 {% if batiment.imgUrl is not null and batiment.imgUrl is defined %}
                                     <img class="img-fluid imgUrl" src="{{ asset('uploads/batiments/' ~ batiment.imgUrl) }}"
                                          alt="{{ asset('uploads/batiments/' ~ batiment.imgUrl) }}"/>
-                                {% else %}
-                                    Pas d'image.
                                 {% endif %}
                             </td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.Nom }}</td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.Nbetage }}</td>
+                            <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.LatitudeGPS and batiment.LongitudeGPS ? '{%lf, %lf}'|format(batiment.LatitudeGPS, batiment.LongitudeGPS) : ''}}</td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.TypeBatiment }}</td>
                             {% if batiment.etat %}
                                 <td class="clickabletd" onclick="toggleCollapse({{ key }})">Publié</td>

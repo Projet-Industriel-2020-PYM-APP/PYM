@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class Batiment2Type extends AbstractType
 {
@@ -60,6 +61,17 @@ class Batiment2Type extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'form-check-input reg'],
                 'label' => 'Accessoire'
+            ])
+            ->add('imgUrl', FileType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new Image([
+                        'mimeTypesMessage' => "Ce fichier n'est pas une image.",
+                    ])
+                ],
+                'label' => 'Arrière plan du service (JPEG ou PNG)',
+                'required' => false,
+                'attr' => ['class' => 'custom-file-input']
             ])
             ->add('Representation3D', FileType::class, [
                 'required' => false,

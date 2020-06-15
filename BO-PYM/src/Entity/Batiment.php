@@ -118,28 +118,14 @@ class Batiment implements JsonSerializable
      * @ORM\Column(type="boolean", options={"default" : false})
      */
     private $IsVisibleAR;
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $imgUrl;
 
     public function __construct()
     {
         $this->Bureaux = new ArrayCollection();
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function getIsVisibleAR(): ?bool
-    {
-        return $this->IsVisibleAR;
-    }
-
-    /**
-     * @param bool $IsVisibleAR
-     * @return Batiment
-     */
-    public function setIsVisibleAR(bool $IsVisibleAR): self
-    {
-        $this->IsVisibleAR = $IsVisibleAR;
-        return $this;
     }
 
     /**
@@ -196,6 +182,11 @@ class Batiment implements JsonSerializable
     public function jsonSerialize()
     {
         if ($this->getEtat() === true) {
+            $imgUrl = null;
+            if ($this->getImgUrl()) {
+                $imgUrl = "https://map-pym.com/sharedfolder/batiments/" . $this->getImgUrl();
+            }
+
             return [
                 'id' => $this->getId(),
                 'nom' => $this->getNom(),
@@ -217,7 +208,8 @@ class Batiment implements JsonSerializable
                 'formeParamétrique' => $this->getTypeBatiment()->getNom() == "Forme Paramétrique" ? $this->getFormeParametrique()->getNom() : null,
                 'adresse' => $this->getAdresse(),
                 'accessoire' => $this->getAccessoire(),
-                'isVisibleAR' => $this->getIsVisibleAR()
+                'isVisibleAR' => $this->getIsVisibleAR(),
+                'img_url' => $imgUrl,
             ];
 
         } else {
@@ -233,6 +225,18 @@ class Batiment implements JsonSerializable
     public function setEtat(bool $Etat): self
     {
         $this->Etat = $Etat;
+
+        return $this;
+    }
+
+    public function getImgUrl()
+    {
+        return $this->imgUrl;
+    }
+
+    public function setImgUrl($imgUrl): self
+    {
+        $this->imgUrl = $imgUrl;
 
         return $this;
     }
@@ -438,6 +442,24 @@ class Batiment implements JsonSerializable
     {
         $this->Accessoire = $Accessoire;
 
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getIsVisibleAR(): ?bool
+    {
+        return $this->IsVisibleAR;
+    }
+
+    /**
+     * @param bool $IsVisibleAR
+     * @return Batiment
+     */
+    public function setIsVisibleAR(bool $IsVisibleAR): self
+    {
+        $this->IsVisibleAR = $IsVisibleAR;
         return $this;
     }
 }

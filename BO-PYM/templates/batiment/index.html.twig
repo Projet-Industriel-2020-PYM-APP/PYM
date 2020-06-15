@@ -108,6 +108,7 @@
                 <table class="table rounded" id="batimentsTable">
                     <thead class="thead-dark">
                     <tr class="searchHide">
+                        <th scope="col">Image</th>
                         <th scope="col">Nom</th>
                         <th scope="col">Nbr d'étages</th>
                         <th scope="col">Type</th>
@@ -120,6 +121,14 @@
                     <tbody id="batBody">
                     {% for key, batiment in batiments %}
                         <tr class="searchHide">
+                            <td>
+                                {% if batiment.imgUrl is not null and batiment.imgUrl is defined %}
+                                    <img class="img-fluid imgUrl" src="{{ asset('uploads/batiments/' ~ batiment.imgUrl) }}"
+                                         alt="{{ asset('uploads/batiments/' ~ batiment.imgUrl) }}"/>
+                                {% else %}
+                                    Pas d'image.
+                                {% endif %}
+                            </td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.Nom }}</td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.Nbetage }}</td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.TypeBatiment }}</td>

@@ -13,6 +13,7 @@ use App\Service\FileUploader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -68,6 +69,14 @@ class BatimentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imgFile */
+            $imgFile = $form->get('imgUrl')->getData();
+
+            if ($imgFile) {
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $newFilename = $this->fileUploader->upload($imgFile, $originalFilename, 'batiments');
+                $batiment->setImgUrl($newFilename);
+            }
 
             switch ($batiment->getTypeBatiment()) {
                 case "Arret de bus":
@@ -118,12 +127,26 @@ class BatimentController extends AbstractController
     public function edit(Batiment $batiment, Request $request)
     {
         $old_value = $batiment->getRepresentation3D();
+        $oldFile = $batiment->getImgUrl();
 
         $form = $this->createForm(Batiment2Type::class, $batiment);
         $form->handleRequest($request);
 
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imgFile */
+            $imgFile = $form->get('imgUrl')->getData();
+
+            if ($imgFile) {
+                $path = $this->getParameter('shared_directory') . 'service_categories/' . $oldFile;
+                if ($oldFile && file_exists($path)) {
+                    unlink($path);
+                }
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $newFilename = $this->fileUploader->upload($imgFile, $originalFilename, 'batiments');
+                $batiment->setImgUrl($newFilename);
+            }
+
             if ($batiment->getTypeBatiment() == "Arret de bus") {
                 $batiment->setRepresentation3D("ARRET.babylon");
             }

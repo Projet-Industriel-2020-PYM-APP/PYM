@@ -63,6 +63,11 @@
     background: rgba(0, 0, 0, 0);
 }
 
+.imgUrl {
+    max-height: 100px;
+    max-width: 500px;
+}
+
 /* #batimentsTable #batBody>tr:hover {
     background: rgba(0, 0, 0, 0.08);
 } */

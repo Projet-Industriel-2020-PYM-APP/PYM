@@ -122,7 +122,7 @@
                     <tbody id="batBody">
                     {% for key, batiment in batiments %}
                         <tr class="searchHide">
-                            <td>
+                            <td class="clickabletd" onclick="toggleCollapse({{ key }})">
                                 {% if batiment.imgUrl is not null and batiment.imgUrl is defined %}
                                     <img class="img-fluid imgUrl" src="{{ asset('uploads/batiments/' ~ batiment.imgUrl) }}"
                                          alt="{{ asset('uploads/batiments/' ~ batiment.imgUrl) }}"/>
@@ -130,19 +130,15 @@
                             </td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.Nom }}</td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.Nbetage }}</td>
-                            <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.LatitudeGPS and batiment.LongitudeGPS ? '{%lf, %lf}'|format(batiment.LatitudeGPS, batiment.LongitudeGPS) : ''}}</td>
+                            <td>
+                                {% if batiment.LatitudeGPS and batiment.LongitudeGPS %}
+                                    <a href={{ "http://maps.google.com/?q=%lf,%lf"|format(batiment.LatitudeGPS, batiment.LongitudeGPS)}}> {{ "{ %lf, %lf }"|format(batiment.LatitudeGPS, batiment.LongitudeGPS) }} </a>
+                                {% endif %}
+                            </td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.TypeBatiment }}</td>
-                            {% if batiment.etat %}
-                                <td class="clickabletd" onclick="toggleCollapse({{ key }})">Publié</td>
-                            {% else %}
-                                <td class="clickabletd" onclick="toggleCollapse({{ key }})">Non Publié</td>
-                            {% endif %}
+                            <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.etat ? "Publié" : "Non Publié" }}Publié</td>
                             <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.isVisibleAR ? "Oui" : "Non" }}</td>
-                            {% if batiment.acceshandicape %}
-                                <td class="clickabletd" onclick="toggleCollapse({{ key }})">Oui</td>
-                            {% else %}
-                                <td class="clickabletd" onclick="toggleCollapse({{ key }})">Non</td>
-                            {% endif %}
+                            <td class="clickabletd" onclick="toggleCollapse({{ key }})">{{ batiment.acceshandicape ? "Oui" : "Non Non" }}Publié</td>
                             <td>
                                 <div class="btn-group action">
                                     <button aria-expanded="false" aria-haspopup="true"

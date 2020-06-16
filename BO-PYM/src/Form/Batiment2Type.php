@@ -76,12 +76,14 @@ class Batiment2Type extends AbstractType
             ->add('LatitudeGPS', NumberType::class, [
                 'label' => 'Latitude GPS (en °)',
                 'required' => false,
-                'attr' => ['class' => 'form-control reg rounded']
+                'attr' => ['class' => 'form-control reg rounded'],
+                'scale' => 8
             ])
             ->add('LongitudeGPS', NumberType::class, [
                 'label' => 'Longitude GPS (en °)',
                 'required' => false,
-                'attr' => ['class' => 'form-control reg rounded']
+                'attr' => ['class' => 'form-control reg rounded'],
+                'scale' => 8
             ])
             ->add('Representation3D', FileType::class, [
                 'required' => false,

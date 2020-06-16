@@ -1,20 +1,20 @@
-@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
-@import './layout.css';
+@import "../../node_modules/bootstrap/dist/css/bootstrap.css";
+@import "./layout.css";
 
-.batiments .navbar{
+.batiments .navbar {
     width: 90%;
     position: relative;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.batiments input{
+.batiments input {
     color: white;
     background: transparent;
     padding: 6px 20px 6px 30px;
     border: 2px solid #ffffff;
 }
 
-.batiments table{
+.batiments table {
     margin-top: 30px;
     position: relative;
     height: auto;
@@ -22,27 +22,26 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.batiments th{
+.batiments th {
     text-align: center;
 }
 
-.batiments td{
+.batiments td {
     text-align: center;
 }
-.dropdown-menu a{
+.dropdown-menu a {
     text-align: center;
-    
 }
-.dropdown-menu a:hover{
+.dropdown-menu a:hover {
     background: #343a40;
     color: white;
 }
 
-.clickabletd{
+.clickabletd {
     cursor: pointer;
 }
 
-.batiments .Bureaux{
+.batiments .Bureaux {
     height: auto;
     width: max-content;
 }
@@ -51,27 +50,27 @@
     background: rgb(96, 96, 224);
 }
 
-.Bureaux table{
+.Bureaux table {
     width: 100%;
 }
 
-#batimentsTable #batBody>tr:nth-child(4n+1) {
+#batimentsTable #batBody > tr:nth-child(4n + 1) {
     background: rgba(0, 0, 0, 0.05);
 }
 
-#batimentsTable #batBody>tr:nth-child(4n+3) {
+#batimentsTable #batBody > tr:nth-child(4n + 3) {
     background: rgba(0, 0, 0, 0);
 }
 
 .imgUrl {
     max-height: 100px;
-    max-width: 500px;
+    max-width: 100px;
 }
 
 /* #batimentsTable #batBody>tr:hover {
     background: rgba(0, 0, 0, 0.08);
 } */
 
-#batimentsTable #batBody .searchHide:hover{
+#batimentsTable #batBody .searchHide:hover {
     background-color: rgba(0, 0, 250, 0.08);
 }

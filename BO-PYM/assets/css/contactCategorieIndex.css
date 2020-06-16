@@ -1,6 +1,5 @@
-@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
-@import './layout.css';
-
+@import "../../node_modules/bootstrap/dist/css/bootstrap.css";
+@import "./layout.css";
 
 .categories .navbar {
     width: 90%;
@@ -59,5 +58,5 @@
 
 .imgUrl {
     max-height: 100px;
-    max-width: 500px;
+    max-width: 100px;
 }
